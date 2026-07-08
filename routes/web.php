@@ -4,6 +4,9 @@ use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('/student-dashboard', 'pages.dashboards.student')->name('student.dashboard');
+Route::view('/lecturer-dashboard', 'pages.dashboards.lecturer')->name('lecturer.dashboard');
+Route::view('/admin-dashboard', 'pages.dashboards.admin')->name('admin.dashboard');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
