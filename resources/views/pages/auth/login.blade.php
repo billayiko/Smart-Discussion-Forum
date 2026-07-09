@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <x-layouts::auth :title="__('Log in')">
     <div class="flex flex-col gap-6">
         <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
@@ -44,15 +43,6 @@
                         {{ __('Forgot your password?') }}
                     </flux:link>
                 @endif
-=======
-<x-layouts.academic-pulse title="Login">
-    <main class="form-shell">
-        <section class="ap-card form-card">
-            <div class="form-logo">
-                <span class="ap-logo"><i class="fas fa-graduation-cap"></i></span>
-                <h1>Academic<span>Pulse</span></h1>
-                <p style="color:var(--muted);font-weight:650;margin-top:4px;"><i class="fas fa-comments" style="color:var(--gold);"></i> Smart Discussion Forum</p>
->>>>>>> b198b3de1229c4eca8e9ade11f3a2b6efadc396a
             </div>
 
             <x-auth-session-status class="notice" :status="session('status')" />
