@@ -659,6 +659,347 @@
             background: rgba(255, 255, 255, .76);
         }
 
+        .pulse-landing {
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            padding: 26px;
+            color: var(--pulse-ink);
+            background:
+                radial-gradient(circle at 12% 22%, rgba(139, 92, 246, .16), transparent 16%),
+                radial-gradient(circle at 88% 18%, rgba(49, 92, 255, .14), transparent 18%),
+                radial-gradient(circle at 84% 46%, rgba(22, 199, 132, .13), transparent 15%),
+                linear-gradient(135deg, #f8fbff 0%, #ffffff 46%, #f5f8ff 100%);
+            font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+
+        .pulse-landing-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 16px 18px;
+            border: 1px solid var(--pulse-line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .72);
+            box-shadow: var(--pulse-shadow);
+            backdrop-filter: blur(20px);
+        }
+
+        .pulse-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            color: #405175;
+            font-size: .82rem;
+            font-weight: 800;
+        }
+
+        .pulse-hero {
+            position: relative;
+            max-width: 1320px;
+            min-height: 590px;
+            margin: 26px auto 0;
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+
+        .pulse-hero h1 {
+            margin: 0;
+            color: var(--pulse-ink);
+            font-size: clamp(2.1rem, 5.2vw, 4.9rem);
+            line-height: 1.05;
+            font-weight: 950;
+        }
+
+        .pulse-hero h1 span {
+            display: block;
+            margin-top: 10px;
+            color: var(--pulse-blue);
+        }
+
+        .pulse-hero p {
+            max-width: 560px;
+            margin: 22px auto 28px;
+            color: #405175;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            font-weight: 650;
+        }
+
+        .pulse-hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .pulse-float {
+            position: absolute;
+            width: 78px;
+            height: 78px;
+            display: grid;
+            place-items: center;
+            border-radius: 26px;
+            color: var(--pulse-blue);
+            background: rgba(255, 255, 255, .72);
+            border: 1px solid var(--pulse-line);
+            box-shadow: 0 18px 54px rgba(49, 92, 255, .16);
+            backdrop-filter: blur(18px);
+            font-size: 1.6rem;
+        }
+
+        .pulse-float.one { left: 7%; top: 18%; color: var(--pulse-purple); }
+        .pulse-float.two { right: 6%; top: 15%; }
+        .pulse-float.three { left: 13%; bottom: 24%; color: var(--pulse-purple); }
+        .pulse-float.four { right: 12%; bottom: 28%; color: var(--pulse-green); }
+
+        .pulse-feature-grid {
+            max-width: 1320px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .pulse-feature {
+            min-height: 178px;
+            display: grid;
+            justify-items: center;
+            align-content: center;
+            gap: 14px;
+            padding: 22px;
+            text-align: center;
+        }
+
+        .pulse-feature h2 {
+            margin: 0;
+            color: var(--pulse-ink);
+            font-size: 1rem;
+        }
+
+        .pulse-feature p {
+            margin: 0;
+            color: var(--pulse-muted);
+            font-size: .82rem;
+            line-height: 1.6;
+            font-weight: 650;
+        }
+
+        .pulse-proof {
+            max-width: 1320px;
+            margin: 48px auto 0;
+            text-align: center;
+        }
+
+        .pulse-proof > p {
+            margin: 0 0 18px;
+            color: var(--pulse-ink);
+            font-weight: 850;
+        }
+
+        .pulse-proof-card {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            padding: 28px;
+        }
+
+        .pulse-proof-card strong {
+            display: block;
+            margin-top: 8px;
+            color: var(--pulse-ink);
+            font-size: 1.45rem;
+        }
+
+        .pulse-proof-card span {
+            color: var(--pulse-muted);
+            font-size: .78rem;
+            font-weight: 750;
+        }
+
+        .pulse-auth {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(320px, .85fr) minmax(360px, 1.15fr);
+            gap: 30px;
+            align-items: center;
+            padding: clamp(22px, 4vw, 48px);
+            color: var(--pulse-ink);
+            background:
+                radial-gradient(circle at 11% 70%, rgba(22, 199, 132, .14), transparent 17%),
+                radial-gradient(circle at 32% 58%, rgba(139, 92, 246, .13), transparent 13%),
+                linear-gradient(135deg, #f8fbff 0%, #ffffff 50%, #f5f8ff 100%);
+            font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+
+        .pulse-auth-side {
+            position: relative;
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pulse-auth-copy {
+            max-width: 360px;
+            margin-top: 58px;
+        }
+
+        .pulse-auth-copy h1 {
+            margin: 0;
+            color: var(--pulse-ink);
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.08;
+            font-weight: 950;
+        }
+
+        .pulse-auth-copy p {
+            margin: 14px 0 0;
+            color: #405175;
+            line-height: 1.65;
+            font-weight: 650;
+        }
+
+        .pulse-illustration {
+            position: relative;
+            width: min(360px, 92%);
+            aspect-ratio: 1 / 1;
+            align-self: center;
+            border-radius: 36px;
+            background:
+                radial-gradient(circle at 50% 18%, #ffd6a5 0 11%, transparent 12%),
+                radial-gradient(circle at 50% 28%, #0f1f3d 0 18%, transparent 19%),
+                linear-gradient(180deg, transparent 0 40%, #4f8cff 41% 68%, transparent 69%),
+                linear-gradient(160deg, transparent 0 58%, #f2a65a 59% 68%, transparent 69%),
+                linear-gradient(20deg, transparent 0 58%, #f2a65a 59% 68%, transparent 69%),
+                linear-gradient(0deg, transparent 0 71%, #dfe8ff 72% 78%, transparent 79%);
+        }
+
+        .pulse-illustration::before,
+        .pulse-illustration::after {
+            content: "";
+            position: absolute;
+            border-radius: 14px;
+            background: #fff;
+            border: 1px solid var(--pulse-line);
+            box-shadow: var(--pulse-shadow);
+        }
+
+        .pulse-illustration::before {
+            width: 220px;
+            height: 112px;
+            left: 50%;
+            bottom: 44px;
+            transform: translateX(-50%);
+        }
+
+        .pulse-illustration::after {
+            width: 92px;
+            height: 18px;
+            left: 44px;
+            bottom: 22px;
+            background: #ffb86b;
+        }
+
+        .pulse-auth-card {
+            width: min(640px, 100%);
+            justify-self: center;
+            padding: clamp(26px, 5vw, 48px);
+        }
+
+        .pulse-auth-card h2 {
+            margin: 0 0 28px;
+            text-align: center;
+            color: var(--pulse-ink);
+            font-size: 1.35rem;
+            font-weight: 950;
+        }
+
+        .pulse-form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .pulse-field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .pulse-field label {
+            color: var(--pulse-ink);
+            font-size: .78rem;
+            font-weight: 850;
+        }
+
+        .pulse-input {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 15px;
+            border: 1px solid #dce5f5;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .82);
+        }
+
+        .pulse-input input,
+        .pulse-input select {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--pulse-ink);
+            font-weight: 700;
+        }
+
+        .pulse-form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: var(--pulse-muted);
+            font-size: .78rem;
+            font-weight: 750;
+        }
+
+        .pulse-auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: var(--pulse-muted);
+            font-size: .8rem;
+            font-weight: 750;
+            margin: 8px 0;
+        }
+
+        .pulse-auth-divider::before,
+        .pulse-auth-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--pulse-line);
+        }
+
+        .pulse-provider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .pulse-alert {
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #b91c1c;
+            background: #fff1f2;
+            font-size: .82rem;
+            font-weight: 800;
+        }
+
         @media (max-width: 1180px) {
             .pulse-stats,
             .pulse-three {
@@ -673,6 +1014,22 @@
         @media (max-width: 840px) {
             .pulse-app {
                 grid-template-columns: 1fr;
+            }
+
+            .pulse-landing-nav,
+            .pulse-nav-links {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .pulse-feature-grid,
+            .pulse-proof-card,
+            .pulse-auth {
+                grid-template-columns: 1fr;
+            }
+
+            .pulse-auth-side {
+                min-height: 460px;
             }
 
             .pulse-sidebar {
@@ -699,6 +1056,20 @@
         @media (max-width: 560px) {
             .pulse-main {
                 padding: 18px;
+            }
+
+            .pulse-landing {
+                padding: 14px;
+            }
+
+            .pulse-float {
+                display: none;
+            }
+
+            .pulse-provider-grid,
+            .pulse-hero-actions {
+                grid-template-columns: 1fr;
+                flex-direction: column;
             }
 
             .pulse-stats,
