@@ -1,82 +1,89 @@
 <x-layouts.academic-pulse title="Register">
-    <main class="form-shell">
-        <section class="ap-card form-card">
-            <div class="form-logo">
-                <span class="ap-logo"><i class="fas fa-user-plus"></i></span>
-                <h1>Academic<span>Pulse</span></h1>
-                <p style="color:var(--muted);font-weight:650;margin-top:4px;"><i class="fas fa-user-edit" style="color:var(--gold);"></i> Create account</p>
+    <main class="pulse-page pulse-auth">
+        <section class="pulse-auth-side">
+            <a class="pulse-logo" href="{{ route('home') }}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Academic<span>Pulse Forum</span></span>
+            </a>
+
+            <div class="pulse-auth-copy">
+                <h1>Create your account</h1>
+                <p>Join Academic Pulse Forum and start your learning journey.</p>
             </div>
 
-            <x-auth-session-status class="notice" :status="session('status')" />
+            <div class="pulse-illustration" aria-hidden="true"></div>
+        </section>
 
-            @if ($errors->any())
-                <div class="error-list">
-                    <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
-                </div>
-            @endif
+        <section class="pulse-card pulse-auth-card">
+            <h2>Create your account</h2>
+
+            <x-auth-session-status class="notice" :status="session('status')" />
 
             @if ($teamInvitation)
                 <x-team-invitation-alert :invitation="$teamInvitation" :action="__('Register')" />
             @endif
 
-            <form method="POST" action="{{ route('register.store') }}">
+            @if ($errors->any())
+                <div class="pulse-alert"><i class="fas fa-circle-exclamation"></i> {{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('register.store') }}" class="pulse-form">
                 @csrf
-                <div class="field">
-                    <label for="name"><i class="fas fa-user" style="color:var(--gold);"></i> Full Name</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-user"></i>
-                        <input id="name" name="name" type="text" value="{{ old('name') }}" placeholder="John Doe" required autofocus autocomplete="name">
-                    </div>
-                </div>
 
-                <div class="field">
-                    <label for="email"><i class="fas fa-envelope" style="color:var(--gold);"></i> Email</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-envelope"></i>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="university@example.com" required autocomplete="email">
-                    </div>
-                </div>
+                <label class="pulse-field" for="name">
+                    <span>Full name</span>
+                    <span class="pulse-input">
+                        <input id="name" name="name" type="text" value="{{ old('name') }}" placeholder="Enter your full name" required autofocus autocomplete="name">
+                    </span>
+                </label>
 
-                <div class="field">
-                    <label for="password"><i class="fas fa-lock" style="color:var(--gold);"></i> Password</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-lock"></i>
-                        <input id="password" name="password" type="password" placeholder="Minimum 8 characters" required autocomplete="new-password">
-                    </div>
-                </div>
+                <label class="pulse-field" for="email">
+                    <span>Email address</span>
+                    <span class="pulse-input">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="Enter your email" required autocomplete="email">
+                    </span>
+                </label>
 
-                <div class="field">
-                    <label for="password_confirmation"><i class="fas fa-check-circle" style="color:var(--gold);"></i> Confirm Password</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-check-circle"></i>
-                        <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Re-enter password" required autocomplete="new-password">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="role"><i class="fas fa-user-tag" style="color:var(--gold);"></i> Role</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-user-tag"></i>
-                        <select id="role" name="role">
+                <label class="pulse-field" for="role">
+                    <span>Role</span>
+                    <span class="pulse-input">
+                        <select id="role" name="role" required>
+                            <option value="">Select your role</option>
                             <option value="student" @selected(old('role') === 'student')>Student</option>
                             <option value="lecturer" @selected(old('role') === 'lecturer')>Lecturer</option>
                             <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                         </select>
-                    </div>
-                </div>
-
-                <label class="form-row" style="justify-content:flex-start;">
-                    <input type="checkbox" required>
-                    <span>I agree to the platform guidelines</span>
+                    </span>
                 </label>
 
-                <button type="submit" class="ap-btn primary" style="width:100%;"><i class="fas fa-user-check"></i> Register</button>
+                <label class="pulse-field" for="password">
+                    <span>Password</span>
+                    <span class="pulse-input">
+                        <input id="password" name="password" type="password" placeholder="Create a password" required autocomplete="new-password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </label>
+
+                <label class="pulse-field" for="password_confirmation">
+                    <span>Confirm password</span>
+                    <span class="pulse-input">
+                        <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Confirm your password" required autocomplete="new-password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </label>
+
+                <label class="pulse-form-row" style="justify-content:flex-start;">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a style="color:var(--pulse-blue);" href="#">Terms of Service</a> and <a style="color:var(--pulse-blue);" href="#">Privacy Policy</a></span>
+                </label>
+
+                <button type="submit" class="pulse-btn" style="width:100%;">Create Account</button>
             </form>
 
-            <div style="text-align:center;margin-top:14px;color:var(--muted);font-size:.86rem;font-weight:650;">
-                Have an account?
-                <a style="color:var(--gold);font-weight:800;" href="{{ $teamInvitation ? route('login', ['invitation' => $teamInvitation['code']]) : route('login') }}">Sign In</a>
-            </div>
+            <p style="margin:28px 0 0;text-align:center;color:var(--pulse-muted);font-weight:750;">
+                Already have an account?
+                <a style="color:var(--pulse-blue);" href="{{ $teamInvitation ? route('login', ['invitation' => $teamInvitation['code']]) : route('login') }}">Log in</a>
+            </p>
         </section>
     </main>
 </x-layouts.academic-pulse>
