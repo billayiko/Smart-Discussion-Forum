@@ -69,7 +69,15 @@
                 if (response.ok) {
                     sessionStorage.setItem('academic_pulse_token', data.access_token);
                     sessionStorage.setItem('user_profile', JSON.stringify(data.user));
-                    window.location.href = "{{ url('/dashboard') }}";
+                    const role = data.user?.role;
+                    const target = role === 'student'
+                        ? "{{ url('/student-dashboard') }}"
+                        : role === 'lecturer'
+                            ? "{{ url('/lecturer-dashboard') }}"
+                            : role === 'admin'
+                                ? "{{ url('/admin-dashboard') }}"
+                                : "{{ url('/dashboard') }}";
+                    window.location.href = target;
                 } else {
                     throw new Error(data.message || 'Invalid credentials.');
                 }

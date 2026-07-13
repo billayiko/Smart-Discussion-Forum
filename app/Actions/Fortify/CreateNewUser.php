@@ -28,6 +28,7 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
+            'role' => ['required', 'string', 'in:student,lecturer,admin'],
             'password' => $this->passwordRules(),
         ])->validate();
 
@@ -36,6 +37,7 @@ class CreateNewUser implements CreatesNewUsers
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => $input['password'],
+                'role' => $input['role'],
             ]);
 
             $this->createTeam->handle($user, $user->name."'s Team", isPersonal: true);

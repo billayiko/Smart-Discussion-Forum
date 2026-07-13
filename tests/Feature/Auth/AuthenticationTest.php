@@ -36,6 +36,19 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    public function test_students_are_redirected_to_the_student_dashboard_after_login(): void
+    {
+        $user = User::factory()->create(['role' => 'student']);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertSessionHasNoErrors()
+            ->assertRedirect(route('student.dashboard', absolute: false));
+    }
+
     public function test_passkey_login_response_redirects_to_the_current_team_dashboard(): void
     {
         $user = User::factory()->create();

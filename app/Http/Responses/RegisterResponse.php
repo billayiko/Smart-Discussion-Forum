@@ -14,8 +14,10 @@ class RegisterResponse implements RegisterResponseContract
 
     public function toResponse($request): Response
     {
+        $redirect = $this->redirectPathForAuthenticatedUser($request, Fortify::redirects('register'));
+
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 201)
-            : redirect()->intended($this->redirectPathForCurrentTeam($request, Fortify::redirects('register')));
+            : redirect()->intended($redirect);
     }
 }

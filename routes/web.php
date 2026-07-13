@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QuizController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +16,13 @@ Route::prefix('{current_team}')
     });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/quizzes', [QuizController::class, 'index'])->name('quizzes.index');
+    Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
+    Route::post('/quizzes', [QuizController::class, 'store'])->name('quizzes.store');
+    Route::post('/quizzes/import', [QuizController::class, 'import'])->name('quizzes.import');
+
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
 });
+
 
 require __DIR__.'/settings.php';

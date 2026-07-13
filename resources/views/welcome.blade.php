@@ -16,10 +16,10 @@
 
             <div class="pulse-tools">
                 @if (Route::has('login'))
-                    <a class="pulse-btn light" href="{{ route('login') }}">Log in</a>
+                    <a class="pulse-btn light" href="{{ url('/login') }}">Log in</a>
                 @endif
                 @if (Route::has('register'))
-                    <a class="pulse-btn" href="{{ route('register') }}">Get Started</a>
+                    <a class="pulse-btn" href="{{ url('/register') }}">Get Started</a>
                 @endif
             </div>
         </header>
@@ -35,10 +35,10 @@
                 <p>Your central hub for lectures, discussions, quizzes, and academic collaboration.</p>
                 <div class="pulse-hero-actions">
                     @if (Route::has('register'))
-                        <a class="pulse-btn" href="{{ route('register') }}">Get Started</a>
+                        <a class="pulse-btn" href="{{ url('/register') }}">Get Started</a>
                     @endif
                     @if (Route::has('login'))
-                        <a class="pulse-btn light" href="{{ route('login') }}">Learn More</a>
+                        <a class="pulse-btn light" href="{{ url('/login') }}">Learn More</a>
                     @endif
                 </div>
             </div>
