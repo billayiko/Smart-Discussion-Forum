@@ -9,19 +9,23 @@
 
                 <nav class="pulse-menu" aria-label="Student navigation">
                     <a class="active" href="#"><i class="fas fa-house"></i> Dashboard</a>
-                    <a href="#"><i class="fas fa-book-open"></i> My Lectures</a>
-                    <a href="#"><i class="fas fa-square-check"></i> Quizzes</a>
+                    <a href="#"><i class="fas fa-book-open"></i> Lectures</a>
                     <a href="#"><i class="fas fa-calendar"></i> Schedule</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
-                    <a href="#"><i class="fas fa-chart-simple"></i> Grades</a>
-                    <a href="#"><i class="fas fa-folder-open"></i> Resources</a>
-                    <a href="#"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#"><i class="fas fa-users"></i> Students</a>
+                    <a href="#"><i class="fas fa-chart-simple"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
-                <div class="pulse-user">
-                    <span class="pulse-avatar">AJ</span>
-                    <span><strong>Alex Johnson</strong><span>Computer Science</span></span>
+                <div class="pulse-sidebar-footer">
+                    <div class="pulse-user">
+                        <span class="pulse-avatar">AJ</span>
+                        <span><strong>Alex Johnson</strong><span>Computer Science</span></span>
+                    </div>
+                    <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
+                        <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
+                        <button type="button" class="pulse-theme-btn" data-theme="dark"><i class="fas fa-moon"></i> Dark</button>
+                    </div>
                 </div>
             </aside>
 

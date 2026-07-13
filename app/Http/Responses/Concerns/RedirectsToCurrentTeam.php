@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\URL;
 
 trait RedirectsToCurrentTeam
 {
+    protected function redirectPathForAuthenticatedUser(Request $request, string $redirect): string
+    {
+        return match ($request->user()?->role) {
+            'student' => route('student.dashboard', absolute: false),
+            'lecturer' => route('lecturer.dashboard', absolute: false),
+            'admin' => route('admin.dashboard', absolute: false),
+            default => $this->redirectPathForCurrentTeam($request, $redirect),
+        };
+    }
+
     protected function redirectPathForCurrentTeam(Request $request, string $redirect): string
     {
         $team = $this->currentTeam($request);

@@ -154,14 +154,40 @@
         .notice { margin-bottom: 14px; padding: 10px 12px; border-radius: 12px; background: rgba(34,197,94,.08); color: #166534; font-weight: 700; font-size: .82rem; }
         .error-list { margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: rgba(239,68,68,.08); color: #b91c1c; font-weight: 700; font-size: .82rem; }
         .dashboard { display: flex; min-height: calc(100vh - 74px); }
-        .sidebar {
-            width: 292px;
-            flex: 0 0 auto;
-            padding: 18px 16px;
-            background: var(--blue-dark);
-            color: #8ea5c1;
-            border-right: 2px solid var(--line);
-        }
+
+.sidebar {
+    width: 292px;
+    position: fixed; /* Fixes it to the screen */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh; /* Forces it to fill the exact viewport height */
+    z-index: 100; /* Keeps it on top of background elements */
+    
+    /* Remove padding so the white container fills the edges completely */
+    padding: 0; 
+    
+    /* Keep your existing styles */
+    background: var(--blue-dark);
+    color: #8ea5c1;
+    border-right: 2px solid var(--line);
+}
+
+.pulse-sidebar {
+    height: 100%; /* Spans the full height of the newly fixed wrapper */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Keeps the profile at the very bottom */
+    gap: 22px;
+    
+    /* Shift your inner padding here to keep items neat inside the white block */
+    padding: 26px 18px 20px; 
+    
+    background: rgba(255, 255, 255, .78);
+    border-right: 1px solid rgba(255, 255, 255, .88);
+    box-shadow: 12px 0 40px rgba(15, 31, 61, .04);
+}
+
         .side-block { padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid rgba(201,168,76,.12); }
         .side-title { margin-bottom: 10px; color: #8ea5c1; font-size: .67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
         .side-title i { color: var(--gold); margin-right: 6px; }
@@ -194,25 +220,54 @@
         }
 
         .pulse-page {
-            --pulse-blue: #315cff;
-            --pulse-blue-soft: #eef3ff;
-            --pulse-purple: #8b5cf6;
+            --pulse-blue: #2563eb;
+            --pulse-blue-soft: #eef6ff;
+            --pulse-purple: #4f46e5;
             --pulse-green: #16c784;
             --pulse-orange: #ff9f1c;
             --pulse-cyan: #06b6d4;
             --pulse-ink: #0f1f3d;
             --pulse-muted: #7182a8;
-            --pulse-line: #e8edf8;
-            --pulse-card: rgba(255, 255, 255, .86);
-            --pulse-shadow: 0 18px 55px rgba(49, 92, 255, .08);
+            --pulse-line: rgba(255, 255, 255, .7);
+            --pulse-card: rgba(255, 255, 255, .72);
+            --pulse-shadow: 0 24px 70px rgba(37, 99, 235, .12);
+            position: relative;
+            isolation: isolate;
             min-height: 100vh;
             color: var(--pulse-ink);
             background:
-                radial-gradient(circle at 8% 20%, rgba(49, 92, 255, .12), transparent 20%),
-                radial-gradient(circle at 86% 8%, rgba(49, 92, 255, .10), transparent 18%),
-                radial-gradient(circle at 34% 90%, rgba(139, 92, 246, .12), transparent 20%),
-                linear-gradient(135deg, #f8fbff 0%, #ffffff 45%, #f6f9ff 100%);
+                radial-gradient(circle at 12% 18%, rgba(37,99,235,.18) 0%, transparent 26%),
+                radial-gradient(circle at 88% 12%, rgba(6,182,212,.14) 0%, transparent 28%),
+                radial-gradient(circle at 28% 82%, rgba(79,70,229,.12) 0%, transparent 30%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cdefs%3E%3CradialGradient id='g1' cx='30%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.9'/%3E%3Cstop offset='100%25' stop-color='%232563eb' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g2' cx='65%25' cy='20%25'%3E%3Cstop offset='0%25' stop-color='%234F46E5' stop-opacity='0.85'/%3E%3Cstop offset='100%25' stop-color='%234F46E5' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g3' cx='20%25' cy='80%25'%3E%3Cstop offset='0%25' stop-color='%232563eb' stop-opacity='0.85'/%3E%3Cstop offset='100%25' stop-color='%232563eb' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g4' cx='80%25' cy='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='0.85'/%3E%3Cstop offset='100%25' stop-color='%23ffffff' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g5' cx='50%25' cy='50%25'%3E%3Cstop offset='0%25' stop-color='%231e40af' stop-opacity='0.9'/%3E%3Cstop offset='100%25' stop-color='%231e40af' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse cx='140' cy='120' rx='220' ry='160' fill='url(%23g1)'/%3E%3Cellipse cx='620' cy='80' rx='220' ry='160' fill='url(%23g2)'/%3E%3Cellipse cx='180' cy='460' rx='220' ry='160' fill='url(%23g3)'/%3E%3Cellipse cx='640' cy='480' rx='200' ry='140' fill='url(%23g4)'/%3E%3Cellipse cx='400' cy='300' rx='260' ry='200' fill='url(%23g5)'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E" );
+            background-size: auto, auto, auto, cover, 180px 180px;
             font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        .pulse-page[data-theme="dark"] {
+            --pulse-blue: #7aa2ff;
+            --pulse-blue-soft: #17253f;
+            --pulse-purple: #9b8cff;
+            --pulse-green: #34d399;
+            --pulse-orange: #ffb455;
+            --pulse-cyan: #22d3ee;
+            --pulse-ink: #f7f9ff;
+            --pulse-muted: #8ea0bf;
+            --pulse-line: rgba(255, 255, 255, .12);
+            --pulse-card: rgba(10, 18, 34, .82);
+            --pulse-shadow: 0 24px 70px rgba(2, 8, 23, .38);
+            background:
+                radial-gradient(circle at 12% 18%, rgba(122,162,255,.16) 0%, transparent 26%),
+                radial-gradient(circle at 88% 12%, rgba(34,211,238,.14) 0%, transparent 28%),
+                radial-gradient(circle at 28% 82%, rgba(155,140,255,.14) 0%, transparent 30%),
+                #07111f;
+        }
+
+        .pulse-page > * {
+            position: relative;
+            z-index: 1;
         }
 
         .pulse-app {
@@ -221,20 +276,7 @@
             min-height: 100vh;
         }
 
-        .pulse-sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-            padding: 26px 18px 20px;
-            background: rgba(255, 255, 255, .72);
-            border-right: 1px solid var(--pulse-line);
-            backdrop-filter: blur(22px);
-        }
-
-        .pulse-logo {
+                .pulse-logo {
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -263,6 +305,12 @@
         .pulse-menu {
             display: grid;
             gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.88);
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(31,38,135,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
+            padding: 20px;
+            overflow: hidden;
         }
 
         .pulse-menu a {
@@ -291,8 +339,13 @@
             text-align: center;
         }
 
-        .pulse-user {
+        .pulse-sidebar-footer {
             margin-top: auto;
+            display: grid;
+            gap: 12px;
+        }
+
+        .pulse-user {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -300,6 +353,36 @@
             border: 1px solid var(--pulse-line);
             border-radius: 18px;
             background: rgba(255, 255, 255, .76);
+        }
+
+        .pulse-theme-panel {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid var(--pulse-line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .72);
+        }
+
+        .pulse-theme-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 36px;
+            border: 0;
+            border-radius: 10px;
+            color: var(--pulse-muted);
+            background: transparent;
+            font-size: .75rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .pulse-theme-btn.active {
+            color: var(--pulse-blue);
+            background: var(--pulse-blue-soft);
         }
 
         .pulse-avatar {
@@ -369,11 +452,11 @@
             align-items: center;
             gap: 10px;
             padding: 0 14px;
-            border: 1px solid var(--pulse-line);
+            border: 1px solid rgba(255, 255, 255, .8);
             border-radius: 14px;
-            background: rgba(255, 255, 255, .84);
+            background: rgba(255, 255, 255, .96);
             color: var(--pulse-muted);
-            box-shadow: 0 10px 32px rgba(15, 31, 61, .04);
+            box-shadow: 0 8px 20px rgba(15, 31, 61, .03);
         }
 
         .pulse-search input,
@@ -391,11 +474,11 @@
             height: 42px;
             display: grid;
             place-items: center;
-            border: 1px solid var(--pulse-line);
+            border: 1px solid rgba(255, 255, 255, .8);
             border-radius: 14px;
             color: var(--pulse-blue);
-            background: rgba(255, 255, 255, .84);
-            box-shadow: 0 10px 32px rgba(15, 31, 61, .04);
+            background: rgba(255, 255, 255, .96);
+            box-shadow: 0 8px 20px rgba(15, 31, 61, .03);
         }
 
         .pulse-btn {
@@ -438,10 +521,23 @@
         }
 
         .pulse-card {
-            border: 1px solid var(--pulse-line);
-            border-radius: 18px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, .72);
+            border-radius: 22px;
             background: var(--pulse-card);
             box-shadow: var(--pulse-shadow);
+            overflow: hidden;
+        }
+
+        .pulse-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: radial-gradient(circle at 20% 18%, rgba(79,70,229,.06) 0%, transparent 18%), radial-gradient(circle at 78% 78%, rgba(37,99,235,.04) 0%, transparent 28%);
+            mix-blend-mode: overlay;
+            z-index: 0;
         }
 
         .pulse-pad {
@@ -530,9 +626,10 @@
             align-items: center;
             min-height: 62px;
             padding: 12px;
-            border: 1px solid var(--pulse-line);
+            border: 1px solid rgba(255, 255, 255, .66);
             border-radius: 14px;
-            background: rgba(255, 255, 255, .74);
+            background: rgba(255, 255, 255, .7);
+            
         }
 
         .pulse-time {
@@ -654,9 +751,10 @@
             align-items: center;
             gap: 12px;
             padding: 14px;
-            border: 1px solid var(--pulse-line);
+            border: 1px solid rgba(255, 255, 255, .66);
             border-radius: 14px;
-            background: rgba(255, 255, 255, .76);
+            background: rgba(255, 255, 255, .72);
+            
         }
 
         .pulse-landing {
@@ -685,7 +783,6 @@
             border-radius: 18px;
             background: rgba(255, 255, 255, .72);
             box-shadow: var(--pulse-shadow);
-            backdrop-filter: blur(20px);
         }
 
         .pulse-nav-links {
@@ -1087,5 +1184,32 @@
 </head>
 <body>
     {{ $slot }}
+    <script>
+        (function () {
+            const pages = document.querySelectorAll('.pulse-page');
+            const buttons = document.querySelectorAll('.pulse-theme-btn');
+            const storageKey = 'pulse-theme';
+
+            const applyTheme = (theme) => {
+                pages.forEach((page) => {
+                    page.setAttribute('data-theme', theme);
+                });
+                buttons.forEach((button) => {
+                    button.classList.toggle('active', button.dataset.theme === theme);
+                });
+                localStorage.setItem(storageKey, theme);
+            };
+
+            const savedTheme = localStorage.getItem(storageKey);
+            const initialTheme = savedTheme === 'dark' ? 'dark' : 'light';
+            applyTheme(initialTheme);
+
+            buttons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    applyTheme(button.dataset.theme);
+                });
+            });
+        })();
+    </script>
 </body>
 </html>
