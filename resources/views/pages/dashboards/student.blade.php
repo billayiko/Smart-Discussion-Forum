@@ -9,11 +9,11 @@
 
                 <nav class="pulse-menu" aria-label="Student navigation">
                     <a class="active" href="#"><i class="fas fa-house"></i> Dashboard</a>
-                    <a href="#"><i class="fas fa-book-open"></i> Lectures</a>
-                    <a href="#"><i class="fas fa-calendar"></i> Schedule</a>
+                    {{-- <a href="#"><i class="fas fa-book-open"></i> Lectures</a>
+                    <a href="#"><i class="fas fa-calendar"></i> Schedule</a> --}}
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
-                    <a href="#"><i class="fas fa-users"></i> Students</a>
-                    <a href="#"><i class="fas fa-chart-simple"></i> Analytics</a>
+                    {{-- <a href="#"><i class="fas fa-users"></i> Students</a>
+                    <a href="#"><i class="fas fa-chart-simple"></i> Analytics</a> --}}
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
