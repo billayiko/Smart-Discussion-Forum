@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
 {
-
     public function index()
     {
+        $this->authorize('viewAny', Quiz::class);
+
         $stats = $this->lecturerCardStats();
         $quizzes = auth()->user()->quizzes()->latest()->paginate(10);
 
@@ -19,11 +20,15 @@ class QuizController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Quiz::class);
+
         return view('quizzes.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', Quiz::class);
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'subject' => ['required', 'string', 'max:255'],
@@ -40,13 +45,54 @@ class QuizController extends Controller
 
     public function import(Request $request)
     {
+        $this->authorize('create', Quiz::class);
+
         $request->validate([
             'file' => ['required', 'file', 'mimes:csv,xlsx,xls'],
         ]);
 
         $path = $request->file('file')->store('imports/quizzes', 'local');
+        $contents = Storage::disk('local')->get($path);
+        $rows = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $contents) ?: [])));
 
-        return back()->with('success', 'Quiz import file uploaded successfully.')->with('import_path', $path);
+        if (count($rows) < 2) {
+            return back()->withErrors(['file' => 'The uploaded file does not contain any quiz rows.']);
+        }
+
+        $header = str_getcsv($rows[0]);
+        $imported = 0;
+
+        foreach (array_slice($rows, 1) as $row) {
+            $values = str_getcsv($row);
+
+            if (count($values) !== count($header)) {
+                continue;
+            }
+
+            $data = array_combine($header, $values);
+
+            if (empty($data['title']) || empty($data['subject'])) {
+                continue;
+            }
+
+            $payload = [
+                'title' => trim((string) ($data['title'] ?? '')),
+                'subject' => trim((string) ($data['subject'] ?? '')),
+                'total_questions' => (int) ($data['total_questions'] ?? 0),
+                'duration_minutes' => (int) ($data['duration_minutes'] ?? 0),
+                'scheduled_at' => ! empty($data['scheduled_at']) ? now()->parse($data['scheduled_at']) : null,
+                'status' => ! empty($data['status']) ? $data['status'] : 'draft',
+            ];
+
+            if ($payload['total_questions'] < 1 || $payload['duration_minutes'] < 1) {
+                continue;
+            }
+
+            auth()->user()->quizzes()->create($payload);
+            $imported++;
+        }
+
+        return back()->with('success', "Imported {$imported} quiz(es) successfully.");
     }
 
     protected function lecturerCardStats(): array

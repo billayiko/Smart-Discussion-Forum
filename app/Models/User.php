@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 
 /**
  * Cleaned up SDD User Model
@@ -19,7 +21,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory */
-    use HasFactory, HasApiTokens, HasTeams, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasApiTokens, HasTeams, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -55,5 +57,12 @@ class User extends Authenticatable
     public function quizzes()
     {
         return $this->hasMany(Quiz::class);
+    }
+
+    public function roleLabel(): string
+    {
+        return $this->role
+            ? Str::of($this->role)->replace(['_', '-'], ' ')->ucfirst()->toString()
+            : __('User');
     }
 }

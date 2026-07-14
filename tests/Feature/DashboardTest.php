@@ -30,4 +30,20 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_dashboard_shows_the_authenticated_users_name_and_role_in_the_account_menu(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Ada Lovelace',
+            'role' => 'admin',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSeeText('Ada Lovelace');
+        $response->assertSeeText('Admin');
+    }
 }

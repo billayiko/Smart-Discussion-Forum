@@ -19,8 +19,8 @@
 
                 <div class="pulse-sidebar-footer">
                     <div class="pulse-user">
-                        <span class="pulse-avatar">AJ</span>
-                        <span><strong>Alex Johnson</strong><span>Computer Science</span></span>
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'U', 0, 2)) }}</span>
+                        <span><strong>{{ $user->name ?? 'Student' }}</strong><span>{{ $user->role_label ?? 'Student' }}</span></span>
                     </div>
                     <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
@@ -32,7 +32,7 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Good morning, Alex</h1>
+                        <h1>Good morning, {{ explode(' ', trim($user->name ?? 'Student'))[0] }}</h1>
                         <p>Here is what is happening with your learning today.</p>
                     </div>
                     <div class="pulse-tools">
@@ -48,19 +48,19 @@
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
-                        <span><small>Enrolled Lectures</small><b>6</b><span class="pulse-trend">2 new this week</span></span>
+                        <span><small>Enrolled Lectures</small><b>{{ $stats['enrolled_lectures'] }}</b><span class="pulse-trend">2 new this week</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon purple"><i class="fas fa-clipboard-question"></i></span>
-                        <span><small>Quizzes</small><b>8</b><span class="pulse-trend">3 upcoming</span></span>
+                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">3 upcoming</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-calendar-check"></i></span>
-                        <span><small>Upcoming Classes</small><b>4</b><span class="pulse-trend">Today</span></span>
+                        <span><small>Upcoming Classes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">Today</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-award"></i></span>
-                        <span><small>Average Grade</small><b>A-</b><span class="pulse-trend">88.5%</span></span>
+                        <span><small>Average Grade</small><b>{{ $stats['average_grade'] }}</b><span class="pulse-trend">88.5%</span></span>
                     </article>
                 </section>
 
@@ -84,10 +84,11 @@
                             <a href="#">View all</a>
                         </div>
                         <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>Data Structures Quiz 2</strong><p>May 20, 2024 - 60 mins</p></span><span class="pulse-tag">5 days left</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-code"></i></span><span><strong>Algorithms Quiz 2</strong><p>May 24, 2024 - 60 mins</p></span><span class="pulse-tag">9 days left</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-database"></i></span><span><strong>Database Systems Quiz 1</strong><p>May 27, 2024 - 45 mins</p></span><span class="pulse-tag">12 days left</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-network-wired"></i></span><span><strong>Computer Networks Quiz 1</strong><p>May 31, 2024 - 60 mins</p></span><span class="pulse-tag">16 days left</span></div>
+                            @forelse ($upcomingQuizzes as $quiz)
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $quiz->title }}</strong><p>{{ $quiz->subject }} · {{ $quiz->duration_minutes }} mins</p></span><span class="pulse-tag">{{ $quiz->scheduled_at?->diffForHumans() ?? 'Scheduled' }}</span></div>
+                            @empty
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>No upcoming quizzes</strong><p>New quiz activity will appear here.</p></span></div>
+                            @endforelse
                         </div>
                     </article>
                 </section>

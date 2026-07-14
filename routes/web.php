@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-Route::view('/student-dashboard', 'pages.dashboards.student')->name('student.dashboard');
-Route::view('/lecturer-dashboard', 'pages.dashboards.lecturer')->name('lecturer.dashboard');
-Route::view('/admin-dashboard', 'pages.dashboards.admin')->name('admin.dashboard');
+Route::get('/student-dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
+Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
+Route::get('/admin-dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
