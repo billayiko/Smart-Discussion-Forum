@@ -19,8 +19,8 @@
 
                 <div class="pulse-sidebar-footer">
                     <div class="pulse-user">
-                        <span class="pulse-avatar">AC</span>
-                        <span><strong>Dr. Alan Carter</strong><span>Computer Science</span></span>
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'LC', 0, 2)) }}</span>
+                        <span><strong>{{ $user->name ?? 'Lecturer' }}</strong><span>{{ $user->role_label ?? 'Lecturer' }}</span></span>
                     </div>
                     <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
@@ -32,7 +32,7 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Good morning, Dr. Carter</h1>
+                        <h1>Good morning, {{ explode(' ', trim($user->name ?? 'Lecturer'))[0] }}</h1>
                         <p>Here is what is happening with your lectures today.</p>
                     </div>
                     <div class="pulse-tools">
@@ -48,7 +48,7 @@
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-clipboard-check"></i></span>
-                        <span><small>Quizzes</small><b>24</b><span class="pulse-trend">+15% this month</span></span>
+                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">+15% this month</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
@@ -56,7 +56,7 @@
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon purple"><i class="fas fa-users"></i></span>
-                        <span><small>Students</small><b>842</b><span class="pulse-trend">+8% this month</span></span>
+                        <span><small>Students</small><b>{{ $stats['students'] }}</b><span class="pulse-trend">+8% this month</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-calendar"></i></span>
@@ -71,7 +71,7 @@
                             <a href="{{ route('quizzes.index') }}">Open</a>
                         </div>
                         <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>24 active quizzes</strong><p>4 published this week</p></span><span class="pulse-tag green">Ready</span></div>
+                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $stats['active_quizzes'] }} active quizzes</strong><p>{{ $stats['published_this_week'] }} published this week</p></span><span class="pulse-tag green">Ready</span></div>
                             <div class="pulse-row"><a href="{{ route('quizzes.create') }}" style="display: contents;"><span class="pulse-soft-icon"><i class="fas fa-plus"></i></span><span><strong>Create new quiz</strong><p>Bulk import from templates</p></span><span class="pulse-tag">New</span></a></div>
                         </div>
                     </article>

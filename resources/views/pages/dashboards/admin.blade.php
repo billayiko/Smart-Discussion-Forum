@@ -19,8 +19,8 @@
 
                 <div class="pulse-sidebar-footer">
                     <div class="pulse-user">
-                        <span class="pulse-avatar">AC</span>
-                        <span><strong>Dr. Alex Carter</strong><span>Computer Science</span></span>
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'AC', 0, 2)) }}</span>
+                        <span><strong>{{ $user->name ?? 'Admin' }}</strong><span>{{ $user->role_label ?? 'Administrator' }}</span></span>
                     </div>
                     <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
@@ -43,19 +43,19 @@
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-clipboard-list"></i></span>
-                        <span><small>Total Quizzes</small><b>24</b><span class="pulse-trend">+15% this month</span></span>
+                        <span><small>Total Quizzes</small><b>{{ $stats['total_quizzes'] }}</b><span class="pulse-trend">+15% this month</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-calendar-check"></i></span>
-                        <span><small>Published Quizzes</small><b>18</b><span class="pulse-muted">75% of total</span></span>
+                        <span><small>Published Quizzes</small><b>{{ $stats['published_quizzes'] }}</b><span class="pulse-muted">{{ $stats['total_quizzes'] > 0 ? round(($stats['published_quizzes'] / $stats['total_quizzes']) * 100) : 0 }}% of total</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon purple"><i class="fas fa-layer-group"></i></span>
-                        <span><small>Total Attempts</small><b>1,248</b><span class="pulse-trend">+15% this month</span></span>
+                        <span><small>Total Attempts</small><b>{{ $stats['total_attempts'] }}</b><span class="pulse-trend">+15% this month</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-bullseye"></i></span>
-                        <span><small>Average Score</small><b>72%</b><span class="pulse-trend">+6% this month</span></span>
+                        <span><small>Average Score</small><b>{{ $stats['average_score'] }}</b><span class="pulse-trend">+6% this month</span></span>
                     </article>
                 </section>
 
@@ -91,56 +91,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>Data Structures Quiz 1</strong></td>
-                                    <td>Data Structures</td>
-                                    <td>20</td>
-                                    <td>60 mins</td>
-                                    <td>245</td>
-                                    <td>75%</td>
-                                    <td><span class="pulse-tag green">Published</span></td>
-                                    <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Algorithms Quiz 2</strong></td>
-                                    <td>Algorithms</td>
-                                    <td>25</td>
-                                    <td>60 mins</td>
-                                    <td>210</td>
-                                    <td>68%</td>
-                                    <td><span class="pulse-tag green">Published</span></td>
-                                    <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Database Systems Quiz 1</strong></td>
-                                    <td>Database Systems</td>
-                                    <td>15</td>
-                                    <td>45 mins</td>
-                                    <td>198</td>
-                                    <td>82%</td>
-                                    <td><span class="pulse-tag green">Published</span></td>
-                                    <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Computer Networks Quiz 1</strong></td>
-                                    <td>Computer Networks</td>
-                                    <td>20</td>
-                                    <td>60 mins</td>
-                                    <td>195</td>
-                                    <td>70%</td>
-                                    <td><span class="pulse-tag orange">Scheduled</span></td>
-                                    <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Algorithms Quiz 3</strong></td>
-                                    <td>Algorithms</td>
-                                    <td>30</td>
-                                    <td>60 mins</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td><span class="pulse-tag gray">Draft</span></td>
-                                    <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
-                                </tr>
+                                @forelse ($quizzes as $quiz)
+                                    <tr>
+                                        <td><strong>{{ $quiz->title }}</strong></td>
+                                        <td>{{ $quiz->subject }}</td>
+                                        <td>{{ $quiz->total_questions }}</td>
+                                        <td>{{ $quiz->duration_minutes }} mins</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td><span class="pulse-tag {{ $quiz->status === 'active' ? 'green' : ($quiz->status === 'scheduled' ? 'orange' : 'gray') }}">{{ ucfirst(str_replace('_', ' ', $quiz->status)) }}</span></td>
+                                        <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="pulse-muted">No quizzes available yet.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
