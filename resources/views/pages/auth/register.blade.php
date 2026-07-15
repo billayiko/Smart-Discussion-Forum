@@ -60,7 +60,7 @@
                     <span>Password</span>
                     <span class="pulse-input">
                         <input id="password" name="password" type="password" placeholder="Create a password" required autocomplete="new-password">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye" data-toggle-password="password" role="button" tabindex="0" style="cursor:pointer;" aria-label="Show password"></i>
                     </span>
                 </label>
 
@@ -68,7 +68,7 @@
                     <span>Confirm password</span>
                     <span class="pulse-input">
                         <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Confirm your password" required autocomplete="new-password">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye" data-toggle-password="password_confirmation" role="button" tabindex="0" style="cursor:pointer;" aria-label="Show password"></i>
                     </span>
                 </label>
 

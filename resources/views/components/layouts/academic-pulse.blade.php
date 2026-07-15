@@ -1210,6 +1210,32 @@
                 });
             });
         })();
+
+        (function () {
+            document.querySelectorAll('[data-toggle-password]').forEach((toggle) => {
+                const input = document.getElementById(toggle.dataset.togglePassword);
+
+                if (!input) {
+                    return;
+                }
+
+                const toggleVisibility = () => {
+                    const showing = input.type === 'text';
+                    input.type = showing ? 'password' : 'text';
+                    toggle.classList.toggle('fa-eye', showing);
+                    toggle.classList.toggle('fa-eye-slash', !showing);
+                    toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+                };
+
+                toggle.addEventListener('click', toggleVisibility);
+                toggle.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        toggleVisibility();
+                    }
+                });
+            });
+        })();
     </script>
 </body>
 </html>

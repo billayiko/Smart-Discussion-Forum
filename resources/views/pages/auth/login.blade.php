@@ -41,7 +41,7 @@
                     <span>Password</span>
                     <span class="pulse-input">
                         <input id="password" name="password" type="password" placeholder="Enter your password" required autocomplete="current-password">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye" data-toggle-password="password" role="button" tabindex="0" style="cursor:pointer;" aria-label="Show password"></i>
                     </span>
                 </label>
 
