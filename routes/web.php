@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TopicController;
 use App\Http\Middleware\EnsureTeamMembership;
@@ -28,6 +30,20 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/topics', [AdminTopicController::class, 'store'])->name('admin.topics.store');
     Route::patch('/admin/topics/{topic}/assign', [AdminTopicController::class, 'assign'])->name('admin.topics.assign');
     Route::delete('/admin/topics/{topic}', [AdminTopicController::class, 'destroy'])->name('admin.topics.destroy');
+    Route::get('/admin/complaints', [AdminComplaintController::class, 'index'])->name('admin.complaints.index');
+    Route::patch('/admin/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('admin.complaints.update');
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+});
+
+Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
+    Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
+    Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+});
+
+Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
+    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
+    Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store');
+    Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store');
 });
 
 Route::prefix('{current_team}')

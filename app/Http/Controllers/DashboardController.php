@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
 
@@ -23,7 +24,9 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
-        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes'));
+        [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
+
+        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes', 'recentQuestions', 'unansweredQuestionsCount'));
     }
 
     public function lecturer(Request $request)
@@ -39,7 +42,9 @@ class DashboardController extends Controller
 
         $recentQuizzes = Quiz::latest()->take(5)->get();
 
-        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuizzes'));
+        [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
+
+        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuizzes', 'recentQuestions', 'unansweredQuestionsCount'));
     }
 
     public function admin(Request $request)
@@ -56,5 +61,19 @@ class DashboardController extends Controller
         $quizzes = Quiz::latest()->take(5)->get();
 
         return view('pages.dashboards.admin', compact('user', 'stats', 'quizzes'));
+    }
+
+    protected function questionsPanelData(): array
+    {
+        $recentQuestions = Question::with(['user', 'topic'])
+            ->withCount('answers')
+            ->orderByRaw('answers_count = 0 desc')
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $unansweredQuestionsCount = Question::doesntHave('answers')->count();
+
+        return [$recentQuestions, $unansweredQuestionsCount];
     }
 }

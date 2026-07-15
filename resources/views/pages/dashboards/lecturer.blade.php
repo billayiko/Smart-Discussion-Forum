@@ -11,6 +11,7 @@
                     <a class="active" href="{{ route('lecturer.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('lecturer.students') }}"><i class="fas fa-users"></i> Students</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
@@ -91,17 +92,35 @@
 
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
-                            <h2>Weekly Chart Activity</h2>
-                            <a href="#">View</a>
+                            <h2>Questions</h2>
+                            <a href="{{ route('questions.index') }}">View all</a>
                         </div>
-                        <div class="pulse-chart">
-                            <svg viewBox="0 0 520 230" role="img" aria-label="Weekly activity chart">
-                                <path d="M18 176 C70 142 98 126 138 150 C178 176 206 174 246 128 C286 82 326 66 362 96 C402 130 436 136 464 104 C488 78 506 76 514 84" fill="none" stroke="#315cff" stroke-width="5" stroke-linecap="round" />
-                                <circle cx="138" cy="150" r="6" fill="#315cff" />
-                                <circle cx="246" cy="128" r="6" fill="#315cff" />
-                                <circle cx="362" cy="96" r="6" fill="#315cff" />
-                                <circle cx="464" cy="104" r="6" fill="#315cff" />
-                            </svg>
+                        @if ($unansweredQuestionsCount > 0)
+                            <div class="pulse-row" style="margin-bottom:10px;">
+                                <span class="pulse-soft-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                                <span><strong>{{ $unansweredQuestionsCount }} question(s) awaiting an answer</strong><p>Help by replying below.</p></span>
+                                <span class="pulse-tag orange">Reminder</span>
+                            </div>
+                        @endif
+                        <div class="pulse-list">
+                            @forelse ($recentQuestions as $question)
+                                <a href="{{ route('questions.show', $question) }}" style="display:contents;">
+                                    <div class="pulse-row">
+                                        <span class="pulse-soft-icon"><i class="fas fa-circle-question"></i></span>
+                                        <span><strong>{{ $question->title }}</strong><p>{{ $question->topic->title ?? 'Other' }} &middot; asked by {{ $question->user->name }}</p></span>
+                                        @if ($question->answers_count > 0)
+                                            <span class="pulse-tag green">Answered</span>
+                                        @else
+                                            <span class="pulse-tag orange">Not answered</span>
+                                        @endif
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-circle-question"></i></span><span><strong>No questions yet</strong><p>Questions from students will appear here.</p></span></div>
+                            @endforelse
+                        </div>
+                        <div style="margin-top:12px;">
+                            <a href="{{ route('questions.index') }}" class="pulse-btn light" style="width:100%; text-decoration:none; text-align:center;"><i class="fas fa-plus"></i> Ask a question</a>
                         </div>
                     </article>
 
