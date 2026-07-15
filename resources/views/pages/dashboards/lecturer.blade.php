@@ -24,9 +24,17 @@
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
                         <button type="button" class="pulse-theme-btn" data-theme="dark"><i class="fas fa-moon"></i> Dark</button>
                     </div>
+<<<<<<< HEAD
                     <form method="POST" action="{{ route('logout') }}" style="margin-top:12px;">
                         @csrf
                         <button type="submit" class="pulse-btn light" style="width:100%;"><i class="fas fa-arrow-right-from-bracket"></i> Log out</button>
+=======
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="pulse-btn light" style="width:100%;">
+                            <i class="fas fa-arrow-right-from-bracket"></i> Log out
+                        </button>
+>>>>>>> 95d3e4d9c9881161069efb700cf74cae18a1a49e
                     </form>
                 </div>
             </aside>
