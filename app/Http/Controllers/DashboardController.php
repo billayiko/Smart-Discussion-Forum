@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Complaint;
+use App\Models\CourseTopic;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -51,16 +54,21 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $stats = [
-            'total_quizzes' => Quiz::count(),
+        $bubbles = [
+            'topics' => CourseTopic::count(),
+            'unassigned_topics' => CourseTopic::whereNull('lecturer_id')->count(),
+            'questions' => Question::count(),
+            'unanswered_questions' => Question::doesntHave('answers')->count(),
+            'pending_complaints' => Complaint::where('status', 'pending')->count(),
+            'quizzes' => Quiz::count(),
             'published_quizzes' => Quiz::where('status', '!=', 'draft')->count(),
-            'total_attempts' => 1248,
-            'average_score' => '72%',
+            'students' => User::where('role', 'student')->count(),
+            'lecturers' => User::where('role', 'lecturer')->count(),
         ];
 
         $quizzes = Quiz::latest()->take(5)->get();
 
-        return view('pages.dashboards.admin', compact('user', 'stats', 'quizzes'));
+        return view('pages.dashboards.admin', compact('user', 'bubbles', 'quizzes'));
     }
 
     protected function questionsPanelData(): array

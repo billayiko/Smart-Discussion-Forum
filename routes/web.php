@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
@@ -33,6 +34,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/complaints', [AdminComplaintController::class, 'index'])->name('admin.complaints.index');
     Route::patch('/admin/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('admin.complaints.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+    Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
 });
 
 Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
