@@ -11,6 +11,7 @@
                     <a class="active" href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -97,14 +98,35 @@
                 <section class="pulse-grid pulse-three" style="margin-top:18px;">
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
-                            <h2>My Lectures</h2>
-                            <a href="#">View all</a>
+                            <h2>Questions</h2>
+                            <a href="{{ route('questions.index') }}">View all</a>
                         </div>
+                        @if ($unansweredQuestionsCount > 0)
+                            <div class="pulse-row" style="margin-bottom:10px;">
+                                <span class="pulse-soft-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                                <span><strong>{{ $unansweredQuestionsCount }} question(s) awaiting an answer</strong><p>Help by replying below.</p></span>
+                                <span class="pulse-tag orange">Reminder</span>
+                            </div>
+                        @endif
                         <div class="pulse-list">
-                            <div class="pulse-mini"><strong>Data Structures</strong><span class="pulse-muted">Dr. Alan Carter</span><div class="pulse-progress"><span style="width:70%;"></span></div></div>
-                            <div class="pulse-mini"><strong>Algorithms</strong><span class="pulse-muted">Dr. Sarah Johnson</span><div class="pulse-progress"><span style="width:60%;"></span></div></div>
-                            <div class="pulse-mini"><strong>Database Systems</strong><span class="pulse-muted">Dr. Michael Lee</span><div class="pulse-progress"><span style="width:85%;"></span></div></div>
-                            <div class="pulse-mini"><strong>Computer Networks</strong><span class="pulse-muted">Dr. James Wilson</span><div class="pulse-progress"><span style="width:45%;"></span></div></div>
+                            @forelse ($recentQuestions as $question)
+                                <a href="{{ route('questions.show', $question) }}" style="display:contents;">
+                                    <div class="pulse-row">
+                                        <span class="pulse-soft-icon"><i class="fas fa-circle-question"></i></span>
+                                        <span><strong>{{ $question->title }}</strong><p>{{ $question->topic->title ?? 'Other' }} &middot; asked by {{ $question->user->name }}</p></span>
+                                        @if ($question->answers_count > 0)
+                                            <span class="pulse-tag green">Answered</span>
+                                        @else
+                                            <span class="pulse-tag orange">Not answered</span>
+                                        @endif
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-circle-question"></i></span><span><strong>No questions yet</strong><p>Be the first to ask one.</p></span></div>
+                            @endforelse
+                        </div>
+                        <div style="margin-top:12px;">
+                            <a href="{{ route('questions.index') }}" class="pulse-btn light" style="width:100%; text-decoration:none; text-align:center;"><i class="fas fa-plus"></i> Ask a question</a>
                         </div>
                     </article>
 

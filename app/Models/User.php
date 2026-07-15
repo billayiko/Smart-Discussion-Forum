@@ -72,6 +72,16 @@ class User extends Authenticatable
         return $this->belongsToMany(CourseTopic::class, 'course_topic_subscriptions', 'user_id', 'course_topic_id')->withTimestamps();
     }
 
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    public function answers(): HasMany
+    {
+        return $this->hasMany(Answer::class);
+    }
+
     public function isOnline(): bool
     {
         return DB::table('sessions')
