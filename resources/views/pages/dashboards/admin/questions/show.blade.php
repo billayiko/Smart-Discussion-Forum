@@ -13,7 +13,7 @@
                     <a class="active" href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="{{ route('admin.complaints.index') }}"><i class="fas fa-flag"></i> Complaints</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
-                    <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a href="{{ route('admin.analytics.index') }}"><i class="fas fa-chart-line"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 

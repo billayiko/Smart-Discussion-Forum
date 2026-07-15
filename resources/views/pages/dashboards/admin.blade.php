@@ -13,7 +13,7 @@
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="{{ route('admin.complaints.index') }}"><i class="fas fa-flag"></i> Complaints</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
-                    <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a href="{{ route('admin.analytics.index') }}"><i class="fas fa-chart-line"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -32,7 +32,7 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Quiz Settings & Management</h1>
+                        <h1>Monitoring & Management</h1>
                         <p>Create, manage and analyze quizzes for your students.</p>
                     </div>
                     <div class="pulse-tools">
@@ -40,22 +40,30 @@
                     </div>
                 </header>
 
-                <section class="pulse-grid pulse-stats">
+                <section class="pulse-grid pulse-stats" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <a class="pulse-card pulse-stat" href="{{ route('admin.topics.index') }}" style="text-decoration:none;">
+                        <span class="pulse-stat-icon"><i class="fas fa-book"></i></span>
+                        <span><small>Topics</small><b>{{ $bubbles['topics'] }}</b><span class="pulse-muted">{{ $bubbles['unassigned_topics'] }} unassigned</span></span>
+                    </a>
+                    <a class="pulse-card pulse-stat" href="{{ route('questions.index') }}" style="text-decoration:none;">
+                        <span class="pulse-stat-icon orange"><i class="fas fa-circle-question"></i></span>
+                        <span><small>Questions</small><b>{{ $bubbles['questions'] }}</b><span class="pulse-muted">{{ $bubbles['unanswered_questions'] }} unanswered</span></span>
+                    </a>
+                    <a class="pulse-card pulse-stat" href="{{ route('admin.complaints.index') }}" style="text-decoration:none;">
+                        <span class="pulse-stat-icon" style="color:#d33;"><i class="fas fa-flag"></i></span>
+                        <span><small>Complaints</small><b>{{ $bubbles['pending_complaints'] }}</b><span class="pulse-muted">pending review</span></span>
+                    </a>
+                    <a class="pulse-card pulse-stat" href="{{ route('quizzes.index') }}" style="text-decoration:none;">
+                        <span class="pulse-stat-icon green"><i class="fas fa-clipboard-list"></i></span>
+                        <span><small>Quizzes</small><b>{{ $bubbles['quizzes'] }}</b><span class="pulse-muted">{{ $bubbles['published_quizzes'] }} published</span></span>
+                    </a>
                     <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon"><i class="fas fa-clipboard-list"></i></span>
-                        <span><small>Total Quizzes</small><b>{{ $stats['total_quizzes'] }}</b><span class="pulse-trend">+15% this month</span></span>
+                        <span class="pulse-stat-icon purple"><i class="fas fa-user-graduate"></i></span>
+                        <span><small>Students</small><b>{{ $bubbles['students'] }}</b><span class="pulse-muted">enrolled</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon green"><i class="fas fa-calendar-check"></i></span>
-                        <span><small>Published Quizzes</small><b>{{ $stats['published_quizzes'] }}</b><span class="pulse-muted">{{ $stats['total_quizzes'] > 0 ? round(($stats['published_quizzes'] / $stats['total_quizzes']) * 100) : 0 }}% of total</span></span>
-                    </article>
-                    <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon purple"><i class="fas fa-layer-group"></i></span>
-                        <span><small>Total Attempts</small><b>{{ $stats['total_attempts'] }}</b><span class="pulse-trend">+15% this month</span></span>
-                    </article>
-                    <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon green"><i class="fas fa-bullseye"></i></span>
-                        <span><small>Average Score</small><b>{{ $stats['average_score'] }}</b><span class="pulse-trend">+6% this month</span></span>
+                        <span class="pulse-stat-icon purple"><i class="fas fa-chalkboard-user"></i></span>
+                        <span><small>Lecturers</small><b>{{ $bubbles['lecturers'] }}</b><span class="pulse-muted">teaching</span></span>
                     </article>
                 </section>
 
