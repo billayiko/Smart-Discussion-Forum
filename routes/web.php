@@ -1,14 +1,34 @@
 <?php
 
+use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\TopicController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-Route::get('/student-dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
-Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
-Route::get('/admin-dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/student-dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
+    Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
+    Route::post('/topics/{topic}/subscribe', [TopicController::class, 'subscribe'])->name('topics.subscribe');
+    Route::delete('/topics/{topic}/subscribe', [TopicController::class, 'unsubscribe'])->name('topics.unsubscribe');
+});
+
+Route::middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
+    Route::get('/lecturer/students', [LecturerStudentController::class, 'index'])->name('lecturer.students');
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin-dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/admin/topics', [AdminTopicController::class, 'index'])->name('admin.topics.index');
+    Route::post('/admin/topics', [AdminTopicController::class, 'store'])->name('admin.topics.store');
+    Route::patch('/admin/topics/{topic}/assign', [AdminTopicController::class, 'assign'])->name('admin.topics.assign');
+    Route::delete('/admin/topics/{topic}', [AdminTopicController::class, 'destroy'])->name('admin.topics.destroy');
+});
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])

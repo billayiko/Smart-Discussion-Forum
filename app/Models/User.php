@@ -8,8 +8,11 @@ use App\Concerns\HasTeams;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Passkeys\PasskeyAuthenticatable;
 
@@ -57,6 +60,24 @@ class User extends Authenticatable
     public function quizzes()
     {
         return $this->hasMany(Quiz::class);
+    }
+
+    public function assignedTopics(): HasMany
+    {
+        return $this->hasMany(CourseTopic::class, 'lecturer_id');
+    }
+
+    public function subscribedTopics(): BelongsToMany
+    {
+        return $this->belongsToMany(CourseTopic::class, 'course_topic_subscriptions', 'user_id', 'course_topic_id')->withTimestamps();
+    }
+
+    public function isOnline(): bool
+    {
+        return DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->where('last_activity', '>=', now()->subMinutes(5)->timestamp)
+            ->exists();
     }
 
     public function roleLabel(): string

@@ -8,12 +8,9 @@
                 </a>
 
                 <nav class="pulse-menu" aria-label="Student navigation">
-                    <a class="active" href="#"><i class="fas fa-house"></i> Dashboard</a>
-                    {{-- <a href="#"><i class="fas fa-book-open"></i> Lectures</a>
-                    <a href="#"><i class="fas fa-calendar"></i> Schedule</a> --}}
+                    <a class="active" href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="#"><i class="fas fa-message"></i> Messages</a>
-                    {{-- <a href="#"><i class="fas fa-users"></i> Students</a>
-                    <a href="#"><i class="fas fa-chart-simple"></i> Analytics</a> --}}
+                    <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -26,6 +23,10 @@
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
                         <button type="button" class="pulse-theme-btn" data-theme="dark"><i class="fas fa-moon"></i> Dark</button>
                     </div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin-top:12px;">
+                        @csrf
+                        <button type="submit" class="pulse-btn light" style="width:100%;"><i class="fas fa-arrow-right-from-bracket"></i> Log out</button>
+                    </form>
                 </div>
             </aside>
 
