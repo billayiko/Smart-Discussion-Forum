@@ -1,4 +1,4 @@
-<x-layouts.academic-pulse title="Question">
+<x-layouts.academic-pulse title="Messages">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -9,9 +9,9 @@
 
                 <nav class="pulse-menu" aria-label="Student navigation">
                     <a href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
-                    <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
+                    <a class="active" href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
-                    <a class="active" href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -32,8 +32,13 @@
             </aside>
 
             <main class="pulse-main">
-                @include('pages.dashboards.questions._header', ['title' => 'Question', 'subtitle' => 'View replies and join the discussion.'])
-                @include('pages.dashboards.questions._thread', ['canReply' => true, 'canComplain' => true, 'canDelete' => false])
+                <header class="pulse-topbar">
+                    <div class="pulse-title">
+                        <h1>Messages</h1>
+                        <p>Message classmates, lecturers, or start a group.</p>
+                    </div>
+                </header>
+                @include('pages.dashboards.messages._conversations')
             </main>
         </div>
     </div>

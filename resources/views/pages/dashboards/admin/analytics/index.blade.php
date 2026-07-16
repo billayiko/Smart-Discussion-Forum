@@ -12,7 +12,7 @@
                     <a href="{{ route('admin.topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="{{ route('admin.complaints.index') }}"><i class="fas fa-flag"></i> Complaints</a>
-                    <a href="#"><i class="fas fa-message"></i> Messages</a>
+                    <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a class="active" href="{{ route('admin.analytics.index') }}"><i class="fas fa-chart-line"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>

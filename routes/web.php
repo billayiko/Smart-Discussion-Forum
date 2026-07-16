@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TopicController;
@@ -46,6 +47,16 @@ Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
     Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store');
     Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store');
+});
+
+Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/start', [MessageController::class, 'start'])->name('messages.start');
+    Route::post('/messages/groups', [MessageController::class, 'storeGroup'])->name('messages.groups.store');
+    Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{conversation}/messages', [MessageController::class, 'storeMessage'])->name('messages.messages.store');
+    Route::post('/messages/{conversation}/members', [MessageController::class, 'addMember'])->name('messages.members.store');
+    Route::delete('/messages/{conversation}/members/{member}', [MessageController::class, 'removeMember'])->name('messages.members.destroy');
 });
 
 Route::prefix('{current_team}')

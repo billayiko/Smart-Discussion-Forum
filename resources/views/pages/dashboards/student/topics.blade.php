@@ -9,7 +9,7 @@
 
                 <nav class="pulse-menu" aria-label="Student navigation">
                     <a href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
-                    <a href="#"><i class="fas fa-message"></i> Messages</a>
+                    <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a class="active" href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
