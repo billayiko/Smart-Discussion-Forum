@@ -57,6 +57,8 @@ class QuestionController extends Controller
             'body' => $validated['body'],
         ]);
 
+        $request->user()->recordCommunication();
+
         return back()->with('success', 'Your reply has been posted.');
     }
 

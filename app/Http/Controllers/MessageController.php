@@ -129,6 +129,7 @@ class MessageController extends Controller
         ]);
 
         $conversation->touch();
+        $user->recordCommunication();
 
         return back()->with('success', 'Message sent.');
     }

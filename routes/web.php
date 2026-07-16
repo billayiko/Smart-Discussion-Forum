@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
+use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
@@ -36,6 +37,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('admin.complaints.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
+    Route::get('/admin/members', [AdminMemberController::class, 'index'])->name('admin.members.index');
+    Route::patch('/admin/members/settings', [AdminMemberController::class, 'updateSettings'])->name('admin.members.settings');
+    Route::post('/admin/members/{member}/warn', [AdminMemberController::class, 'warn'])->name('admin.members.warn');
+    Route::post('/admin/members/{member}/blacklist', [AdminMemberController::class, 'blacklist'])->name('admin.members.blacklist');
+    Route::post('/admin/members/{member}/unblacklist', [AdminMemberController::class, 'unblacklist'])->name('admin.members.unblacklist');
 });
 
 Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {

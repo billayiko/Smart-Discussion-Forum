@@ -36,6 +36,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'blacklisted' => 'boolean',
+            'blacklisted_until' => 'datetime',
+            'last_communication_at' => 'datetime',
+            'last_warned_at' => 'datetime',
         ];
     }
         /**
@@ -119,6 +123,45 @@ class User extends Authenticatable
         }
 
         return collect();
+    }
+
+    /**
+     * Record that the user communicated (sent a message or posted an answer),
+     * resetting their inactivity warnings.
+     */
+    public function recordCommunication(): void
+    {
+        $this->forceFill([
+            'last_communication_at' => now(),
+            'warning_count' => 0,
+            'last_warned_at' => null,
+        ])->save();
+    }
+
+    public function isBlacklisted(): bool
+    {
+        if (! $this->blacklisted) {
+            return false;
+        }
+
+        if ($this->blacklisted_until && $this->blacklisted_until->isPast()) {
+            $this->liftBlacklist();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function liftBlacklist(): void
+    {
+        $this->forceFill([
+            'blacklisted' => false,
+            'blacklisted_until' => null,
+            'warning_count' => 0,
+            'last_warned_at' => null,
+            'last_communication_at' => now(),
+        ])->save();
     }
 
     public function isOnline(): bool
