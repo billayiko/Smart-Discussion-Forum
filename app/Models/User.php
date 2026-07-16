@@ -82,6 +82,45 @@ class User extends Authenticatable
         return $this->hasMany(Answer::class);
     }
 
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user')->withTimestamps();
+    }
+
+    /**
+     * IDs of other users to prioritize when starting a new message, based on
+     * shared topic subscriptions (students <-> students, students <-> their topic's lecturer).
+     */
+    public function priorityContactIds(): \Illuminate\Support\Collection
+    {
+        if ($this->role === 'student') {
+            $topicIds = $this->subscribedTopics()->pluck('course_topics.id');
+
+            $studentIds = static::where('role', 'student')
+                ->where('id', '!=', $this->id)
+                ->whereHas('subscribedTopics', fn ($query) => $query->whereIn('course_topics.id', $topicIds))
+                ->pluck('id');
+
+            $lecturerIds = static::where('role', 'lecturer')
+                ->whereHas('assignedTopics', fn ($query) => $query->whereIn('course_topics.id', $topicIds))
+                ->pluck('id');
+
+            return $studentIds->merge($lecturerIds)->unique()->values();
+        }
+
+        if ($this->role === 'lecturer') {
+            $topicIds = $this->assignedTopics()->pluck('id');
+
+            return static::where('role', 'student')
+                ->whereHas('subscribedTopics', fn ($query) => $query->whereIn('course_topics.id', $topicIds))
+                ->pluck('id')
+                ->unique()
+                ->values();
+        }
+
+        return collect();
+    }
+
     public function isOnline(): bool
     {
         return DB::table('sessions')
