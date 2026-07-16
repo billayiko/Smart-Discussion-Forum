@@ -9,3 +9,5 @@ Schedule::call(function () {
         ->where('expires_at', '<', now())
         ->delete();
 })->daily()->description('Delete expired team invitations');
+
+Schedule::command('members:check-inactivity')->daily()->description('Warn and blacklist inactive members');
