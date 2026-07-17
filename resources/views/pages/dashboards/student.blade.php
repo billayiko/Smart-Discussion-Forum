@@ -34,7 +34,11 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Good morning, {{ explode(' ', trim($user->name ?? 'Student'))[0] }}</h1>
+                        <h1>{{ match (true) {
+                            now()->hour < 12 => 'Good morning',
+                            now()->hour < 17 => 'Good afternoon',
+                            default => 'Good evening',
+                        } }}, {{ explode(' ', trim($user->name ?? 'Student'))[0] }}</h1>
                         <p>Here is what is happening with your learning today.</p>
                     </div>
                     <div class="pulse-tools">
