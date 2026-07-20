@@ -11,7 +11,7 @@
                     <a href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a class="active" href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
-                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discusion Forum</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 

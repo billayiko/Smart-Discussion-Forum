@@ -29,7 +29,14 @@ class DashboardController extends Controller
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
-        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes', 'recentQuestions', 'unansweredQuestionsCount'));
+        $quizzesBySubject = $this->quizzesBySubject();
+
+        $totalQuestionsCount = Question::count();
+        $answeredRate = $totalQuestionsCount > 0
+            ? (int) round((($totalQuestionsCount - $unansweredQuestionsCount) / $totalQuestionsCount) * 100)
+            : 0;
+
+        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesBySubject', 'answeredRate'));
     }
 
     public function lecturer(Request $request)
@@ -47,7 +54,9 @@ class DashboardController extends Controller
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
-        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuizzes', 'recentQuestions', 'unansweredQuestionsCount'));
+        $quizzesByStatus = $this->quizzesByStatus($user);
+
+        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuizzes', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesByStatus'));
     }
 
     public function admin(Request $request)
@@ -83,5 +92,50 @@ class DashboardController extends Controller
         $unansweredQuestionsCount = Question::doesntHave('answers')->count();
 
         return [$recentQuestions, $unansweredQuestionsCount];
+    }
+
+    /**
+     * Non-draft quiz counts grouped by subject, with each row's bar width
+     * pre-computed as a percentage of the largest subject's count.
+     */
+    protected function quizzesBySubject(): \Illuminate\Support\Collection
+    {
+        $rows = Quiz::where('status', '!=', 'draft')
+            ->selectRaw('subject, count(*) as total')
+            ->groupBy('subject')
+            ->orderByDesc('total')
+            ->take(5)
+            ->get();
+
+        $max = (int) $rows->max('total') ?: 1;
+
+        return $rows->map(function ($row) use ($max) {
+            $row->pct = (int) round(($row->total / $max) * 100);
+
+            return $row;
+        });
+    }
+
+    /**
+     * A lecturer's own quizzes grouped by workflow status, in a fixed stage
+     * order, with each row's bar width pre-computed as a percentage of the
+     * largest status's count.
+     */
+    protected function quizzesByStatus(User $user): \Illuminate\Support\Collection
+    {
+        $counts = $user->quizzes()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $stages = ['draft', 'planned', 'scheduled', 'due_soon', 'active', 'closed'];
+        $max = max($counts->max() ?: 1, 1);
+
+        return collect($stages)->map(fn ($status) => (object) [
+            'status' => $status,
+            'label' => ucfirst(str_replace('_', ' ', $status)),
+            'total' => (int) ($counts[$status] ?? 0),
+            'pct' => (int) round((($counts[$status] ?? 0) / $max) * 100),
+        ]);
     }
 }

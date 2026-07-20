@@ -13,16 +13,23 @@ class QuestionController extends Controller
     {
         $user = $request->user();
 
-        $questions = Question::with(['user', 'topic'])
-            ->withCount('answers')
-            ->orderByRaw('answers_count = 0 desc')
-            ->latest()
-            ->get();
+        if ($user->role === 'admin') {
+            $questions = Question::with(['user', 'topic'])
+                ->withCount('answers')
+                ->orderByRaw('answers_count = 0 desc')
+                ->latest()
+                ->get();
 
-        $topics = CourseTopic::orderBy('title')->get();
-        $unansweredCount = $questions->where('answers_count', 0)->count();
+            $topics = CourseTopic::orderBy('title')->get();
+            $unansweredCount = $questions->where('answers_count', 0)->count();
 
-        return view("pages.dashboards.{$user->role}.questions.index", compact('questions', 'topics', 'unansweredCount', 'user'));
+            return view("pages.dashboards.{$user->role}.questions.index", compact('questions', 'topics', 'unansweredCount', 'user'));
+        }
+
+        $topicsQuery = $user->role === 'student' ? $user->subscribedTopics() : $user->assignedTopics();
+        $topics = $topicsQuery->withCount(['questions', 'subscribers'])->orderBy('title')->get();
+
+        return view("pages.dashboards.{$user->role}.questions.index", compact('topics', 'user'));
     }
 
     public function store(Request $request)
@@ -46,7 +53,7 @@ class QuestionController extends Controller
 
         $extra = [];
 
-        if ($user->role === 'student') {
+        if (in_array($user->role, ['student', 'lecturer'], true)) {
             if (! $request->hasHeader('X-Sync')) {
                 $question->increment('views');
             }

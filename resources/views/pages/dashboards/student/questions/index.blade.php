@@ -11,7 +11,7 @@
                     <a href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
-                    <a class="active" href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
+                    <a class="active" href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -32,8 +32,8 @@
             </aside>
 
             <main class="pulse-main">
-                @include('pages.dashboards.questions._header', ['title' => 'Questions', 'subtitle' => 'Ask a question and get help from lecturers and fellow students.'])
-                @include('pages.dashboards.questions._list', ['canAsk' => true])
+                @include('pages.dashboards.questions._header', ['title' => 'Discussion Forum', 'subtitle' => 'Open a topic to browse its discussions and ask a question.'])
+                @include('pages.dashboards.questions._topic-bubbles')
             </main>
         </div>
     </div>

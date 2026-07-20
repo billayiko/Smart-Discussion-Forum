@@ -714,6 +714,65 @@
             background: var(--pulse-blue);
         }
 
+        .pulse-bars {
+            display: grid;
+            gap: 12px;
+        }
+
+        .pulse-bar-row {
+            display: grid;
+            grid-template-columns: minmax(0, 108px) 1fr 28px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse-bar-label {
+            overflow: hidden;
+            color: var(--pulse-muted);
+            font-size: .76rem;
+            font-weight: 700;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .pulse-bar-track {
+            height: 18px;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #edf2fb;
+        }
+
+        .pulse-bar-fill {
+            display: block;
+            height: 100%;
+            border-radius: 0 4px 4px 0;
+            background: var(--pulse-blue);
+        }
+
+        .pulse-bar-fill.has-value {
+            min-width: 4px;
+        }
+
+        .pulse-bar-value {
+            text-align: right;
+            color: var(--pulse-ink);
+            font-size: .78rem;
+            font-weight: 800;
+        }
+
+        .pulse-meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--pulse-muted);
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        .pulse-meter-label strong {
+            color: var(--pulse-ink);
+        }
+
         .pulse-table {
             width: 100%;
             border-collapse: collapse;

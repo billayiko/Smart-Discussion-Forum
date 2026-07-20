@@ -11,7 +11,7 @@
                     <a class="active" href="{{ route('student.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
-                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discusion Forum</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
@@ -73,14 +73,26 @@
                 <section class="pulse-grid pulse-two" style="margin-top:18px;">
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
-                            <h2>Today's Schedule</h2>
-                            <a href="#">View all</a>
+                            <h2>Quiz Load by Subject</h2>
+                            <a href="{{ route('quizzes.index') }}">View all</a>
                         </div>
-                        <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-time">09:00<br>AM</span><span><strong>Data Structures</strong><p>Lecture 12 - Room 204</p></span><span class="pulse-dot"></span></div>
-                            <div class="pulse-row"><span class="pulse-time">11:00<br>AM</span><span><strong>Algorithms</strong><p>Lecture 8 - Room 301</p></span><span class="pulse-dot" style="background:var(--pulse-purple);"></span></div>
-                            <div class="pulse-row"><span class="pulse-time">01:30<br>PM</span><span><strong>Database Systems</strong><p>Lecture 10 - Room 204</p></span><span class="pulse-dot" style="background:var(--pulse-green);"></span></div>
-                            <div class="pulse-row"><span class="pulse-time">03:30<br>PM</span><span><strong>Computer Networks</strong><p>Lecture 7 - Room 205</p></span><span class="pulse-dot" style="background:var(--pulse-orange);"></span></div>
+                        <div class="pulse-bars">
+                            @forelse ($quizzesBySubject as $row)
+                                <div class="pulse-bar-row">
+                                    <span class="pulse-bar-label">{{ $row->subject }}</span>
+                                    <span class="pulse-bar-track"><span class="pulse-bar-fill {{ $row->total > 0 ? 'has-value' : '' }}" style="width: {{ $row->pct }}%;"></span></span>
+                                    <span class="pulse-bar-value">{{ $row->total }}</span>
+                                </div>
+                            @empty
+                                <p class="pulse-muted">No quizzes published yet.</p>
+                            @endforelse
+                        </div>
+                        <div style="margin-top:16px;">
+                            <div class="pulse-meter-label">
+                                <span>Discussion Forum answer rate</span>
+                                <strong>{{ $answeredRate }}%</strong>
+                            </div>
+                            <div class="pulse-progress"><span style="width: {{ $answeredRate }}%;"></span></div>
                         </div>
                     </article>
 
