@@ -10,7 +10,7 @@
                 <nav class="pulse-menu" aria-label="Admin navigation">
                     <a href="{{ route('admin.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="{{ route('admin.topics.index') }}"><i class="fas fa-book"></i> Topics</a>
-                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
                     <a href="{{ route('admin.complaints.index') }}"><i class="fas fa-flag"></i> Complaints</a>
                     <a href="{{ route('admin.members.index') }}"><i class="fas fa-user-shield"></i> Members</a>
                     <a class="active" href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>

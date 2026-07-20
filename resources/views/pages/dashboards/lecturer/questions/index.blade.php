@@ -33,8 +33,8 @@
             </aside>
 
             <main class="pulse-main">
-                @include('pages.dashboards.questions._header', ['title' => 'Questions', 'subtitle' => 'Ask a question or help answer ones from your students.'])
-                @include('pages.dashboards.questions._list', ['canAsk' => true])
+                @include('pages.dashboards.questions._header', ['title' => 'Discussion Forum', 'subtitle' => 'Open a topic you teach to browse its discussions and ask a question.'])
+                @include('pages.dashboards.questions._topic-bubbles')
             </main>
         </div>
     </div>

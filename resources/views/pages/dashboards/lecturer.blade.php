@@ -11,7 +11,7 @@
                     <a class="active" href="{{ route('lecturer.dashboard') }}"><i class="fas fa-house"></i> Dashboard</a>
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('lecturer.students') }}"><i class="fas fa-users"></i> Students</a>
-                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Questions</a>
+                    <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
                     <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
                     <a href="#"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
@@ -130,12 +130,17 @@
 
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
-                            <h2>Schedule</h2>
-                            <a href="#">Plan</a>
+                            <h2>Quiz Status Breakdown</h2>
+                            <a href="{{ route('quizzes.index') }}">Open</a>
                         </div>
-                        <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-time">09:00<br>AM</span><span><strong>Data Structures</strong><p>Room 204 · Live session</p></span><span class="pulse-dot"></span></div>
-                            <div class="pulse-row"><span class="pulse-time">11:00<br>AM</span><span><strong>Algorithms Lab</strong><p>Room 301 · Practical</p></span><span class="pulse-dot" style="background:var(--pulse-purple);"></span></div>
+                        <div class="pulse-bars">
+                            @foreach ($quizzesByStatus as $row)
+                                <div class="pulse-bar-row">
+                                    <span class="pulse-bar-label">{{ $row->label }}</span>
+                                    <span class="pulse-bar-track"><span class="pulse-bar-fill {{ $row->total > 0 ? 'has-value' : '' }}" style="width: {{ $row->pct }}%;"></span></span>
+                                    <span class="pulse-bar-value">{{ $row->total }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     </article>
 

@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+    Route::get('/topics/{topic}/discussions', [TopicController::class, 'show'])->name('topics.show');
 });
 
 Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
