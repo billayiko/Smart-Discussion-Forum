@@ -49,6 +49,24 @@
                         </select>
                     </div>
                 </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium">Course Topic</label>
+                        <select name="course_topic_id" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+                            <option value="">None</option>
+                            @foreach ($topics as $topic)
+                                <option value="{{ $topic->id }}" @selected(old('course_topic_id') == $topic->id)>{{ $topic->title }}</option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-slate-500">Linking a topic shows this quiz's countdown on that topic's discussion threads.</p>
+                    </div>
+                    <div class="flex items-end pb-2">
+                        <label class="flex items-center gap-2 text-sm font-medium">
+                            <input type="checkbox" name="proctored" value="1" @checked(old('proctored'))>
+                            Proctored
+                        </label>
+                    </div>
+                </div>
 
                 <div class="flex gap-3">
                     <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Save quiz</button>

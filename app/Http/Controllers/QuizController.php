@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CourseTopic;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +23,9 @@ class QuizController extends Controller
     {
         $this->authorize('create', Quiz::class);
 
-        return view('quizzes.create');
+        $topics = CourseTopic::orderBy('title')->get();
+
+        return view('quizzes.create', compact('topics'));
     }
 
     public function store(Request $request)
@@ -36,6 +39,8 @@ class QuizController extends Controller
             'scheduled_at' => ['nullable', 'date'],
             'duration_minutes' => ['required', 'integer', 'min:1'],
             'status' => ['nullable', 'in:draft,planned,scheduled,due_soon,active,closed'],
+            'course_topic_id' => ['nullable', 'exists:course_topics,id'],
+            'proctored' => ['nullable', 'boolean'],
         ]);
 
         auth()->user()->quizzes()->create($validated);

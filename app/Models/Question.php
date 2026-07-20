@@ -16,6 +16,7 @@ class Question extends Model
         'course_topic_id',
         'title',
         'body',
+        'views',
     ];
 
     public function user(): BelongsTo
