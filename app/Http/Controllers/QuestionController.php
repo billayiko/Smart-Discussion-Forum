@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseTopic;
 use App\Models\Question;
+use App\Models\Quiz;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -41,21 +42,72 @@ class QuestionController extends Controller
     {
         $user = $request->user();
 
-        $question->load(['user', 'topic', 'answers.user']);
+        $question->load(['user', 'topic', 'answers.user', 'answers.excludedUsers']);
 
-        return view("pages.dashboards.{$user->role}.questions.show", compact('question', 'user'));
+        $extra = [];
+
+        if ($user->role === 'student') {
+            if (! $request->hasHeader('X-Sync')) {
+                $question->increment('views');
+            }
+
+            $question->setRelation(
+                'answers',
+                $question->answers->reject(fn ($answer) => $answer->isExcludedFor($user))->values()
+            );
+
+            $topic = $question->topic;
+
+            $groupMembers = collect();
+            $siblingThreads = collect();
+
+            if ($topic) {
+                $groupMembers = $topic->subscribers()->get()
+                    ->when($topic->lecturer, fn ($members) => $members->push($topic->lecturer))
+                    ->unique('id')
+                    ->values();
+
+                $siblingThreads = $topic->questions()
+                    ->withCount('answers')
+                    ->orderByDesc('updated_at')
+                    ->get();
+            }
+
+            $otherTopics = CourseTopic::withCount('subscribers')
+                ->when($topic, fn ($query) => $query->where('id', '!=', $topic->id))
+                ->orderBy('title')
+                ->get();
+
+            $quiz = $topic
+                ? Quiz::where('course_topic_id', $topic->id)
+                    ->whereNotIn('status', ['draft'])
+                    ->where('scheduled_at', '>=', now())
+                    ->orderBy('scheduled_at')
+                    ->first()
+                : null;
+
+            $extra = compact('groupMembers', 'siblingThreads', 'otherTopics', 'quiz');
+        }
+
+        return view("pages.dashboards.{$user->role}.questions.show", array_merge(compact('question', 'user'), $extra));
     }
 
     public function storeAnswer(Request $request, Question $question)
     {
         $validated = $request->validate([
             'body' => ['required', 'string'],
+            'topic' => ['nullable', 'string', 'max:255'],
+            'excluded_user_ids' => ['nullable', 'array'],
+            'excluded_user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        $question->answers()->create([
+        $answer = $question->answers()->create([
             'user_id' => $request->user()->id,
             'body' => $validated['body'],
+            'topic' => $validated['topic'] ?? null,
         ]);
+
+        $answer->excludedUsers()->sync($validated['excluded_user_ids'] ?? []);
 
         $request->user()->recordCommunication();
 
