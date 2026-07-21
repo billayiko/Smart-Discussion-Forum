@@ -31,7 +31,7 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('dashboard', absolute: false));
+            ->assertRedirect(route($user->dashboardRouteName(), absolute: false));
 
         $this->assertAuthenticated();
     }
@@ -49,9 +49,9 @@ class AuthenticationTest extends TestCase
             ->assertRedirect(route('student.dashboard', absolute: false));
     }
 
-    public function test_passkey_login_response_redirects_to_the_current_team_dashboard(): void
+    public function test_passkey_login_response_redirects_to_the_role_dashboard(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'lecturer']);
 
         $request = Request::create(route('login', absolute: false), 'GET', server: [
             'HTTP_ACCEPT' => 'application/json',
@@ -62,7 +62,7 @@ class AuthenticationTest extends TestCase
         $jsonResponse = app(PasskeyLoginResponse::class)->toResponse($request);
 
         $this->assertSame(
-            route('dashboard', ['current_team' => $user->personalTeam()->slug]),
+            route('lecturer.dashboard'),
             $jsonResponse->getData()->redirect,
         );
     }

@@ -21,7 +21,7 @@
                 <div class="pulse-sidebar-footer">
                     <div class="pulse-user">
                         <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'AC', 0, 2)) }}</span>
-                        <span><strong>{{ $user->name ?? 'Admin' }}</strong><span>{{ $user->role_label ?? 'Administrator' }}</span></span>
+                        <span><strong>{{ $user->name ?? 'Admin' }}</strong><span>{{ $user->roleLabel() ?? 'Administrator' }}</span></span>
                     </div>
                     <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
                         <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
@@ -121,15 +121,8 @@
                     </div>
 
                     <div class="pulse-section-head" style="margin:18px 0 0;">
-                        <span class="pulse-muted">Showing 1 to 5 of 24 quizzes</span>
-                        <div class="pulse-actions">
-                            <span class="pulse-icon-btn" style="width:34px;height:34px;"><i class="fas fa-chevron-left"></i></span>
-                            <span class="pulse-tag">1</span>
-                            <span class="pulse-tag gray">2</span>
-                            <span class="pulse-tag gray">3</span>
-                            <span class="pulse-tag gray">5</span>
-                            <span class="pulse-icon-btn" style="width:34px;height:34px;"><i class="fas fa-chevron-right"></i></span>
-                        </div>
+                        <span class="pulse-muted">Showing {{ $quizzes->count() }} most recent quiz(zes)</span>
+                        <a class="pulse-btn light" href="{{ route('quizzes.index') }}">View all quizzes</a>
                     </div>
                 </section>
             </main>

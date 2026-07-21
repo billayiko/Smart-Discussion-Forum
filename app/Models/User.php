@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Sanctum\HasApiTokens;
 use App\Concerns\HasTeams;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -12,19 +10,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Passkeys\PasskeyAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Cleaned up SDD User Model
  */
-#[Fillable(['name', 'email', 'password', 'role', 'current_team_id'])]
+#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'rules_agreed_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory */
-    use HasFactory, HasApiTokens, HasTeams, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasTeams, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -40,12 +41,12 @@ class User extends Authenticatable
             'blacklisted_until' => 'datetime',
             'last_communication_at' => 'datetime',
             'last_warned_at' => 'datetime',
+            'rules_agreed_at' => 'datetime',
         ];
     }
-        /**
+
+    /**
      * Get the user's initials.
-     *
-     * @return string
      */
     public function initials(): string
     {
@@ -53,7 +54,7 @@ class User extends Authenticatable
         $initials = '';
 
         foreach ($words as $word) {
-            if (!empty($word)) {
+            if (! empty($word)) {
                 $initials .= strtoupper($word[0]);
             }
         }
@@ -95,7 +96,7 @@ class User extends Authenticatable
      * IDs of other users to prioritize when starting a new message, based on
      * shared topic subscriptions (students <-> students, students <-> their topic's lecturer).
      */
-    public function priorityContactIds(): \Illuminate\Support\Collection
+    public function priorityContactIds(): Collection
     {
         if ($this->role === 'student') {
             $topicIds = $this->subscribedTopics()->pluck('course_topics.id');
@@ -177,5 +178,18 @@ class User extends Authenticatable
         return $this->role
             ? Str::of($this->role)->replace(['_', '-'], ' ')->ucfirst()->toString()
             : __('User');
+    }
+
+    /**
+     * The name of the route this user should land on after authenticating.
+     */
+    public function dashboardRouteName(): string
+    {
+        return match ($this->role) {
+            'student' => 'student.dashboard',
+            'lecturer' => 'lecturer.dashboard',
+            'admin' => 'admin.dashboard',
+            default => 'home',
+        };
     }
 }

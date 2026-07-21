@@ -19,7 +19,9 @@ class MemberController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('pages.dashboards.admin.members.index', compact('user', 'settings', 'members'));
+        $admins = User::where('role', 'admin')->orderBy('name')->get();
+
+        return view('pages.dashboards.admin.members.index', compact('user', 'settings', 'members', 'admins'));
     }
 
     public function updateSettings(Request $request)
@@ -33,6 +35,19 @@ class MemberController extends Controller
         ModerationSetting::current()->update($validated);
 
         return back()->with('success', 'Moderation settings updated.');
+    }
+
+    public function updateRole(Request $request, User $member)
+    {
+        abort_if($member->id === $request->user()->id, 422, "You can't change your own role.");
+
+        $validated = $request->validate([
+            'role' => ['required', 'string', 'in:student,lecturer,admin'],
+        ]);
+
+        $member->update(['role' => $validated['role']]);
+
+        return back()->with('success', "{$member->name} is now a(n) {$member->roleLabel()}.");
     }
 
     public function warn(Request $request, User $member)

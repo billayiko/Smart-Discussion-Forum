@@ -102,7 +102,7 @@ class TeamInvitationTest extends TestCase
             'invitation' => $invitation,
         ]);
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route($invitedUser->dashboardRouteName()));
 
         $this->assertTrue(session('team-invitation-accepted'));
 
