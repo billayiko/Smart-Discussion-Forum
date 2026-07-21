@@ -51,7 +51,6 @@
                             <option value="">Select your role</option>
                             <option value="student" @selected(old('role') === 'student')>Student</option>
                             <option value="lecturer" @selected(old('role') === 'lecturer')>Lecturer</option>
-                            <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                         </select>
                     </span>
                 </label>
@@ -72,9 +71,19 @@
                     </span>
                 </label>
 
+                <details class="pulse-field" style="background:var(--pulse-surface-2, #f6f7f9); border-radius:10px; padding:12px 14px;">
+                    <summary style="cursor:pointer; font-weight:700;">Platform rules (read before joining)</summary>
+                    <ul style="margin:10px 0 0; padding-left:18px; color:var(--pulse-muted); font-size:0.92em; line-height:1.6;">
+                        <li>Keep discussion on-topic; don't flood the forum with unrelated material.</li>
+                        <li>Be respectful — harassment or abusive language may result in warnings or a blacklist.</li>
+                        <li>Members inactive for a prolonged period will receive up to two warnings before a temporary blacklist.</li>
+                        <li>Content you post may be visible to other members of your group and can be exported by them.</li>
+                    </ul>
+                </details>
+
                 <label class="pulse-form-row" style="justify-content:flex-start;">
-                    <input type="checkbox" required>
-                    <span>I agree to the <a style="color:var(--pulse-blue);" href="#">Terms of Service</a> and <a style="color:var(--pulse-blue);" href="#">Privacy Policy</a></span>
+                    <input type="checkbox" name="rules_agreement" value="1" required @checked(old('rules_agreement'))>
+                    <span>I have read and agree to the platform rules above</span>
                 </label>
 
                 <button type="submit" class="pulse-btn" style="width:100%;">Create Account</button>

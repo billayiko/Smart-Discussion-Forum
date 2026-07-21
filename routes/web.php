@@ -10,7 +10,6 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TopicController;
-use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -39,6 +38,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::get('/admin/members', [AdminMemberController::class, 'index'])->name('admin.members.index');
     Route::patch('/admin/members/settings', [AdminMemberController::class, 'updateSettings'])->name('admin.members.settings');
+    Route::patch('/admin/members/{member}/role', [AdminMemberController::class, 'updateRole'])->name('admin.members.role');
     Route::post('/admin/members/{member}/warn', [AdminMemberController::class, 'warn'])->name('admin.members.warn');
     Route::post('/admin/members/{member}/blacklist', [AdminMemberController::class, 'blacklist'])->name('admin.members.blacklist');
     Route::post('/admin/members/{member}/unblacklist', [AdminMemberController::class, 'unblacklist'])->name('admin.members.unblacklist');
@@ -66,12 +66,6 @@ Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
     Route::delete('/messages/{conversation}/members/{member}', [MessageController::class, 'removeMember'])->name('messages.members.destroy');
 });
 
-Route::prefix('{current_team}')
-    ->middleware(['auth', 'verified', EnsureTeamMembership::class])
-    ->group(function () {
-        Route::view('dashboard', 'dashboard')->name('dashboard');
-    });
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/quizzes', [QuizController::class, 'index'])->name('quizzes.index');
     Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
@@ -80,6 +74,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
 });
-
 
 require __DIR__.'/settings.php';
