@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.TopicsController">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="16" right="16" bottom="8" left="16"/>
+            </padding>
+            <Label text="Discussion Forum" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout"/>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="8" right="16" bottom="16" left="16"/>
+            </padding>
+            <Label fx:id="statusLabel" style="-fx-text-fill: #7182a8;"/>
+            <ListView fx:id="topicsListView" VBox.vgrow="ALWAYS"/>
+            <Button text="Open Forum" onAction="#handleOpenTopic" maxWidth="Infinity"/>
+        </VBox>
+    </center>
+</BorderPane>
