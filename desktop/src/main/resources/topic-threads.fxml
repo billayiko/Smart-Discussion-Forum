@@ -7,9 +7,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.TopicThreadsController">
+    <left>
+        <fx:include source="sidebar.fxml"/>
+    </left>
     <top>
         <HBox spacing="10" alignment="CENTER_LEFT">
             <padding>
@@ -17,8 +19,6 @@
             </padding>
             <Button text="&#8592; Back" onAction="#handleBack"/>
             <Label fx:id="titleLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Logout" onAction="#handleLogout"/>
         </HBox>
     </top>
     <center>

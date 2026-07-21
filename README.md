@@ -44,9 +44,12 @@ Livewire/Jetstream-style personal team workspaces with invitations
 (unrelated to the course-topic discussion groups above).
 
 ### Desktop client (`desktop/`)
-A JavaFX app (Java 25, Maven) that logs in and browses/asks/replies in the
-Discussion Forum against the same data, via a token-authenticated REST API.
-See the [Desktop client](#desktop-client-1) section below.
+A JavaFX app (Java 25, Maven) with a navy-blue left navigation (mirroring
+the web app's dashboard sidebar) that logs in and browses/asks/replies in
+the Discussion Forum against the same data, via a token-authenticated REST
+API. See the [Desktop client](#desktop-client-1) section below, and
+[`desktop/README.md`](desktop/README.md) for architecture details and the
+development log.
 
 ## Tech stack
 
@@ -81,7 +84,9 @@ database/
   seeders/                   Sample data
 desktop/
   src/main/java/...          JavaFX client source
+  src/main/resources/        FXML screens + shared stylesheet
   pom.xml                    Maven build config
+  README.md                  Desktop client architecture + development log
 ```
 
 ## Getting started (web app)
@@ -164,6 +169,36 @@ Maven the first time (`javafx-maven-plugin` downloads the platform-specific
 jars). If the app window renders solid black, that's typically GPU
 acceleration failing under a remote/virtualized display — rerun with
 `-Dprism.order=sw` to force software rendering.
+
+If Maven isn't available, the app can be compiled and run directly against
+a JDK with the JavaFX/Jackson jars on the classpath:
+
+```powershell
+$javaHome = "<path to a JDK 21+>"
+$m2 = "<path to your local .m2 repository>\org\openjfx"
+$modpath = @(
+  "$m2\javafx-base\21.0.2\javafx-base-21.0.2-win.jar",
+  "$m2\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar",
+  "$m2\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar",
+  "$m2\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar"
+) -join ";"
+$jm2 = "<path to your local .m2 repository>\com\fasterxml\jackson"
+$jacksoncp = @(
+  "$jm2\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar",
+  "$jm2\core\jackson-core\2.17.2\jackson-core-2.17.2.jar",
+  "$jm2\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar"
+) -join ";"
+
+# Compile
+& "$javaHome\bin\javac" -encoding UTF-8 -cp $jacksoncp -d target\classes (Get-ChildItem -Recurse -Filter *.java src\main\java | ForEach-Object FullName)
+Copy-Item src\main\resources\*.fxml, src\main\resources\*.css target\classes\
+
+# Run (with `php artisan serve` already up)
+& "$javaHome\bin\java" --module-path $modpath --add-modules javafx.controls,javafx.fxml -cp "target\classes;$jacksoncp" com.academicpulse.desktop.Main
+```
+
+See [`desktop/README.md`](desktop/README.md) for the client's architecture
+(Router/ApiClient/screens/shared sidebar) and a running development log.
 
 ## Roles
 
