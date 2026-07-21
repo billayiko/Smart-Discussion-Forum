@@ -25,6 +25,7 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'role' => 'student',
+            'rules_agreement' => '1',
         ]);
 
         $user = User::where('email', 'test@example.com')->first();
@@ -33,5 +34,37 @@ class RegistrationTest extends TestCase
             ->assertRedirect(route('student.dashboard', absolute: false));
 
         $this->assertAuthenticated();
+        $this->assertNotNull($user->rules_agreed_at);
+    }
+
+    public function test_registration_is_declined_without_agreeing_to_the_rules(): void
+    {
+        $response = $this->post(route('register.store'), [
+            'name' => 'John Doe',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'student',
+        ]);
+
+        $response->assertSessionHasErrors('rules_agreement');
+        $this->assertGuest();
+        $this->assertNull(User::where('email', 'test@example.com')->first());
+    }
+
+    public function test_users_cannot_self_register_as_admin(): void
+    {
+        $response = $this->post(route('register.store'), [
+            'name' => 'John Doe',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'admin',
+            'rules_agreement' => '1',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertGuest();
+        $this->assertNull(User::where('email', 'test@example.com')->first());
     }
 }

@@ -10,40 +10,63 @@ class DashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_to_the_login_page(): void
+    public function test_login_redirects_a_student_to_the_student_dashboard(): void
     {
-        $user = User::factory()->create();
-        $team = $user->currentTeam;
+        $user = User::factory()->create(['role' => 'student', 'password' => bcrypt('password')]);
 
-        $response = $this->get(route('dashboard'));
-        $response->assertRedirect(route('login'));
-    }
-
-    public function test_authenticated_users_can_visit_the_dashboard(): void
-    {
-        $user = User::factory()->create();
-        $team = $user->currentTeam;
-
-        $response = $this
-            ->actingAs($user)
-            ->get(route('dashboard'));
-
-        $response->assertOk();
-    }
-
-    public function test_dashboard_shows_the_authenticated_users_name_and_role_in_the_account_menu(): void
-    {
-        $user = User::factory()->create([
-            'name' => 'Ada Lovelace',
-            'role' => 'admin',
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
         ]);
 
-        $response = $this
-            ->actingAs($user)
-            ->get(route('dashboard'));
+        $response->assertRedirect(route('student.dashboard', absolute: false));
+    }
 
-        $response->assertOk();
-        $response->assertSeeText('Ada Lovelace');
-        $response->assertSeeText('Admin');
+    public function test_login_redirects_a_lecturer_to_the_lecturer_dashboard(): void
+    {
+        $user = User::factory()->create(['role' => 'lecturer', 'password' => bcrypt('password')]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('lecturer.dashboard', absolute: false));
+    }
+
+    public function test_login_redirects_an_admin_to_the_admin_dashboard(): void
+    {
+        $user = User::factory()->create(['role' => 'admin', 'password' => bcrypt('password')]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard', absolute: false));
+    }
+
+    public function test_a_fresh_login_after_closing_the_browser_still_lands_on_the_role_dashboard(): void
+    {
+        // Simulates closing the browser (no prior "intended" URL in the session)
+        // and logging back in from scratch.
+        $user = User::factory()->create(['role' => 'lecturer', 'password' => bcrypt('password')]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('lecturer.dashboard', absolute: false));
+
+        $dashboard = $this->get(route('lecturer.dashboard'));
+        $dashboard->assertOk();
+    }
+
+    public function test_guests_are_redirected_to_the_login_page(): void
+    {
+        $response = $this->get(route('student.dashboard'));
+
+        $response->assertRedirect(route('login'));
     }
 }
