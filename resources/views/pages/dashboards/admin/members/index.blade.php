@@ -92,6 +92,53 @@
 
                 <section class="pulse-card pulse-pad" style="margin-top:22px;">
                     <div class="pulse-section-head">
+                        <h2>Administrators</h2>
+                        <span class="pulse-muted">{{ $admins->count() }} total</span>
+                    </div>
+                    <div style="overflow:auto;">
+                        <table class="pulse-table">
+                            <thead>
+                                <tr>
+                                    <th>Admin</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($admins as $admin)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $admin->name }}</strong>
+                                            <p class="pulse-muted" style="margin:2px 0 0;">{{ $admin->email }}</p>
+                                        </td>
+                                        <td>
+                                            @if ($admin->id === $user->id)
+                                                <span class="pulse-tag">Admin (you)</span>
+                                            @else
+                                                <form method="POST" action="{{ route('admin.members.role', $admin) }}" style="display:flex; gap:6px; align-items:center;" onsubmit="return confirm('Demote {{ $admin->name }} from Admin to the selected role?');">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <select name="role" class="pulse-input" style="padding:4px 8px; height:auto;" onchange="this.form.submit()">
+                                                        <option value="admin" selected>Admin</option>
+                                                        <option value="lecturer">Lecturer</option>
+                                                        <option value="student">Student</option>
+                                                    </select>
+                                                    <noscript><button class="pulse-btn light" type="submit">Save</button></noscript>
+                                                </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="pulse-muted">No administrators yet.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="pulse-card pulse-pad" style="margin-top:22px;">
+                    <div class="pulse-section-head">
                         <h2>All Members</h2>
                         <span class="pulse-muted">{{ $members->count() }} total</span>
                     </div>
@@ -114,7 +161,18 @@
                                             <strong>{{ $member->name }}</strong>
                                             <p class="pulse-muted" style="margin:2px 0 0;">{{ $member->email }}</p>
                                         </td>
-                                        <td>{{ $member->roleLabel() }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ route('admin.members.role', $member) }}" style="display:flex; gap:6px; align-items:center;" onsubmit="return confirm('Change {{ $member->name }}\'s role to the selected value?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <select name="role" class="pulse-input" style="padding:4px 8px; height:auto;" onchange="this.form.submit()">
+                                                    <option value="student" @selected($member->role === 'student')>Student</option>
+                                                    <option value="lecturer" @selected($member->role === 'lecturer')>Lecturer</option>
+                                                    <option value="admin" @selected($member->role === 'admin')>Admin</option>
+                                                </select>
+                                                <noscript><button class="pulse-btn light" type="submit">Save</button></noscript>
+                                            </form>
+                                        </td>
                                         <td>{{ $member->last_communication_at?->diffForHumans() ?? 'Never' }}</td>
                                         <td>
                                             @if ($member->warning_count > 0)

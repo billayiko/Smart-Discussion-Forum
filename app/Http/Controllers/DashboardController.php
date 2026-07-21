@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -47,7 +48,7 @@ class DashboardController extends Controller
             'quizzes' => Quiz::count(),
             'active_quizzes' => Quiz::whereIn('status', ['scheduled', 'due_soon', 'active'])->count(),
             'published_this_week' => Quiz::where('status', '!=', 'draft')->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'students' => 842,
+            'students' => User::where('role', 'student')->count(),
         ];
 
         $recentQuizzes = Quiz::latest()->take(5)->get();
@@ -98,7 +99,7 @@ class DashboardController extends Controller
      * Non-draft quiz counts grouped by subject, with each row's bar width
      * pre-computed as a percentage of the largest subject's count.
      */
-    protected function quizzesBySubject(): \Illuminate\Support\Collection
+    protected function quizzesBySubject(): Collection
     {
         $rows = Quiz::where('status', '!=', 'draft')
             ->selectRaw('subject, count(*) as total')
@@ -121,7 +122,7 @@ class DashboardController extends Controller
      * order, with each row's bar width pre-computed as a percentage of the
      * largest status's count.
      */
-    protected function quizzesByStatus(User $user): \Illuminate\Support\Collection
+    protected function quizzesByStatus(User $user): Collection
     {
         $counts = $user->quizzes()
             ->selectRaw('status, count(*) as total')

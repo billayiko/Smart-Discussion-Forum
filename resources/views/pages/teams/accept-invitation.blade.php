@@ -40,7 +40,7 @@ new #[Title('Teams')] class extends Component {
 
         session()->flash('team-invitation-accepted', true);
 
-        $this->redirectRoute('dashboard', navigate: true);
+        $this->redirectRoute($user->dashboardRouteName(), navigate: true);
     }
 
     private function validateInvitation(User $user, TeamInvitation $invitation): void
