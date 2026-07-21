@@ -96,24 +96,6 @@ public class ThreadDetailController {
         }
     }
 
-    @FXML
-    private void handleLogout() {
-        statusLabel.setText("Logging out...");
-        new Thread(() -> {
-            try {
-                Router.api().logout();
-            } catch (Exception ignored) {
-            }
-            Platform.runLater(() -> {
-                try {
-                    Router.navigate("/login.fxml", "Academic Pulse - Login");
-                } catch (Exception e) {
-                    statusLabel.setText("Failed to return to login: " + describe(e));
-                }
-            });
-        }).start();
-    }
-
     private String describe(Exception e) {
         String message = e.getMessage();
         return message == null || message.isBlank() ? e.getClass().getSimpleName() : message;

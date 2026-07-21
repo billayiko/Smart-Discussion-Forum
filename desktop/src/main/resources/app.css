@@ -1,0 +1,63 @@
+.app-sidebar {
+    -fx-background-color: linear-gradient(to bottom, #0a1628, #0f2b4b);
+    -fx-min-width: 220;
+    -fx-pref-width: 220;
+}
+
+.app-sidebar-brand {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.app-sidebar-brand-accent {
+    -fx-text-fill: #c9a84c;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.app-nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b9c8e0;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 12 10 12;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.app-nav-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: white;
+}
+
+.app-nav-btn.active {
+    -fx-background-color: rgba(201, 168, 76, 0.16);
+    -fx-text-fill: #f0d060;
+}
+
+.app-sidebar-user-name {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.app-sidebar-user-role {
+    -fx-text-fill: #8ea5c1;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.app-logout-btn {
+    -fx-background-color: rgba(239, 68, 68, 0.16);
+    -fx-text-fill: #fca5a5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-cursor: hand;
+}
+
+.app-logout-btn:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.28);
+}
