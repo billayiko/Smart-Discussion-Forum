@@ -3,6 +3,7 @@
     $groupCount = $otherTopics->count() + ($topic ? 1 : 0);
     $onlineCount = $groupMembers->filter(fn ($member) => $member->isOnline())->count();
     $activeQuestionId = $question->id;
+    $shareUrl = route('questions.show', $question);
 @endphp
 
 <div class="forum-shell">
@@ -50,12 +51,13 @@
                 <p class="forum-meta" id="forum-meta">
                     <span><i class="fas fa-clock"></i> Last activity: {{ $question->updated_at->diffForHumans() }}</span>
                     <span><i class="fas fa-eye"></i> {{ number_format($question->views) }} views</span>
+                    <span><i class="fas fa-comment"></i> {{ number_format($question->answers->count()) }} repl{{ $question->answers->count() === 1 ? 'y' : 'ies' }}</span>
                 </p>
             </div>
 
             <div class="forum-actions">
                 <button type="button" class="forum-btn gold" id="forum-export-btn"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                <button type="button" class="forum-btn gold" id="forum-share-btn"><i class="fab fa-twitter"></i> Share</button>
+                @include('pages.dashboards.questions._share-menu', ['shareUrl' => $shareUrl, 'shareText' => $question->title, 'buttonClass' => 'forum-btn gold', 'buttonLabel' => 'Share'])
                 <button type="button" class="forum-btn gold" id="forum-sync-btn"><i class="fas fa-arrows-rotate"></i> Sync</button>
                 <details class="forum-report">
                     <summary class="forum-btn light"><i class="fas fa-flag"></i> Report</summary>
@@ -89,6 +91,14 @@
                             <span class="forum-muted">{{ $question->created_at->diffForHumans() }}</span>
                         </div>
                         <p>{{ $question->body }}</p>
+                        <div class="forum-message-footer">
+                            <button type="button" class="forum-like-btn {{ $question->isLikedBy($user) ? 'liked' : '' }}" data-like-url="{{ route('questions.like', $question) }}">
+                                <i class="fas fa-heart"></i> <span class="forum-like-count">{{ $question->likes->count() }}</span>
+                            </button>
+                            <span class="forum-view-count"><i class="fas fa-eye"></i> {{ number_format($question->views) }}</span>
+                            <button type="button" class="forum-reply-trigger"><i class="fas fa-reply"></i> Reply</button>
+                            @include('pages.dashboards.questions._share-menu', ['shareUrl' => $shareUrl, 'shareText' => $question->title])
+                        </div>
                     </div>
                 </div>
 
@@ -105,6 +115,14 @@
                                 <span class="forum-muted">{{ $answer->created_at->diffForHumans() }}</span>
                             </div>
                             <p>{{ $answer->body }}</p>
+                            <div class="forum-message-footer">
+                                <button type="button" class="forum-like-btn {{ $answer->isLikedBy($user) ? 'liked' : '' }}" data-like-url="{{ route('answers.like', $answer) }}">
+                                    <i class="fas fa-heart"></i> <span class="forum-like-count">{{ $answer->likes->count() }}</span>
+                                </button>
+                                <span class="forum-view-count"><i class="fas fa-eye"></i> {{ number_format($answer->views) }}</span>
+                                <button type="button" class="forum-reply-trigger"><i class="fas fa-reply"></i> Reply</button>
+                                @include('pages.dashboards.questions._share-menu', ['shareUrl' => $shareUrl, 'shareText' => $answer->user->name.'\'s reply on '.$question->title])
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -116,7 +134,7 @@
                 @csrf
                 <input type="text" name="topic" placeholder="Topic (optional)" class="forum-composer-topic">
                 <div class="forum-composer-row">
-                    <textarea name="body" rows="1" placeholder="Write your message..." required></textarea>
+                    <textarea id="forum-reply-input" name="body" rows="1" placeholder="Write your message..." required></textarea>
                     <button type="submit" class="forum-btn gold"><i class="fas fa-paper-plane"></i> Send</button>
                 </div>
                 <div class="forum-composer-footer">

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\Likeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,13 +10,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Answer extends Model
 {
-    use HasFactory;
+    use HasFactory, Likeable;
 
     protected $fillable = [
         'question_id',
         'user_id',
         'body',
         'topic',
+        'views',
     ];
 
     protected $touches = ['question'];

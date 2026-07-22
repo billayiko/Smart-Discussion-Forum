@@ -306,6 +306,99 @@
 
     .forum-topic-chip { padding: 2px 8px; border-radius: 999px; background: #eef6ff; color: #2563eb; font-size: .64rem; font-weight: 800; }
 
+    .forum-message-footer { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(15,31,61,.06); }
+
+    .forum-like-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        background: transparent;
+        padding: 4px 8px;
+        border-radius: 999px;
+        color: #7182a8;
+        font-size: .78rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .forum-like-btn:hover { background: rgba(239,68,68,.08); color: #ef4444; }
+    .forum-like-btn.liked { color: #ef4444; }
+    .forum-like-btn.liked i { font-weight: 900; }
+
+    .forum-view-count { display: inline-flex; align-items: center; gap: 6px; color: #7182a8; font-size: .78rem; font-weight: 700; }
+
+    .forum-reply-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        background: transparent;
+        padding: 4px 8px;
+        border-radius: 999px;
+        color: #7182a8;
+        font-size: .78rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .forum-reply-trigger:hover { background: rgba(37,99,235,.08); color: var(--forum-gold, #2563eb); }
+
+    .forum-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        background: transparent;
+        padding: 4px 8px;
+        border-radius: 999px;
+        color: #7182a8;
+        font-size: .78rem;
+        font-weight: 800;
+        cursor: pointer;
+        list-style: none;
+        margin-left: auto;
+    }
+
+    .forum-icon-btn::-webkit-details-marker { display: none; }
+    .forum-icon-btn:hover { background: rgba(15,31,61,.06); color: #14213d; }
+
+    .forum-share { position: relative; }
+    .forum-share-menu {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        z-index: 6;
+        display: grid;
+        gap: 2px;
+        width: 190px;
+        padding: 8px;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 10px 26px rgba(15,31,61,.14);
+    }
+
+    .forum-share-menu a,
+    .forum-share-menu button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: #2a3a5c;
+        font-size: .8rem;
+        font-weight: 700;
+        text-align: left;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .forum-share-menu a:hover,
+    .forum-share-menu button:hover { background: #f1f5f9; }
+    .forum-share-menu i { width: 16px; text-align: center; color: #7182a8; }
+
     .forum-composer { padding: 16px; border-radius: 18px; background: #fff; box-shadow: 0 10px 26px rgba(15,31,61,.06); }
     .forum-composer-topic { width: 100%; border: 1px solid rgba(15,31,61,.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; font: inherit; }
     .forum-composer-row { display: flex; gap: 10px; align-items: flex-end; }
@@ -332,7 +425,7 @@
     [data-forum-hidden] { display: none !important; }
 
     @media print {
-        .forum-topbar, .forum-sidebar, .forum-search-bar, .forum-actions, .forum-composer { display: none !important; }
+        .forum-topbar, .forum-sidebar, .forum-search-bar, .forum-actions, .forum-composer, .forum-message-footer { display: none !important; }
         .forum-app { display: block; }
         .forum-main { padding: 0; }
     }
@@ -367,15 +460,58 @@
         const exportBtn = document.getElementById('forum-export-btn');
         exportBtn?.addEventListener('click', () => window.print());
 
-        const shareBtn = document.getElementById('forum-share-btn');
-        shareBtn?.addEventListener('click', async () => {
+        document.addEventListener('click', async (event) => {
+            const copyBtn = event.target.closest('.forum-copy-link-btn');
+            if (!copyBtn) return;
+
+            const url = copyBtn.getAttribute('data-share-url');
+            const original = copyBtn.innerHTML;
             try {
-                await navigator.clipboard.writeText(window.location.href);
-                const original = shareBtn.innerHTML;
-                shareBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => { shareBtn.innerHTML = original; }, 1800);
+                await navigator.clipboard.writeText(url);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
             } catch (e) {
-                window.prompt('Copy this link:', window.location.href);
+                window.prompt('Copy this link:', url);
+            }
+            setTimeout(() => { copyBtn.innerHTML = original; }, 1500);
+
+            copyBtn.closest('.forum-share')?.removeAttribute('open');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.forum-reply-trigger')) return;
+
+            const replyInput = document.getElementById('forum-reply-input');
+            replyInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            replyInput?.focus();
+        });
+
+        document.addEventListener('click', async (event) => {
+            const likeBtn = event.target.closest('.forum-like-btn');
+            if (!likeBtn) return;
+
+            const url = likeBtn.getAttribute('data-like-url');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            likeBtn.disabled = true;
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    likeBtn.classList.toggle('liked', data.liked);
+                    const countEl = likeBtn.querySelector('.forum-like-count');
+                    if (countEl) countEl.textContent = data.count;
+                }
+            } catch (e) {
+                // leave the button's state unchanged on network failure
+            } finally {
+                likeBtn.disabled = false;
             }
         });
 
