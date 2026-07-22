@@ -29,7 +29,8 @@ public class LoginController {
 
         new Thread(() -> {
             try {
-                Router.api().login(email, password);
+                var user = Router.api().login(email, password);
+                Router.setCurrentUser(user);
                 Platform.runLater(this::goToTopics);
             } catch (Exception e) {
                 Platform.runLater(() -> showError(describe(e)));
