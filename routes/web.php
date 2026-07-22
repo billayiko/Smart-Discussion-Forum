@@ -7,12 +7,28 @@ use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TopicController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
+        ->whereIn('provider', ['google', 'github'])
+        ->name('social.redirect');
+    Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
+        ->whereIn('provider', ['google', 'github'])
+        ->name('social.callback');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/onboarding', [OnboardingController::class, 'edit'])->name('onboarding.edit');
+    Route::patch('/onboarding', [OnboardingController::class, 'update'])->name('onboarding.update');
+});
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student-dashboard', [DashboardController::class, 'student'])->name('student.dashboard');

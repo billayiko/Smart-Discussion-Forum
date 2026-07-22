@@ -57,8 +57,8 @@
                 <div class="pulse-auth-divider">Or continue with</div>
 
                 <div class="pulse-provider-grid">
-                    <button type="button" class="pulse-btn light"><i class="fab fa-google"></i> Google</button>
-                    <button type="button" class="pulse-btn light"><i class="fab fa-microsoft"></i> Microsoft</button>
+                    <a href="{{ route('social.redirect', 'google') }}" class="pulse-btn light"><i class="fab fa-google"></i> Google</a>
+                    <a href="{{ route('social.redirect', 'github') }}" class="pulse-btn light"><i class="fab fa-github"></i> GitHub</a>
                 </div>
             </form>
 

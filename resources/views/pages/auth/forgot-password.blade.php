@@ -1,31 +1,45 @@
-<x-layouts::auth :title="__('Forgot password')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
+<x-layouts.academic-pulse title="Forgot password">
+    <main class="pulse-page pulse-auth">
+        <section class="pulse-auth-side">
+            <a class="pulse-logo" href="{{ route('home') }}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Academic<span>Pulse Forum</span></span>
+            </a>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+            <div class="pulse-auth-copy">
+                <h1>Forgot your password?</h1>
+                <p>Enter your registered email and we'll send you a secure link to set a new one.</p>
+            </div>
 
-        <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-6">
-            @csrf
+            <div class="pulse-illustration" aria-hidden="true"></div>
+        </section>
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                type="email"
-                required
-                autofocus
-                placeholder="email@example.com"
-            />
+        <section class="pulse-card pulse-auth-card">
+            <h2>Reset your password</h2>
 
-            <flux:button variant="primary" type="submit" class="w-full" data-test="email-password-reset-link-button">
-                {{ __('Email password reset link') }}
-            </flux:button>
-        </form>
+            <x-auth-session-status class="notice" :status="session('status')" />
 
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
-            <span>{{ __('Or, return to') }}</span>
-            <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
-        </div>
-    </div>
-</x-layouts::auth>
+            @if ($errors->any())
+                <div class="pulse-alert"><i class="fas fa-circle-exclamation"></i> {{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('password.email') }}" class="pulse-form">
+                @csrf
+
+                <label class="pulse-field" for="email">
+                    <span>Email address</span>
+                    <span class="pulse-input">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="Enter your registered email" required autofocus autocomplete="email">
+                    </span>
+                </label>
+
+                <button type="submit" class="pulse-btn" style="width:100%;" data-test="email-password-reset-link-button">Email password reset link</button>
+            </form>
+
+            <p style="margin:28px 0 0;text-align:center;color:var(--pulse-muted);font-weight:750;">
+                Remembered your password?
+                <a style="color:var(--pulse-blue);" href="{{ route('login') }}">Log in</a>
+            </p>
+        </section>
+    </main>
+</x-layouts.academic-pulse>
