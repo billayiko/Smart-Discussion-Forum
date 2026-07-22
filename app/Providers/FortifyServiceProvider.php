@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
 use App\Http\Responses\LoginResponse;
 use App\Http\Responses\PasskeyLoginResponse;
 use App\Http\Responses\RegisterResponse;
 use App\Http\Responses\TwoFactorLoginResponse;
 use App\Http\Responses\VerifyEmailResponse;
 use App\Models\TeamInvitation;
+use App\Support\SecurityQuestion;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -51,7 +51,6 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureActions(): void
     {
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
     }
 
@@ -68,9 +67,8 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));
         Fortify::registerView(fn (Request $request) => view('pages::auth.register', [
             'teamInvitation' => $this->teamInvitation($request),
+            'securityQuestions' => SecurityQuestion::OPTIONS,
         ]));
-        Fortify::resetPasswordView(fn () => view('pages::auth.reset-password'));
-        Fortify::requestPasswordResetLinkView(fn () => view('pages::auth.forgot-password'));
     }
 
     /**

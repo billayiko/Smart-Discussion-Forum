@@ -5,14 +5,16 @@ namespace App\Actions\Fortify;
 use App\Actions\Teams\CreateTeam;
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
+use App\Concerns\SecurityQuestionValidationRules;
 use App\Models\User;
+use App\Support\SecurityQuestion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules, ProfileValidationRules;
+    use PasswordValidationRules, ProfileValidationRules, SecurityQuestionValidationRules;
 
     public function __construct(private CreateTeam $createTeam)
     {
@@ -31,6 +33,8 @@ class CreateNewUser implements CreatesNewUsers
             'role' => ['required', 'string', 'in:student,lecturer'],
             'password' => $this->passwordRules(),
             'rules_agreement' => ['required', 'accepted'],
+            'security_question' => $this->securityQuestionRules(),
+            'security_answer' => $this->securityAnswerRules(),
         ])->validate();
 
         return DB::transaction(function () use ($input) {
@@ -40,6 +44,8 @@ class CreateNewUser implements CreatesNewUsers
                 'password' => $input['password'],
                 'role' => $input['role'],
                 'rules_agreed_at' => now(),
+                'security_question' => $input['security_question'],
+                'security_answer' => SecurityQuestion::normalizeAnswer($input['security_answer']),
             ]);
 
             $this->createTeam->handle($user, $user->name."'s Team", isPersonal: true);
