@@ -152,8 +152,9 @@
                             <a href="#">View all</a>
                         </div>
                         <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-bullhorn"></i></span><span><strong>Midterm Exam Schedule</strong><p>The midterm exams will be held during May 20 - May 24.</p></span><span class="pulse-muted">2h</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-calendar-plus"></i></span><span><strong>Project Deadline Extended</strong><p>The final project submission deadline has been extended.</p></span><span class="pulse-muted">1d</span></div>
+                            @foreach ($upcomingQuizAnnouncements as $announcement)
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-bullhorn"></i></span><span><strong>Upcoming quiz: {{ $announcement->title }}</strong><p>{{ $announcement->subject }} &middot; {{ $announcement->scheduled_at->format('M j, Y g:i A') }} &middot; {{ $announcement->duration_minutes }} mins</p></span><span class="pulse-tag orange">{{ $announcement->scheduled_at->diffForHumans() }}</span></div>
+                            @endforeach
                             <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-user-tie"></i></span><span><strong>Guest Lecture on ML</strong><p>Guest lecture on Machine Learning by Dr. Sarah Johnson.</p></span><span class="pulse-muted">2d</span></div>
                         </div>
                     </article>
@@ -173,4 +174,28 @@
             </main>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const quizzes = @json($upcomingQuizAnnouncements->map(fn ($quiz) => [
+                'url' => route('quizzes.take', $quiz),
+                'startsAt' => $quiz->scheduled_at->toIso8601String(),
+            ]));
+
+            quizzes.forEach(function (quiz) {
+                const delay = new Date(quiz.startsAt).getTime() - Date.now();
+
+                if (delay <= 0) {
+                    window.location.href = quiz.url;
+                    return;
+                }
+
+                if (delay < 24 * 60 * 60 * 1000) {
+                    setTimeout(function () {
+                        window.location.href = quiz.url;
+                    }, delay);
+                }
+            });
+        })();
+    </script>
 </x-layouts.academic-pulse>
