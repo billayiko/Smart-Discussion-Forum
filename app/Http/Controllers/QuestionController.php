@@ -6,6 +6,7 @@ use App\Models\Answer;
 use App\Models\CourseTopic;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Notifications\QuestionAnswered;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -116,8 +117,14 @@ class QuestionController extends Controller
             'body' => $validated['body'],
             'topic' => $validated['topic'] ?? null,
         ]);
+        $answer->setRelation('user', $request->user());
 
-        $answer->excludedUsers()->sync($validated['excluded_user_ids'] ?? []);
+        $excludedUserIds = $validated['excluded_user_ids'] ?? [];
+        $answer->excludedUsers()->sync($excludedUserIds);
+
+        if ($question->user_id !== $request->user()->id && ! in_array($question->user_id, $excludedUserIds, true)) {
+            $question->user->notify(new QuestionAnswered($answer));
+        }
 
         $request->user()->recordCommunication();
 

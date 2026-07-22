@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
@@ -28,6 +29,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'edit'])->name('onboarding.edit');
     Route::patch('/onboarding', [OnboardingController::class, 'update'])->name('onboarding.update');
+
+    Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 });
 
 Route::middleware(['auth', 'role:student'])->group(function () {

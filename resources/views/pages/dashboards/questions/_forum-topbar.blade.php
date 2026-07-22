@@ -6,6 +6,7 @@
 
     <div class="forum-topbar-right">
         <span class="forum-online-pill"><span class="forum-dot online"></span> Online</span>
+        @include('partials._notification-bell')
         <span class="forum-user">
             <span class="forum-avatar gold">{{ $user->initials() }}</span>
             <strong>{{ $user->name }}</strong>
