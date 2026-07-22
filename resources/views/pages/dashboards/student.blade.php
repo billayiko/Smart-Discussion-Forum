@@ -46,7 +46,7 @@
                             <i class="fas fa-magnifying-glass"></i>
                             <input type="search" placeholder="Search anything...">
                         </label>
-                        <span class="pulse-icon-btn"><i class="fas fa-bell"></i></span>
+                        @include('partials._notification-bell')
                         <span class="pulse-avatar">AJ</span>
                     </div>
                 </header>
