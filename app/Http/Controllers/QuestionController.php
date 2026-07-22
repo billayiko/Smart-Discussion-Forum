@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\CourseTopic;
 use App\Models\Question;
 use App\Models\Quiz;
@@ -49,19 +50,21 @@ class QuestionController extends Controller
     {
         $user = $request->user();
 
-        $question->load(['user', 'topic', 'answers.user', 'answers.excludedUsers']);
+        $question->load(['user', 'topic', 'answers.user', 'answers.excludedUsers', 'answers.likes', 'likes']);
 
         $extra = [];
 
         if (in_array($user->role, ['student', 'lecturer'], true)) {
+            $visibleAnswers = $question->answers->reject(fn ($answer) => $answer->isExcludedFor($user))->values();
+
             if (! $request->hasHeader('X-Sync')) {
-                $question->increment('views');
+                // Quietly: a passive view shouldn't touch the question's
+                // "last activity" via Answer's $touches (only real posts should).
+                $question->incrementQuietly('views');
+                $visibleAnswers->each(fn ($answer) => $answer->incrementQuietly('views'));
             }
 
-            $question->setRelation(
-                'answers',
-                $question->answers->reject(fn ($answer) => $answer->isExcludedFor($user))->values()
-            );
+            $question->setRelation('answers', $visibleAnswers);
 
             $topic = $question->topic;
 
@@ -119,6 +122,20 @@ class QuestionController extends Controller
         $request->user()->recordCommunication();
 
         return back()->with('success', 'Your reply has been posted.');
+    }
+
+    public function toggleLike(Request $request, Question $question)
+    {
+        $liked = $question->toggleLikeFor($request->user());
+
+        return response()->json(['liked' => $liked, 'count' => $question->likes()->count()]);
+    }
+
+    public function toggleAnswerLike(Request $request, Answer $answer)
+    {
+        $liked = $answer->toggleLikeFor($request->user());
+
+        return response()->json(['liked' => $liked, 'count' => $answer->likes()->count()]);
     }
 
     public function storeComplaint(Request $request, Question $question)
