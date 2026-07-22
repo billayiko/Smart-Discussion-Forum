@@ -20,7 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
 /**
  * Cleaned up SDD User Model
  */
-#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'rules_agreed_at'])]
+#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'rules_agreed_at', 'google_id', 'github_id', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {

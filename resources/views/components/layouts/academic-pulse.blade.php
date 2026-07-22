@@ -1295,6 +1295,22 @@
                 });
             });
         })();
+
+        (function () {
+            document.querySelectorAll('form.pulse-form').forEach((form) => {
+                form.addEventListener('submit', () => {
+                    const button = form.querySelector('button[type="submit"]');
+
+                    if (!button || button.disabled) {
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.dataset.originalLabel = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Please wait…';
+                });
+            });
+        })();
     </script>
 </body>
 </html>
