@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasTeams;
+use App\Support\SecurityQuestion;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Passkeys\PasskeyAuthenticatable;
@@ -20,8 +22,8 @@ use Laravel\Sanctum\HasApiTokens;
 /**
  * Cleaned up SDD User Model
  */
-#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'rules_agreed_at', 'google_id', 'github_id', 'avatar'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'rules_agreed_at', 'google_id', 'github_id', 'avatar', 'security_question', 'security_answer'])]
+#[Hidden(['password', 'remember_token', 'security_answer'])]
 class User extends Authenticatable
 {
     /** @use HasFactory */
@@ -37,6 +39,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'security_answer' => 'hashed',
             'blacklisted' => 'boolean',
             'blacklisted_until' => 'datetime',
             'last_communication_at' => 'datetime',
@@ -137,6 +140,18 @@ class User extends Authenticatable
             'warning_count' => 0,
             'last_warned_at' => null,
         ])->save();
+    }
+
+    /**
+     * Determine if the given answer matches this user's stored security answer.
+     */
+    public function verifySecurityAnswer(string $answer): bool
+    {
+        if (! $this->security_question || ! $this->security_answer) {
+            return false;
+        }
+
+        return Hash::check(SecurityQuestion::normalizeAnswer($answer), $this->security_answer);
     }
 
     public function isBlacklisted(): bool
