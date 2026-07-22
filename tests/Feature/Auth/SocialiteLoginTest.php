@@ -118,6 +118,8 @@ class SocialiteLoginTest extends TestCase
         $response = $this->actingAs($user)->patch(route('onboarding.update'), [
             'role' => 'lecturer',
             'rules_agreement' => '1',
+            'security_question' => 'favorite_sport',
+            'security_answer' => 'Football',
         ]);
 
         $user->refresh();
@@ -125,6 +127,8 @@ class SocialiteLoginTest extends TestCase
         $this->assertSame('lecturer', $user->role);
         $this->assertNotNull($user->rules_agreed_at);
         $this->assertNotNull($user->currentTeam);
+        $this->assertSame('favorite_sport', $user->security_question);
+        $this->assertTrue($user->verifySecurityAnswer('football'));
         $response->assertRedirect(route('lecturer.dashboard'));
     }
 

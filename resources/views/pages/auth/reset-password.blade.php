@@ -25,14 +25,6 @@
 
             <form method="POST" action="{{ route('password.update') }}" class="pulse-form">
                 @csrf
-                <input type="hidden" name="token" value="{{ request()->route('token') }}">
-
-                <label class="pulse-field" for="email">
-                    <span>Email address</span>
-                    <span class="pulse-input">
-                        <input id="email" name="email" type="email" value="{{ old('email', request('email')) }}" placeholder="Enter your email" required autocomplete="email">
-                    </span>
-                </label>
 
                 <label class="pulse-field" for="password">
                     <span>New password</span>

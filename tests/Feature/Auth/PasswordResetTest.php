@@ -3,79 +3,103 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
-use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->skipUnlessFortifyHas(Features::resetPasswords());
-    }
-
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    public function test_forgot_password_screen_can_be_rendered(): void
     {
         $response = $this->get(route('password.request'));
 
         $response->assertOk();
     }
 
-    public function test_reset_password_link_can_be_requested(): void
+    public function test_identity_can_be_verified_with_the_correct_security_answer(): void
     {
-        Notification::fake();
+        $user = User::factory()->create([
+            'security_question' => 'favorite_sport',
+            'security_answer' => Hash::make('football'),
+        ]);
 
-        $user = User::factory()->create();
+        $response = $this->post(route('password.verify'), [
+            'email' => $user->email,
+            'security_question' => 'favorite_sport',
+            'security_answer' => 'Football',
+        ]);
 
-        $this->post(route('password.request'), ['email' => $user->email]);
+        $response->assertSessionHasNoErrors()
+            ->assertRedirect(route('password.reset'));
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        $this->assertTrue(session()->has('security_reset.user_id'));
     }
 
-    public function test_reset_password_screen_can_be_rendered(): void
+    public function test_identity_verification_fails_with_the_wrong_answer(): void
     {
-        Notification::fake();
+        $user = User::factory()->create([
+            'security_question' => 'favorite_sport',
+            'security_answer' => Hash::make('football'),
+        ]);
 
-        $user = User::factory()->create();
+        $response = $this->post(route('password.verify'), [
+            'email' => $user->email,
+            'security_question' => 'favorite_sport',
+            'security_answer' => 'basketball',
+        ]);
 
-        $this->post(route('password.request'), ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get(route('password.reset', $notification->token));
-
-            $response->assertOk();
-
-            return true;
-        });
+        $response->assertSessionHasErrors('security_answer');
+        $this->assertFalse(session()->has('security_reset.user_id'));
     }
 
-    public function test_password_can_be_reset_with_valid_token(): void
+    public function test_identity_verification_fails_for_accounts_without_a_security_question_set(): void
     {
-        Notification::fake();
+        $user = User::factory()->create([
+            'security_question' => null,
+            'security_answer' => null,
+        ]);
 
-        $user = User::factory()->create();
+        $response = $this->post(route('password.verify'), [
+            'email' => $user->email,
+            'security_question' => 'favorite_sport',
+            'security_answer' => 'anything',
+        ]);
 
-        $this->post(route('password.request'), ['email' => $user->email]);
+        $response->assertSessionHasErrors('security_answer');
+    }
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post(route('password.update'), [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
+    public function test_reset_password_screen_requires_verification_first(): void
+    {
+        $response = $this->get(route('password.reset'));
 
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login', absolute: false));
+        $response->assertRedirect(route('password.request'));
+    }
 
-            return true;
-        });
+    public function test_password_can_be_reset_after_verification(): void
+    {
+        $user = User::factory()->create([
+            'security_question' => 'favorite_sport',
+            'security_answer' => Hash::make('football'),
+        ]);
+
+        $this->post(route('password.verify'), [
+            'email' => $user->email,
+            'security_question' => 'favorite_sport',
+            'security_answer' => 'Football',
+        ]);
+
+        $response = $this->post(route('password.update'), [
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('login', absolute: false));
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('new-password', $user->password));
     }
 }
