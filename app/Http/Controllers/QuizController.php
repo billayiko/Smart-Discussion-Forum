@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseTopic;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
+use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,7 +16,7 @@ class QuizController extends Controller
         $this->authorize('viewAny', Quiz::class);
 
         $stats = $this->lecturerCardStats();
-        $quizzes = auth()->user()->quizzes()->latest()->paginate(10);
+        $quizzes = auth()->user()->quizzes()->withCount('questions')->latest()->paginate(10);
 
         return view('quizzes.index', compact('quizzes', 'stats'));
     }
@@ -43,9 +45,10 @@ class QuizController extends Controller
             'proctored' => ['nullable', 'boolean'],
         ]);
 
-        auth()->user()->quizzes()->create($validated);
+        $quiz = auth()->user()->quizzes()->create($validated);
 
-        return redirect()->route('quizzes.index')->with('success', 'Quiz created successfully.');
+        return redirect()->route('quizzes.questions.create', $quiz)
+            ->with('success', 'Quiz details saved. Now add its questions.');
     }
 
     public function import(Request $request)
@@ -98,6 +101,207 @@ class QuizController extends Controller
         }
 
         return back()->with('success', "Imported {$imported} quiz(es) successfully.");
+    }
+
+    /**
+     * The question-builder screen for a single quiz: add MCQs manually,
+     * import them from a CSV, and publish once the target count is reached.
+     */
+    public function questionsBuilder(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        $quiz->load(['questions', 'topic']);
+
+        return view('quizzes.questions', compact('quiz'));
+    }
+
+    public function storeQuestion(Request $request, Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        if ($quiz->hasEnoughQuestions()) {
+            return back()->withErrors(['question' => 'This quiz already has its required number of questions.']);
+        }
+
+        $request->merge(['correct_option' => strtolower(trim((string) $request->input('correct_option')))]);
+
+        $validated = $request->validate([
+            'question' => ['required', 'string'],
+            'option_a' => ['required', 'string', 'max:255'],
+            'option_b' => ['required', 'string', 'max:255'],
+            'option_c' => ['required', 'string', 'max:255'],
+            'option_d' => ['required', 'string', 'max:255'],
+            'correct_option' => ['required', 'in:a,b,c,d'],
+        ], [
+            'correct_option.in' => 'Type a, b, c or d for the correct answer.',
+        ]);
+
+        $quiz->questions()->create($validated);
+
+        return back()->with('success', 'Question added.');
+    }
+
+    public function importQuestions(Request $request, Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $remaining = max($quiz->total_questions - $quiz->questions()->count(), 0);
+
+        if ($remaining === 0) {
+            return back()->withErrors(['file' => 'This quiz already has its required number of questions.']);
+        }
+
+        $path = $request->file('file')->store('imports/quiz-questions', 'local');
+        $contents = Storage::disk('local')->get($path);
+        $rows = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $contents) ?: [])));
+
+        if (count($rows) < 2) {
+            return back()->withErrors(['file' => 'The uploaded file does not contain any question rows.']);
+        }
+
+        $header = str_getcsv($rows[0]);
+        $imported = 0;
+
+        foreach (array_slice($rows, 1) as $row) {
+            if ($imported >= $remaining) {
+                break;
+            }
+
+            $values = str_getcsv($row);
+
+            if (count($values) !== count($header)) {
+                continue;
+            }
+
+            $data = array_combine($header, $values);
+            $correctOption = strtolower(trim((string) ($data['correct_option'] ?? '')));
+
+            if (
+                empty($data['question'])
+                || empty($data['option_a']) || empty($data['option_b'])
+                || empty($data['option_c']) || empty($data['option_d'])
+                || ! in_array($correctOption, ['a', 'b', 'c', 'd'], true)
+            ) {
+                continue;
+            }
+
+            $quiz->questions()->create([
+                'question' => trim((string) $data['question']),
+                'option_a' => trim((string) $data['option_a']),
+                'option_b' => trim((string) $data['option_b']),
+                'option_c' => trim((string) $data['option_c']),
+                'option_d' => trim((string) $data['option_d']),
+                'correct_option' => $correctOption,
+            ]);
+
+            $imported++;
+        }
+
+        return back()->with('success', "Imported {$imported} question(s) successfully.");
+    }
+
+    public function destroyQuestion(Quiz $quiz, QuizQuestion $question)
+    {
+        $this->authorize('update', $quiz);
+
+        abort_unless($question->quiz_id === $quiz->id, 404);
+
+        if ($quiz->isFinalized()) {
+            return back()->withErrors(['question' => 'This quiz\'s questions are already saved and cannot be changed.']);
+        }
+
+        $question->delete();
+
+        return back()->with('success', 'Question removed.');
+    }
+
+    public function finalizeQuestions(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        if (! $quiz->hasEnoughQuestions()) {
+            return back()->withErrors(['quiz' => 'Add all '.$quiz->total_questions.' question(s) before saving this quiz.']);
+        }
+
+        $quiz->markQuestionsFinalized();
+
+        return redirect()->route('quizzes.index')->with('success', 'Quiz questions saved. Students will see an announcement and be taken to it once it starts.');
+    }
+
+    /**
+     * Student-facing quiz screen. Only reachable while the quiz's scheduled
+     * window is open, and only once per student.
+     */
+    public function take(Request $request, Quiz $quiz)
+    {
+        $user = $request->user();
+
+        $existingAttempt = QuizAttempt::where('quiz_id', $quiz->id)->where('user_id', $user->id)->first();
+
+        if ($existingAttempt) {
+            return redirect()->route('quizzes.result', $quiz)->with('success', 'You have already submitted this quiz.');
+        }
+
+        if (! $quiz->isLive()) {
+            return redirect()->route('student.dashboard')->withErrors(['quiz' => 'This quiz is not currently open.']);
+        }
+
+        $quiz->load('questions');
+
+        return view('quizzes.take', compact('quiz'));
+    }
+
+    public function submit(Request $request, Quiz $quiz)
+    {
+        $user = $request->user();
+
+        if (QuizAttempt::where('quiz_id', $quiz->id)->where('user_id', $user->id)->exists()) {
+            return redirect()->route('quizzes.result', $quiz);
+        }
+
+        abort_unless($quiz->isLive(), 403, 'This quiz is not currently open.');
+
+        $validated = $request->validate([
+            'answers' => ['nullable', 'array'],
+            'answers.*' => ['nullable', 'in:a,b,c,d'],
+        ]);
+
+        $answers = $validated['answers'] ?? [];
+        $questions = $quiz->questions;
+        $score = 0;
+
+        foreach ($questions as $question) {
+            if (($answers[$question->id] ?? null) === $question->correct_option) {
+                $score++;
+            }
+        }
+
+        QuizAttempt::create([
+            'quiz_id' => $quiz->id,
+            'user_id' => $user->id,
+            'score' => $score,
+            'total' => $questions->count(),
+            'answers' => $answers,
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('quizzes.result', $quiz)->with('success', 'Quiz submitted.');
+    }
+
+    public function result(Request $request, Quiz $quiz)
+    {
+        $attempt = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $quiz->load('questions');
+
+        return view('quizzes.result', compact('quiz', 'attempt'));
     }
 
     protected function lecturerCardStats(): array

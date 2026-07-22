@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\CourseTopic;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -15,6 +16,21 @@ class DashboardController extends Controller
     public function student(Request $request)
     {
         $user = $request->user();
+
+        $attemptedQuizIds = QuizAttempt::where('user_id', $user->id)->pluck('quiz_id');
+
+        $liveQuiz = Quiz::where('status', '!=', 'draft')
+            ->whereNotNull('scheduled_at')
+            ->whereNotNull('questions_finalized_at')
+            ->where('scheduled_at', '<=', now())
+            ->whereNotIn('id', $attemptedQuizIds)
+            ->orderBy('scheduled_at')
+            ->get()
+            ->first(fn (Quiz $quiz) => $quiz->isLive());
+
+        if ($liveQuiz) {
+            return redirect()->route('quizzes.take', $liveQuiz);
+        }
 
         $stats = [
             'enrolled_lectures' => 6,
@@ -28,6 +44,15 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
+        $upcomingQuizAnnouncements = Quiz::where('status', '!=', 'draft')
+            ->whereNotNull('scheduled_at')
+            ->whereNotNull('questions_finalized_at')
+            ->where('scheduled_at', '>', now())
+            ->whereNotIn('id', $attemptedQuizIds)
+            ->orderBy('scheduled_at')
+            ->take(3)
+            ->get();
+
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
         $quizzesBySubject = $this->quizzesBySubject();
@@ -37,7 +62,7 @@ class DashboardController extends Controller
             ? (int) round((($totalQuestionsCount - $unansweredQuestionsCount) / $totalQuestionsCount) * 100)
             : 0;
 
-        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesBySubject', 'answeredRate'));
+        return view('pages.dashboards.student', compact('user', 'stats', 'upcomingQuizzes', 'upcomingQuizAnnouncements', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesBySubject', 'answeredRate'));
     }
 
     public function lecturer(Request $request)
