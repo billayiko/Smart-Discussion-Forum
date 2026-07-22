@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
+use App\Http\Controllers\Auth\SecurityQuestionPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\MessageController;
@@ -23,6 +24,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
         ->whereIn('provider', ['google', 'github'])
         ->name('social.callback');
+
+    Route::get('/forgot-password', [SecurityQuestionPasswordController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [SecurityQuestionPasswordController::class, 'verify'])->name('password.verify');
+    Route::get('/reset-password', [SecurityQuestionPasswordController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [SecurityQuestionPasswordController::class, 'update'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {

@@ -8,14 +8,14 @@
 
             <div class="pulse-auth-copy">
                 <h1>Forgot your password?</h1>
-                <p>Enter your registered email and we'll send you a secure link to set a new one.</p>
+                <p>Verify your identity by answering your security question, then set a new password.</p>
             </div>
 
             <div class="pulse-illustration" aria-hidden="true"></div>
         </section>
 
         <section class="pulse-card pulse-auth-card">
-            <h2>Reset your password</h2>
+            <h2>Verify your identity</h2>
 
             <x-auth-session-status class="notice" :status="session('status')" />
 
@@ -23,7 +23,7 @@
                 <div class="pulse-alert"><i class="fas fa-circle-exclamation"></i> {{ $errors->first() }}</div>
             @endif
 
-            <form method="POST" action="{{ route('password.email') }}" class="pulse-form">
+            <form method="POST" action="{{ route('password.verify') }}" class="pulse-form">
                 @csrf
 
                 <label class="pulse-field" for="email">
@@ -33,7 +33,25 @@
                     </span>
                 </label>
 
-                <button type="submit" class="pulse-btn" style="width:100%;" data-test="email-password-reset-link-button">Email password reset link</button>
+                <fieldset class="pulse-field" style="border:0; padding:0; margin:0;">
+                    <legend style="color:var(--pulse-ink); font-size:.78rem; font-weight:850; padding:0;">Security question</legend>
+
+                    @foreach ($securityQuestions as $key => $label)
+                        <label class="pulse-form-row" style="justify-content:flex-start;">
+                            <input type="radio" name="security_question" value="{{ $key }}" required @checked(old('security_question') === $key)>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </fieldset>
+
+                <label class="pulse-field" for="security_answer">
+                    <span>Your answer</span>
+                    <span class="pulse-input">
+                        <input id="security_answer" name="security_answer" type="text" placeholder="Enter your answer" required autocomplete="off">
+                    </span>
+                </label>
+
+                <button type="submit" class="pulse-btn" style="width:100%;" data-test="verify-security-answer-button">Verify and continue</button>
             </form>
 
             <p style="margin:28px 0 0;text-align:center;color:var(--pulse-muted);font-weight:750;">

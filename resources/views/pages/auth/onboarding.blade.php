@@ -36,6 +36,25 @@
                     </span>
                 </label>
 
+                <fieldset class="pulse-field" style="border:0; padding:0; margin:0;">
+                    <legend style="color:var(--pulse-ink); font-size:.78rem; font-weight:850; padding:0;">Security question</legend>
+                    <p style="margin:0 0 8px;color:var(--pulse-muted);font-size:0.92em;">Choose one question and answer it. You'll use this to recover your account if you forget your password.</p>
+
+                    @foreach ($securityQuestions as $key => $label)
+                        <label class="pulse-form-row" style="justify-content:flex-start;">
+                            <input type="radio" name="security_question" value="{{ $key }}" required @checked(old('security_question') === $key)>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </fieldset>
+
+                <label class="pulse-field" for="security_answer">
+                    <span>Your answer</span>
+                    <span class="pulse-input">
+                        <input id="security_answer" name="security_answer" type="text" value="{{ old('security_answer') }}" placeholder="Enter your answer" required autocomplete="off">
+                    </span>
+                </label>
+
                 <details class="pulse-field" style="background:var(--pulse-surface-2, #f6f7f9); border-radius:10px; padding:12px 14px;">
                     <summary style="cursor:pointer; font-weight:700;">Platform rules (read before joining)</summary>
                     <ul style="margin:10px 0 0; padding-left:18px; color:var(--pulse-muted); font-size:0.92em; line-height:1.6;">
