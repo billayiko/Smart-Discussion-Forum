@@ -175,12 +175,16 @@
         </div>
     </div>
 
+    @php
+        $quizAnnouncementsForJs = $upcomingQuizAnnouncements->map(fn ($quiz) => [
+            'url' => route('quizzes.take', $quiz),
+            'startsAt' => $quiz->scheduled_at->toIso8601String(),
+        ]);
+    @endphp
+
     <script>
         (function () {
-            const quizzes = @json($upcomingQuizAnnouncements->map(fn ($quiz) => [
-                'url' => route('quizzes.take', $quiz),
-                'startsAt' => $quiz->scheduled_at->toIso8601String(),
-            ]));
+            const quizzes = @json($quizAnnouncementsForJs);
 
             quizzes.forEach(function (quiz) {
                 const delay = new Date(quiz.startsAt).getTime() - Date.now();
