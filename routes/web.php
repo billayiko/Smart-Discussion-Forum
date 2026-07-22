@@ -35,6 +35,9 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
     Route::post('/topics/{topic}/subscribe', [TopicController::class, 'subscribe'])->name('topics.subscribe');
     Route::delete('/topics/{topic}/subscribe', [TopicController::class, 'unsubscribe'])->name('topics.unsubscribe');
+    Route::get('/quizzes/{quiz}/take', [QuizController::class, 'take'])->name('quizzes.take');
+    Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
+    Route::get('/quizzes/{quiz}/result', [QuizController::class, 'result'])->name('quizzes.result');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
@@ -89,6 +92,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
     Route::post('/quizzes', [QuizController::class, 'store'])->name('quizzes.store');
     Route::post('/quizzes/import', [QuizController::class, 'import'])->name('quizzes.import');
+    Route::get('/quizzes/{quiz}/questions', [QuizController::class, 'questionsBuilder'])->name('quizzes.questions.create');
+    Route::post('/quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
+    Route::post('/quizzes/{quiz}/questions/import', [QuizController::class, 'importQuestions'])->name('quizzes.questions.import');
+    Route::delete('/quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
+    Route::post('/quizzes/{quiz}/finalize', [QuizController::class, 'finalizeQuestions'])->name('quizzes.questions.finalize');
 
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
 });
