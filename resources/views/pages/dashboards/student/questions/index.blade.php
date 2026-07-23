@@ -1,4 +1,4 @@
-<x-layouts.academic-pulse title="Questions">
+﻿<x-layouts.academic-pulse title="Questions">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -12,7 +12,7 @@
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a class="active" href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
-                    <a href="#"><i class="fas fa-gear"></i> Settings</a>
+                    <a href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
                 <div class="pulse-sidebar-footer">

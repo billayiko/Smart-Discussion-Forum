@@ -1,106 +1,100 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route(auth()->user()->dashboardRouteName()) }}" wire:navigate />
-                <flux:sidebar.collapse class="lg:hidden" />
-            </flux:sidebar.header>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    @include('partials.head')
+    @include('partials._pulse-styles')
+</head>
+<body class="pulse-body">
+    @php
+        $user = auth()->user();
 
-            <livewire:team-switcher />
+        $navItems = match ($user->role ?? null) {
+            'student' => [
+                ['route' => 'student.dashboard', 'icon' => 'fa-house', 'label' => 'Dashboard'],
+                ['route' => 'messages.index', 'icon' => 'fa-message', 'label' => 'Messages'],
+                ['route' => 'topics.index', 'icon' => 'fa-book', 'label' => 'Topics'],
+                ['route' => 'questions.index', 'icon' => 'fa-circle-question', 'label' => 'Discussion Forum'],
+            ],
+            'lecturer' => [
+                ['route' => 'lecturer.dashboard', 'icon' => 'fa-house', 'label' => 'Dashboard'],
+                ['route' => 'messages.index', 'icon' => 'fa-message', 'label' => 'Messages'],
+                ['route' => 'lecturer.students', 'icon' => 'fa-users', 'label' => 'Students'],
+                ['route' => 'questions.index', 'icon' => 'fa-circle-question', 'label' => 'Discussion Forum'],
+            ],
+            'admin' => [
+                ['route' => 'admin.dashboard', 'icon' => 'fa-house', 'label' => 'Dashboard'],
+                ['route' => 'admin.topics.index', 'icon' => 'fa-book', 'label' => 'Topics'],
+                ['route' => 'questions.index', 'icon' => 'fa-circle-question', 'label' => 'Discussion Forum'],
+                ['route' => 'admin.complaints.index', 'icon' => 'fa-flag', 'label' => 'Complaints'],
+                ['route' => 'admin.members.index', 'icon' => 'fa-user-shield', 'label' => 'Members'],
+                ['route' => 'messages.index', 'icon' => 'fa-message', 'label' => 'Messages'],
+            ],
+            default => [],
+        };
 
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route(auth()->user()->dashboardRouteName())" :current="request()->routeIs('*.dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
+        $dashboardRoute = $user ? $user->dashboardRouteName() : 'home';
+    @endphp
 
-            <flux:spacer />
+    <div class="pulse-page">
+        <div class="pulse-app">
+            <aside class="pulse-sidebar">
+                <a class="pulse-logo" href="{{ route('home') }}">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Academic<span>Pulse Forum</span></span>
+                </a>
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
+                <nav class="pulse-menu" aria-label="Settings navigation">
+                    @foreach ($navItems as $item)
+                        <a href="{{ route($item['route']) }}"><i class="fas {{ $item['icon'] }}"></i> {{ $item['label'] }}</a>
+                    @endforeach
+                    <a class="active" href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
+                </nav>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
-
-            <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
-        </flux:sidebar>
-
-        <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-
-            <flux:spacer />
-
-            <flux:dropdown position="top" align="end">
-                <flux:profile
-                    :initials="auth()->user()->initials()"
-                    icon-trailing="chevron-down"
-                />
-
-                <flux:menu>
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                                <flux:avatar
-                                    :name="auth()->user()->name"
-                                    :initials="auth()->user()->initials()"
-                                />
-
-                                <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
-                                    <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
-                                    <flux:text class="truncate text-zinc-500">{{ auth()->user()->roleLabel() }}</flux:text>
-                                </div>
-                            </div>
-                        </div>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                            {{ __('Settings') }}
-                        </flux:menu.item>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                <div class="pulse-sidebar-footer">
+                    <div class="pulse-user">
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'U', 0, 2)) }}</span>
+                        <span><strong>{{ $user->name ?? 'User' }}</strong><span>{{ $user?->roleLabel() ?? 'User' }}</span></span>
+                    </div>
+                    <div class="pulse-theme-panel" role="group" aria-label="Theme selector">
+                        <button type="button" class="pulse-theme-btn active" data-theme="light"><i class="fas fa-sun"></i> Light</button>
+                        <button type="button" class="pulse-theme-btn" data-theme="dark"><i class="fas fa-moon"></i> Dark</button>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin-top:12px;">
                         @csrf
-                        <flux:menu.item
-                            as="button"
-                            type="submit"
-                            icon="arrow-right-start-on-rectangle"
-                            class="w-full cursor-pointer"
-                            data-test="logout-button"
-                        >
-                            {{ __('Log out') }}
-                        </flux:menu.item>
+                        <button type="submit" class="pulse-btn light" style="width:100%;"><i class="fas fa-arrow-right-from-bracket"></i> Log out</button>
                     </form>
-                </flux:menu>
-            </flux:dropdown>
-        </flux:header>
+                </div>
+            </aside>
 
-        {{ $slot }}
+            <main class="pulse-main">
+                <header class="pulse-topbar">
+                    <div class="pulse-title">
+                        <h1><a href="{{ route($dashboardRoute) }}" style="color:inherit;"><i class="fas fa-arrow-left" style="font-size:.8em; margin-right:8px;"></i></a>{{ $title ?? 'Settings' }}</h1>
+                    </div>
+                    <div class="pulse-tools">
+                        @include('partials._notification-bell')
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'U', 0, 2)) }}</span>
+                    </div>
+                </header>
 
-        <livewire:create-team-modal />
+                <section class="pulse-card pulse-pad" style="margin-top:18px;">
+                    {{ $slot }}
+                </section>
+            </main>
+        </div>
+    </div>
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
+    <livewire:create-team-modal />
 
-        @fluxScripts
-    </body>
+    @persist('toast')
+        <flux:toast.group>
+            <flux:toast />
+        </flux:toast.group>
+    @endpersist
+
+    @include('partials._pulse-scripts')
+    @fluxScripts
+</body>
 </html>
