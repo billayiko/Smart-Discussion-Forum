@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 class Quiz extends Model
 {
@@ -73,7 +73,7 @@ class Quiz extends Model
         $this->update(['questions_finalized_at' => now()]);
     }
 
-    public function endsAt(): ?Carbon
+    public function endsAt(): ?CarbonInterface
     {
         return $this->scheduled_at?->copy()->addMinutes($this->duration_minutes);
     }
