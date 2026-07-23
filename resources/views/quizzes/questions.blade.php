@@ -126,8 +126,8 @@
                                 @csrf
                                 <div class="pulse-field">
                                     <label>Question</label>
-                                    <div class="pulse-input" style="align-items:flex-start; padding:10px 15px;">
-                                        <textarea name="question" rows="2" style="width:100%; border:0; outline:0; background:transparent; color:inherit; font:inherit; resize:vertical;" required></textarea>
+                                    <div class="pulse-input">
+                                        <input type="text" name="question" placeholder="Type the question text" required>
                                     </div>
                                 </div>
                                 @foreach (['a', 'b', 'c', 'd'] as $letter)

@@ -96,10 +96,13 @@
                                 <tr>
                                     <td>{{ $quiz->title }}</td>
                                     <td>{{ $quiz->subject }}</td>
-                                    <td><span class="pulse-tag {{ $quiz->status === 'draft' ? 'gray' : 'green' }}">{{ str_replace('_', ' ', ucfirst($quiz->status)) }}</span></td>
+                                    <td><span class="pulse-tag {{ $quiz->stage() === 'active' ? 'green' : ($quiz->stage() === 'due_soon' ? 'orange' : ($quiz->stage() === 'draft' ? 'gray' : '')) }}">{{ str_replace('_', ' ', ucfirst($quiz->stage())) }}</span></td>
                                     <td>{{ $quiz->questions_count }} / {{ $quiz->total_questions }}</td>
                                     <td>{{ $quiz->scheduled_at?->format('M j, Y g:i A') ?? '—' }}</td>
                                     <td class="pulse-actions">
+                                        @if ($quiz->isEditable())
+                                            <a href="{{ route('quizzes.edit', $quiz) }}" class="pulse-icon-btn" title="Edit quiz details"><i class="fas fa-pen"></i></a>
+                                        @endif
                                         @if ($quiz->questions_finalized_at)
                                             <a href="{{ route('quizzes.questions.create', $quiz) }}" class="pulse-btn light" style="text-decoration:none;"><i class="fas fa-eye"></i> View questions</a>
                                         @elseif ($quiz->questions_count < $quiz->total_questions)
