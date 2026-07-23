@@ -8,7 +8,9 @@ source of truth.
 Currently implemented: login, the Discussion Forum (browse your
 subscribed/taught topics, view a topic's threads, ask a question, open a
 thread and reply), and direct messaging (list conversations, start a new
-1:1 conversation, view/send messages).
+1:1 conversation, view/send messages). Thread and conversation screens
+poll for updates every few seconds, and all reads fall back to a local
+cache when offline (see the dev log below).
 
 ## Architecture
 
@@ -19,8 +21,14 @@ src/main/java/com/academicpulse/desktop/
                                  and the logged-in User; loads FXML + applies app.css
   api/
     ApiClient.java              HTTP calls (java.net.http.HttpClient) + JSON
-                                 (Jackson, snake_case mapping) + bearer-token auth
+                                 (Jackson, snake_case mapping) + bearer-token auth;
+                                 GET calls are cached and fall back to LocalCache
+                                 on a connectivity failure (see dev log)
     ApiException.java           Thrown for non-2xx API responses
+  cache/
+    LocalCache.java              SQLite-backed local read cache of raw API
+                                 responses, keyed by endpoint — not a database
+                                 the app queries directly, just an offline cache
   model/
     User.java, Topic.java,      Plain DTOs matching the API's JSON shapes
     Question.java, Answer.java,
@@ -121,3 +129,35 @@ rendering pipeline.
   group chats. Added `messages.fxml`, `conversation-detail.fxml`, and
   `new-message.fxml` plus their controllers, and a "Messages" button in
   the sidebar.
+- **Realtime-ish updates + offline cache/sync**: this dev environment has
+  no internet access, so Laravel Reverb/Pusher/any WebSocket package
+  couldn't be installed — built as short-interval (5s) polling instead.
+  `ConversationDetailController` and `ThreadDetailController` each run a
+  `ScheduledExecutorService` that re-fetches while the screen is open,
+  explicitly shut down in `handleBack()` since `Router.navigate()` has no
+  lifecycle callback to do that automatically. On the web side, the
+  forum thread's existing manual "Sync" button
+  (`_forum-assets.blade.php`) got the same fetch-and-DOMParser-swap logic
+  wrapped in a `setInterval`, and the previously-static Messages thread
+  (`pages/dashboards/messages/_thread.blade.php`) got the same treatment
+  added from scratch — neither needed any backend change.
+
+  Re-added `sqlite-jdbc` (dropped earlier, see above) as `LocalCache`: a
+  single `cache_entries(cache_key, json_blob, cached_at)` table storing
+  the raw JSON body of every successful GET, keyed by endpoint (e.g.
+  `"topic:4:questions"`). `ApiClient`'s GET methods now go through
+  `fetchCached(...)`: a real connectivity failure (`IOException` from the
+  HTTP call itself, not `ApiException` from a genuine non-2xx response —
+  that distinction matters, since a real 403/404 must keep behaving
+  exactly as before) falls back to the cached value and sets a new
+  `isOffline()` flag; every screen's status label shows "Offline — showing
+  saved data" when that's set. The 5s poll loop doubles as the
+  reconnect/sync mechanism for free: it retries the same call every tick
+  regardless of the previous outcome, so the moment the network comes
+  back, the very next tick succeeds, the cache refreshes with whatever
+  was sent while offline, and the banner clears automatically — no
+  separate connectivity watcher needed. Needed `slf4j-api` alongside
+  `sqlite-jdbc` (its JDBC driver's static init requires an SLF4J binding
+  on the classpath even though nothing here actually logs). Offline mode
+  is read-only by design — composing new questions/answers/messages still
+  requires connectivity; there's no offline outbox/queue in this pass.

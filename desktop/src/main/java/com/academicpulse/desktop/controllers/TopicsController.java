@@ -35,9 +35,10 @@ public class TopicsController {
                 var topics = Router.api().getTopics();
                 Platform.runLater(() -> {
                     topicsListView.setItems(FXCollections.observableArrayList(topics));
-                    statusLabel.setText(topics.isEmpty()
+                    String base = topics.isEmpty()
                             ? "No topics yet — ask an admin/lecturer to add you to one."
-                            : topics.size() + " topic(s).");
+                            : topics.size() + " topic(s).";
+                    statusLabel.setText(Router.api().isOffline() ? "Offline — showing saved data. " + base : base);
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> statusLabel.setText("Failed to load topics: " + describe(e)));
