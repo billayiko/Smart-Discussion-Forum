@@ -30,6 +30,15 @@ public class SidebarController {
     }
 
     @FXML
+    private void handleMessages() {
+        try {
+            Router.navigate("/messages.fxml", "Academic Pulse - Messages");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
     private void handleLogout() {
         new Thread(() -> {
             try {
