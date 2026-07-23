@@ -86,9 +86,9 @@ Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
-    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
-    Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store');
-    Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store');
+    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store')->middleware('throttle:10,60');
+    Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store')->middleware('throttle:30,60');
+    Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store')->middleware('throttle:10,60');
     Route::post('/questions/{question}/like', [QuestionController::class, 'toggleLike'])->name('questions.like');
     Route::post('/answers/{answer}/like', [QuestionController::class, 'toggleAnswerLike'])->name('answers.like');
 });
