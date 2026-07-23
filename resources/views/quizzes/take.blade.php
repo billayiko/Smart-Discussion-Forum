@@ -10,7 +10,7 @@
                     <p style="color:var(--muted); font-weight:650; margin-top:4px;">{{ $quiz->subject }} &middot; {{ $quiz->questions->count() }} question(s)</p>
                 </div>
                 @if ($endsAt)
-                    <span class="notice" style="margin:0;"><i class="fas fa-clock"></i> Ends at {{ $endsAt->format('g:i A') }}</span>
+                    <span class="notice" id="quiz-countdown" style="margin:0;"><i class="fas fa-clock"></i> <span id="quiz-countdown-text">Ends at {{ $endsAt->format('g:i A') }}</span></span>
                 @endif
             </div>
 
@@ -18,7 +18,7 @@
                 <div class="error-list">{{ $errors->first() }}</div>
             @endif
 
-            <form action="{{ route('quizzes.submit', $quiz) }}" method="POST" style="margin-top:18px; display:grid; gap:22px;">
+            <form id="quiz-take-form" action="{{ route('quizzes.submit', $quiz) }}" method="POST" style="margin-top:18px; display:grid; gap:22px;" @if ($endsAt) data-ends-at="{{ $endsAt->toIso8601String() }}" @endif>
                 @csrf
                 @foreach ($quiz->questions as $index => $question)
                     <div class="field" style="margin-bottom:0;">
@@ -34,8 +34,64 @@
                     </div>
                 @endforeach
 
-                <button type="submit" class="ap-btn primary" style="align-self:flex-start;"><i class="fas fa-paper-plane"></i> Submit quiz</button>
+                <button type="submit" id="quiz-submit-btn" class="ap-btn primary" style="align-self:flex-start;"><i class="fas fa-paper-plane"></i> Submit quiz</button>
             </form>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('quiz-take-form');
+            const endsAtRaw = form?.dataset.endsAt;
+
+            if (!form || !endsAtRaw) {
+                return;
+            }
+
+            const endsAt = new Date(endsAtRaw).getTime();
+            const countdownText = document.getElementById('quiz-countdown-text');
+            const countdownBadge = document.getElementById('quiz-countdown');
+            const submitBtn = document.getElementById('quiz-submit-btn');
+            let autoSubmitted = false;
+
+            const tick = () => {
+                const remainingMs = endsAt - Date.now();
+
+                if (remainingMs <= 0) {
+                    clearInterval(intervalId);
+
+                    if (!autoSubmitted) {
+                        autoSubmitted = true;
+                        countdownText.textContent = "Time's up — submitting...";
+                        // Submit first: disabled fields are excluded from the payload,
+                        // so answers must be captured before anything is disabled.
+                        form.submit();
+                        form.querySelectorAll('input, button').forEach((el) => { el.disabled = true; });
+                    }
+
+                    return;
+                }
+
+                const totalSeconds = Math.floor(remainingMs / 1000);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                countdownText.textContent = `Time left: ${minutes}:${String(seconds).padStart(2, '0')}`;
+
+                if (totalSeconds <= 60) {
+                    countdownBadge.style.color = '#dc2626';
+                    countdownBadge.style.fontWeight = '800';
+                }
+            };
+
+            const intervalId = setInterval(tick, 1000);
+            tick();
+
+            form.addEventListener('submit', () => {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Submitting…';
+                }
+            });
+        })();
+    </script>
 </x-layouts.academic-pulse>
