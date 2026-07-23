@@ -12,7 +12,7 @@
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
-                    <a href="#"><i class="fas fa-gear"></i> Settings</a>
+                    {{-- <a href="#"><i class="fas fa-gear"></i> Settings</a> --}}
                 </nav>
 
                 <div class="pulse-sidebar-footer">
@@ -146,7 +146,7 @@
                         </div>
                     </article>
 
-                    <article class="pulse-card pulse-pad">
+                    {{-- <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Recent Announcements</h2>
                             <a href="#">View all</a>
@@ -157,9 +157,9 @@
                             @endforeach
                             <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-user-tie"></i></span><span><strong>Guest Lecture on ML</strong><p>Guest lecture on Machine Learning by Dr. Sarah Johnson.</p></span><span class="pulse-muted">2d</span></div>
                         </div>
-                    </article>
+                    </article> --}}
 
-                    <article class="pulse-card pulse-pad">
+                    {{-- <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Quick Resources</h2>
                         </div>
@@ -169,7 +169,7 @@
                             <a class="pulse-resource" href="#"><span class="pulse-stat-icon orange"><i class="fas fa-comments"></i></span><span><strong>Discussion Forum</strong><span class="pulse-muted">Join discussions</span></span></a>
                             <a class="pulse-resource" href="#"><span class="pulse-stat-icon cyan"><i class="fas fa-calendar-days"></i></span><span><strong>Academic Calendar</strong><span class="pulse-muted">View events</span></span></a>
                         </div>
-                    </article>
+                    </article> --}}
                 </section>
             </main>
         </div>
