@@ -120,6 +120,20 @@ class Quiz extends Model
     }
 
     /**
+     * Whether this quiz's targeted category of students includes the given
+     * user: untargeted quizzes (no course_topic_id) are open to every
+     * student; targeted ones are restricted to that topic's subscribers.
+     */
+    public function isTargetedAt(User $user): bool
+    {
+        if (! $this->course_topic_id) {
+            return true;
+        }
+
+        return $user->subscribedTopics()->where('course_topics.id', $this->course_topic_id)->exists();
+    }
+
+    /**
      * A published quiz stays editable right up until its scheduled start;
      * once students could be sitting it, its details are locked.
      */

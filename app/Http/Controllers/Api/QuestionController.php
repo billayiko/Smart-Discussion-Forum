@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Concerns\ChecksTopicAccess;
 use App\Http\Controllers\Controller;
+use App\Models\CourseTopic;
 use App\Models\Question;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
+    use ChecksTopicAccess;
+
+
     public function show(Request $request, Question $question)
     {
         $user = $request->user();
@@ -29,6 +34,10 @@ class QuestionController extends Controller
             'body' => ['required', 'string'],
             'course_topic_id' => ['nullable', 'exists:course_topics,id'],
         ]);
+
+        if (! empty($validated['course_topic_id'])) {
+            $this->ensureTopicAccessible($request->user(), CourseTopic::findOrFail($validated['course_topic_id']));
+        }
 
         $question = $request->user()->questions()->create($validated);
 

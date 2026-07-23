@@ -16,6 +16,7 @@
     <Region prefHeight="24"/>
 
     <Button text="Discussion Forum" maxWidth="Infinity" styleClass="app-nav-btn, active" onAction="#handleDiscussionForum"/>
+    <Button text="Messages" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleMessages"/>
 
     <Region VBox.vgrow="ALWAYS"/>
 

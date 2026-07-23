@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ->whereNotIn('id', $attemptedQuizIds)
             ->orderBy('scheduled_at')
             ->get()
-            ->first(fn (Quiz $quiz) => $quiz->isLive());
+            ->first(fn (Quiz $quiz) => $quiz->isLive() && $quiz->isTargetedAt($user));
 
         if ($liveQuiz) {
             return redirect()->route('quizzes.take', $liveQuiz);
@@ -42,8 +42,10 @@ class DashboardController extends Controller
 
         $upcomingQuizzes = Quiz::where('status', '!=', 'draft')
             ->latest('scheduled_at')
+            ->get()
+            ->filter(fn (Quiz $quiz) => $quiz->isTargetedAt($user))
             ->take(4)
-            ->get();
+            ->values();
 
         $upcomingQuizAnnouncements = Quiz::where('status', '!=', 'draft')
             ->whereNotNull('scheduled_at')
@@ -51,8 +53,10 @@ class DashboardController extends Controller
             ->where('scheduled_at', '>', now())
             ->whereNotIn('id', $attemptedQuizIds)
             ->orderBy('scheduled_at')
+            ->get()
+            ->filter(fn (Quiz $quiz) => $quiz->isTargetedAt($user))
             ->take(3)
-            ->get();
+            ->values();
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
