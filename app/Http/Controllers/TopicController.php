@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -59,6 +60,60 @@ class TopicController extends Controller
             'topic', 'user', 'groupMembers', 'siblingThreads', 'otherTopics', 'quiz', 'canAsk',
             'participationLeaderboard', 'recentActivity'
         ));
+    }
+
+    /**
+     * A downloadable PDF of a topic's discussion threads and their answers,
+     * available to any member so they can keep an offline copy.
+     */
+    public function exportPdf(Request $request, CourseTopic $topic)
+    {
+        $viewer = $request->user();
+
+        $threads = $topic->questions()
+            ->with(['user', 'answers.user', 'answers.excludedUsers'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->each(function (Question $thread) use ($viewer) {
+                $thread->setRelation(
+                    'answers',
+                    $thread->answers->reject(fn (Answer $answer) => $answer->isExcludedFor($viewer))->values()
+                );
+            });
+
+        $pdf = Pdf::loadView('pdf.topic-export', compact('topic', 'threads'));
+
+        return $pdf->download(str($topic->title)->slug().'-discussions.pdf');
+    }
+
+    /**
+     * A CSV of the topic's participation leaderboard, for the topic's own
+     * lecturer (or an admin) to import into a gradebook. Not exposed to
+     * students — they can already see the live leaderboard on the page.
+     */
+    public function exportParticipationCsv(Request $request, CourseTopic $topic)
+    {
+        $viewer = $request->user();
+
+        abort_unless($viewer->role === 'admin' || $viewer->id === $topic->lecturer_id, 403);
+
+        $groupMembers = $topic->subscribers()->get()
+            ->when($topic->lecturer, fn ($members) => $members->push($topic->lecturer))
+            ->unique('id')
+            ->values();
+
+        $leaderboard = $this->participationLeaderboard($topic, $groupMembers);
+
+        return response()->streamDownload(function () use ($leaderboard) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Name', 'Email', 'Posts', 'Score (%)']);
+
+            foreach ($leaderboard as $row) {
+                fputcsv($handle, [$row->user->name, $row->user->email, $row->posts, $row->score]);
+            }
+
+            fclose($handle);
+        }, str($topic->title)->slug().'-participation.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function subscribe(Request $request, CourseTopic $topic)

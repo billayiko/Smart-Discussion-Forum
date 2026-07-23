@@ -471,9 +471,6 @@
         searchScope?.addEventListener('change', runSearch);
         searchBtn?.addEventListener('click', runSearch);
 
-        const exportBtn = document.getElementById('forum-export-btn');
-        exportBtn?.addEventListener('click', () => window.print());
-
         document.addEventListener('click', async (event) => {
             const copyBtn = event.target.closest('.forum-copy-link-btn');
             if (!copyBtn) return;

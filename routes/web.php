@@ -36,6 +36,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'edit'])->name('onboarding.edit');
     Route::patch('/onboarding', [OnboardingController::class, 'update'])->name('onboarding.update');
+    Route::delete('/onboarding', [OnboardingController::class, 'decline'])->name('onboarding.decline');
 
     Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
@@ -80,6 +81,8 @@ Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
     Route::get('/topics/{topic}/discussions', [TopicController::class, 'show'])->name('topics.show');
+    Route::get('/topics/{topic}/export', [TopicController::class, 'exportPdf'])->name('topics.export');
+    Route::get('/topics/{topic}/participation.csv', [TopicController::class, 'exportParticipationCsv'])->name('topics.participation.export');
 });
 
 Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
