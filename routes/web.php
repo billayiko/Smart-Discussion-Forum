@@ -65,6 +65,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('admin.complaints.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
+    Route::get('/admin/analytics/topics/{topic}', [AdminAnalyticsController::class, 'show'])->name('admin.analytics.show');
     Route::get('/admin/members', [AdminMemberController::class, 'index'])->name('admin.members.index');
     Route::patch('/admin/members/settings', [AdminMemberController::class, 'updateSettings'])->name('admin.members.settings');
     Route::patch('/admin/members/{member}/role', [AdminMemberController::class, 'updateRole'])->name('admin.members.role');

@@ -264,7 +264,7 @@ class QuizController extends Controller
             return redirect()->route('quizzes.result', $quiz);
         }
 
-        abort_unless($quiz->isLive(), 403, 'This quiz is not currently open.');
+        abort_unless($quiz->canStillSubmit(), 403, 'This quiz is not currently open.');
 
         $validated = $request->validate([
             'answers' => ['nullable', 'array'],

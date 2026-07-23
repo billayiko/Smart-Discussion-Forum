@@ -137,6 +137,7 @@
                                         </td>
                                         <td>
                                             <div class="pulse-actions" style="justify-content:flex-end;">
+                                                <a class="pulse-icon-btn" href="{{ route('admin.analytics.show', $topic) }}" title="View statistics"><i class="fas fa-chart-line"></i></a>
                                                 <form method="POST" action="{{ route('admin.topics.destroy', $topic) }}" onsubmit="return confirm('Remove this topic? This cannot be undone.');">
                                                     @csrf
                                                     @method('DELETE')
