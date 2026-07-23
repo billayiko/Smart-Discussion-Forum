@@ -1,6 +1,7 @@
 package com.academicpulse.desktop.api;
 
 import com.academicpulse.desktop.model.Answer;
+import com.academicpulse.desktop.model.Conversation;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.Topic;
 import com.academicpulse.desktop.model.User;
@@ -105,6 +106,36 @@ public class ApiClient {
         ApiResponse response = send("POST", "/questions/" + questionId + "/answers", payload, true);
         requireSuccess(response);
         return mapper.readValue(response.body(), Answer.class);
+    }
+
+    public List<Conversation> getConversations() throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("GET", "/conversations", null, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), new TypeReference<List<Conversation>>() {});
+    }
+
+    public Conversation getConversation(long conversationId) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("GET", "/conversations/" + conversationId, null, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), Conversation.class);
+    }
+
+    public void sendMessage(long conversationId, String body) throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of("body", body);
+        requireSuccess(send("POST", "/conversations/" + conversationId + "/messages", payload, true));
+    }
+
+    public Conversation startConversation(long userId) throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = Map.of("user_id", userId);
+        ApiResponse response = send("POST", "/conversations/start", payload, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), Conversation.class);
+    }
+
+    public List<User> getContacts() throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("GET", "/conversation-contacts", null, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), new TypeReference<List<User>>() {});
     }
 
     private void requireSuccess(ApiResponse response) throws ApiException {
