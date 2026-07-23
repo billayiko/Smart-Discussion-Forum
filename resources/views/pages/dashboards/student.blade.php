@@ -12,11 +12,8 @@
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
-<<<<<<< HEAD
-                    {{-- <a href="#"><i class="fas fa-gear"></i> Settings</a> --}}
-=======
+
                     <a href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
->>>>>>> 29ccd50d4186b68d3902a68f7d8f2ff8b57297a4
                 </nav>
 
                 <div class="pulse-sidebar-footer">
