@@ -12,5 +12,6 @@
 <body>
     {{ $slot }}
     @include('partials._pulse-scripts')
+    @include('partials._quiz-watch')
 </body>
 </html>
