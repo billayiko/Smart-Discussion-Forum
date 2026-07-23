@@ -301,6 +301,8 @@ class QuizController extends Controller
             return redirect()->route('quizzes.result', $quiz)->with('success', 'You have already submitted this quiz.');
         }
 
+        abort_unless($quiz->isTargetedAt($user), 403, 'This quiz is not available to you.');
+
         if (! $quiz->isLive()) {
             return redirect()->route('student.dashboard')->withErrors(['quiz' => 'This quiz is not currently open.']);
         }
@@ -318,6 +320,7 @@ class QuizController extends Controller
             return redirect()->route('quizzes.result', $quiz);
         }
 
+        abort_unless($quiz->isTargetedAt($user), 403, 'This quiz is not available to you.');
         abort_unless($quiz->canStillSubmit(), 403, 'This quiz is not currently open.');
 
         $validated = $request->validate([
