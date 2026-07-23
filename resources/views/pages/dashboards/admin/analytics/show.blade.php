@@ -1,4 +1,4 @@
-﻿<x-layouts.academic-pulse title="Analytics">
+<x-layouts.academic-pulse title="{{ $topic->title }} Statistics">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -37,23 +37,15 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Analytics</h1>
-                        <p>See how students and lecturers are using the forum.</p>
+                        <h1><a href="{{ route('admin.analytics.index') }}" style="color:inherit;"><i class="fas fa-arrow-left" style="font-size:.8em; margin-right:8px;"></i></a>{{ $topic->title }}</h1>
+                        <p>Statistics for this group only &middot; led by {{ $topic->lecturer->name ?? 'an unassigned lecturer' }}</p>
                     </div>
                 </header>
 
                 <section class="pulse-grid pulse-stats" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
                     <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon purple"><i class="fas fa-user-graduate"></i></span>
-                        <span><small>Students</small><b>{{ $summary['students'] }}</b></span>
-                    </article>
-                    <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon purple"><i class="fas fa-chalkboard-user"></i></span>
-                        <span><small>Lecturers</small><b>{{ $summary['lecturers'] }}</b></span>
-                    </article>
-                    <article class="pulse-card pulse-stat">
-                        <span class="pulse-stat-icon"><i class="fas fa-book"></i></span>
-                        <span><small>Topics</small><b>{{ $summary['topics'] }}</b></span>
+                        <span class="pulse-stat-icon purple"><i class="fas fa-users"></i></span>
+                        <span><small>Subscribers</small><b>{{ $summary['subscribers'] }}</b></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-circle-question"></i></span>
@@ -67,13 +59,21 @@
                         <span class="pulse-stat-icon" style="color:#d33;"><i class="fas fa-flag"></i></span>
                         <span><small>Complaints</small><b>{{ $summary['pending_complaints'] }}</b><span class="pulse-muted">pending</span></span>
                     </article>
+                    <article class="pulse-card pulse-stat">
+                        <span class="pulse-stat-icon"><i class="fas fa-clipboard-check"></i></span>
+                        <span><small>Quizzes</small><b>{{ $summary['quizzes'] }}</b></span>
+                    </article>
+                    <article class="pulse-card pulse-stat">
+                        <span class="pulse-stat-icon green"><i class="fas fa-chart-simple"></i></span>
+                        <span><small>Avg. quiz score</small><b>{{ $summary['average_quiz_score'] !== null ? $summary['average_quiz_score'].'%' : '—' }}</b></span>
+                    </article>
                 </section>
 
                 <section class="pulse-grid" style="margin-top:18px; grid-template-columns: repeat(2, minmax(0, 1fr));">
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Most Active Students</h2>
-                            <span class="pulse-muted">by questions asked</span>
+                            <span class="pulse-muted">in this group, by questions asked</span>
                         </div>
                         <div class="pulse-list">
                             @forelse ($topAskers as $index => $student)
@@ -91,7 +91,7 @@
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Most Helpful Repliers</h2>
-                            <span class="pulse-muted">by answers given</span>
+                            <span class="pulse-muted">in this group, by answers given</span>
                         </div>
                         <div class="pulse-list">
                             @forelse ($topAnswerers as $index => $person)
@@ -102,44 +102,6 @@
                                 </div>
                             @empty
                                 <div class="pulse-row"><span class="pulse-muted">No answers posted yet.</span></div>
-                            @endforelse
-                        </div>
-                    </article>
-
-                    <article class="pulse-card pulse-pad">
-                        <div class="pulse-section-head">
-                            <h2>Most Subscribed Topics</h2>
-                            <span class="pulse-muted">by student subscriptions</span>
-                        </div>
-                        <div class="pulse-list">
-                            @forelse ($topTopics as $index => $topic)
-                                <a href="{{ route('admin.analytics.show', $topic) }}" style="display:contents;">
-                                    <div class="pulse-row">
-                                        <span class="pulse-soft-icon">{{ $index + 1 }}</span>
-                                        <span><strong>{{ $topic->title }}</strong><p>{{ $topic->lecturer->name ?? 'Unassigned' }}</p></span>
-                                        <span class="pulse-tag">{{ $topic->subscribers_count }} subscriber(s)</span>
-                                    </div>
-                                </a>
-                            @empty
-                                <div class="pulse-row"><span class="pulse-muted">No topic subscriptions yet.</span></div>
-                            @endforelse
-                        </div>
-                    </article>
-
-                    <article class="pulse-card pulse-pad">
-                        <div class="pulse-section-head">
-                            <h2>Lecturers by Workload</h2>
-                            <span class="pulse-muted">by topics assigned</span>
-                        </div>
-                        <div class="pulse-list">
-                            @forelse ($topLecturers as $index => $lecturer)
-                                <div class="pulse-row">
-                                    <span class="pulse-soft-icon">{{ $index + 1 }}</span>
-                                    <span><strong>{{ $lecturer->name }}</strong><p>{{ $lecturer->email }}</p></span>
-                                    <span class="pulse-tag">{{ $lecturer->assigned_topics_count }} topic(s)</span>
-                                </div>
-                            @empty
-                                <div class="pulse-row"><span class="pulse-muted">No topics assigned yet.</span></div>
                             @endforelse
                         </div>
                     </article>

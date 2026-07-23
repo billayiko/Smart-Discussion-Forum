@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Complaint;
 use App\Models\CourseTopic;
+use App\Models\ParticipationCriterion;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
@@ -76,13 +77,13 @@ class DashboardController extends Controller
             'students' => User::where('role', 'student')->count(),
         ];
 
-        $recentQuizzes = Quiz::latest()->take(5)->get();
-
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
         $quizzesByStatus = $this->quizzesByStatus($user);
 
-        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuizzes', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesByStatus'));
+        $participationCriteria = ParticipationCriterion::forLecturer($user);
+
+        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesByStatus', 'participationCriteria'));
     }
 
     public function admin(Request $request)

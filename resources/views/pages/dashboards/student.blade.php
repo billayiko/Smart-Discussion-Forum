@@ -1,4 +1,4 @@
-<x-layouts.academic-pulse title="Student Dashboard">
+﻿<x-layouts.academic-pulse title="Student Dashboard">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -12,7 +12,11 @@
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('topics.index') }}"><i class="fas fa-book"></i> Topics</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
+<<<<<<< HEAD
                     {{-- <a href="#"><i class="fas fa-gear"></i> Settings</a> --}}
+=======
+                    <a href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
+>>>>>>> 29ccd50d4186b68d3902a68f7d8f2ff8b57297a4
                 </nav>
 
                 <div class="pulse-sidebar-footer">
@@ -103,7 +107,13 @@
                         </div>
                         <div class="pulse-list">
                             @forelse ($upcomingQuizzes as $quiz)
-                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $quiz->title }}</strong><p>{{ $quiz->subject }} · {{ $quiz->duration_minutes }} mins</p></span><span class="pulse-tag">{{ $quiz->scheduled_at?->diffForHumans() ?? 'Scheduled' }}</span></div>
+                                @if ($quiz->hasStarted())
+                                    <a href="{{ route('quizzes.result', $quiz) }}" style="display:contents;">
+                                        <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $quiz->title }}</strong><p>{{ $quiz->subject }} · {{ $quiz->duration_minutes }} mins</p></span><span class="pulse-tag">View report</span></div>
+                                    </a>
+                                @else
+                                    <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $quiz->title }}</strong><p>{{ $quiz->subject }} · {{ $quiz->duration_minutes }} mins</p></span><span class="pulse-tag">{{ $quiz->scheduled_at?->diffForHumans() ?? 'Scheduled' }}</span></div>
+                                @endif
                             @empty
                                 <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>No upcoming quizzes</strong><p>New quiz activity will appear here.</p></span></div>
                             @endforelse

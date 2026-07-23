@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\Auth\SecurityQuestionPasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Lecturer\ParticipationCriteriaController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
@@ -35,6 +36,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'edit'])->name('onboarding.edit');
     Route::patch('/onboarding', [OnboardingController::class, 'update'])->name('onboarding.update');
+    Route::delete('/onboarding', [OnboardingController::class, 'decline'])->name('onboarding.decline');
 
     Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
@@ -53,6 +55,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
     Route::get('/lecturer/students', [LecturerStudentController::class, 'index'])->name('lecturer.students');
+    Route::patch('/lecturer/participation-criteria', [ParticipationCriteriaController::class, 'update'])->name('lecturer.participation-criteria.update');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -65,6 +68,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/admin/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('admin.complaints.update');
     Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index'])->name('admin.analytics.index');
+    Route::get('/admin/analytics/topics/{topic}', [AdminAnalyticsController::class, 'show'])->name('admin.analytics.show');
     Route::get('/admin/members', [AdminMemberController::class, 'index'])->name('admin.members.index');
     Route::patch('/admin/members/settings', [AdminMemberController::class, 'updateSettings'])->name('admin.members.settings');
     Route::patch('/admin/members/{member}/role', [AdminMemberController::class, 'updateRole'])->name('admin.members.role');
@@ -77,12 +81,14 @@ Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
     Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
     Route::get('/topics/{topic}/discussions', [TopicController::class, 'show'])->name('topics.show');
+    Route::get('/topics/{topic}/export', [TopicController::class, 'exportPdf'])->name('topics.export');
+    Route::get('/topics/{topic}/participation.csv', [TopicController::class, 'exportParticipationCsv'])->name('topics.participation.export');
 });
 
 Route::middleware(['auth', 'role:student,lecturer'])->group(function () {
-    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store');
-    Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store');
-    Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store');
+    Route::post('/questions', [QuestionController::class, 'store'])->name('questions.store')->middleware('throttle:10,60');
+    Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer'])->name('questions.answers.store')->middleware('throttle:30,60');
+    Route::post('/questions/{question}/complaints', [QuestionController::class, 'storeComplaint'])->name('questions.complaints.store')->middleware('throttle:10,60');
     Route::post('/questions/{question}/like', [QuestionController::class, 'toggleLike'])->name('questions.like');
     Route::post('/answers/{answer}/like', [QuestionController::class, 'toggleAnswerLike'])->name('answers.like');
 });

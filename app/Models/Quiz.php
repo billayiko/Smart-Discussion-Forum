@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 class Quiz extends Model
 {
     use HasFactory;
+
+    /**
+     * How long past the scheduled end a submission is still accepted, to
+     * absorb network latency on the client's auto-submit-at-zero timer.
+     */
+    const SUBMISSION_GRACE_SECONDS = 30;
 
     protected $fillable = [
         'user_id',
@@ -73,7 +79,7 @@ class Quiz extends Model
         $this->update(['questions_finalized_at' => now()]);
     }
 
-    public function endsAt(): ?Carbon
+    public function endsAt(): ?CarbonInterface
     {
         return $this->scheduled_at?->copy()->addMinutes($this->duration_minutes);
     }
@@ -83,14 +89,29 @@ class Quiz extends Model
      */
     public function isLive(): bool
     {
+        return $this->isOpenAt(now());
+    }
+
+    /**
+     * Whether a submission arriving right now should still be accepted.
+     * Slightly more lenient than isLive() to absorb the network latency
+     * between the client's countdown hitting zero and the request landing.
+     */
+    public function canStillSubmit(): bool
+    {
+        return $this->isOpenAt(now(), self::SUBMISSION_GRACE_SECONDS);
+    }
+
+    protected function isOpenAt(CarbonInterface $now, int $graceSeconds = 0): bool
+    {
         if (! $this->scheduled_at || $this->status === 'draft' || $this->status === 'closed' || ! $this->isFinalized()) {
             return false;
         }
 
         $endsAt = $this->endsAt();
-        $now = now();
 
-        return $now->greaterThanOrEqualTo($this->scheduled_at) && ($endsAt === null || $now->lessThan($endsAt));
+        return $now->greaterThanOrEqualTo($this->scheduled_at)
+            && ($endsAt === null || $now->lessThan($endsAt->copy()->addSeconds($graceSeconds)));
     }
 
     public function hasStarted(): bool

@@ -50,7 +50,7 @@
             </div>
 
             <div class="forum-actions">
-                <button type="button" class="forum-btn gold" id="forum-export-btn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <a href="{{ route('topics.export', $topic) }}" class="forum-btn gold"><i class="fas fa-file-pdf"></i> Export PDF</a>
                 <button type="button" class="forum-btn gold" id="forum-share-btn"><i class="fab fa-twitter"></i> Share</button>
                 <button type="button" class="forum-btn gold" id="forum-sync-btn"><i class="fas fa-arrows-rotate"></i> Sync</button>
             </div>
@@ -101,6 +101,38 @@
                     </div>
                 </form>
             @endif
+
+            <div class="forum-panel">
+                <div class="forum-panel-head">
+                    <i class="fas fa-ranking-star"></i> Student Participation
+                    @if ($user->role === 'admin' || $user->id === $topic->lecturer_id)
+                        <a href="{{ route('topics.participation.export', $topic) }}" class="forum-muted" style="margin-left:auto; font-weight:700;"><i class="fas fa-file-csv"></i> Export CSV</a>
+                    @endif
+                </div>
+                @forelse ($participationLeaderboard as $row)
+                    <div class="forum-participation-row">
+                        <span class="forum-avatar">{{ $row->user->initials() }}</span>
+                        <span class="forum-participation-name">{{ $row->user->name }}</span>
+                        <span class="forum-muted">Posts: {{ $row->posts }}</span>
+                        <span class="forum-score-tag">Score: {{ $row->score }}%</span>
+                    </div>
+                @empty
+                    <p class="forum-muted">No student activity in this group yet.</p>
+                @endforelse
+            </div>
+
+            <div class="forum-panel">
+                <div class="forum-panel-head"><i class="fas fa-bolt"></i> Recent Activity</div>
+                @forelse ($recentActivity as $event)
+                    <div class="forum-activity-row">
+                        <span class="forum-activity-icon"><i class="fas {{ $event->icon }}"></i></span>
+                        <span class="forum-activity-text">{{ $event->text }}</span>
+                        <span class="forum-muted">{{ $event->at->diffForHumans() }}</span>
+                    </div>
+                @empty
+                    <p class="forum-muted">No recent activity yet.</p>
+                @endforelse
+            </div>
         </main>
     </div>
 </div>

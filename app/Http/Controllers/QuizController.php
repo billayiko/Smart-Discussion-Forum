@@ -264,11 +264,12 @@ class QuizController extends Controller
             return redirect()->route('quizzes.result', $quiz);
         }
 
-        abort_unless($quiz->isLive(), 403, 'This quiz is not currently open.');
+        abort_unless($quiz->canStillSubmit(), 403, 'This quiz is not currently open.');
 
         $validated = $request->validate([
             'answers' => ['nullable', 'array'],
             'answers.*' => ['nullable', 'in:a,b,c,d'],
+            'violations' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $answers = $validated['answers'] ?? [];
@@ -287,21 +288,46 @@ class QuizController extends Controller
             'score' => $score,
             'total' => $questions->count(),
             'answers' => $answers,
+            'proctoring_violations' => $validated['violations'] ?? 0,
             'submitted_at' => now(),
         ]);
 
         return redirect()->route('quizzes.result', $quiz)->with('success', 'Quiz submitted.');
     }
 
+    /**
+     * The performance report for a quiz. Anyone whose quiz window has
+     * started can see it: attendees see their own breakdown, everyone sees
+     * the class-wide average and top scorers. Students who haven't attempted
+     * yet, while the quiz is still open, are sent to take it instead.
+     */
     public function result(Request $request, Quiz $quiz)
     {
+        $user = $request->user();
+
+        abort_unless($quiz->hasStarted(), 403, 'This quiz has not started yet.');
+
         $attempt = QuizAttempt::where('quiz_id', $quiz->id)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (! $attempt && $user->role === 'student' && $quiz->isLive()) {
+            return redirect()->route('quizzes.take', $quiz);
+        }
 
         $quiz->load('questions');
 
-        return view('quizzes.result', compact('quiz', 'attempt'));
+        $attempts = QuizAttempt::where('quiz_id', $quiz->id)->with('user')->get();
+
+        $report = [
+            'attempts_count' => $attempts->count(),
+            'average_score_percent' => $attempts->isNotEmpty()
+                ? (int) round($attempts->avg(fn (QuizAttempt $a) => $a->total > 0 ? ($a->score / $a->total) * 100 : 0))
+                : null,
+            'top_scorers' => $attempts->sortByDesc('score')->take(5)->values(),
+        ];
+
+        return view('quizzes.result', compact('quiz', 'attempt', 'report'));
     }
 
     protected function lecturerCardStats(): array
