@@ -101,6 +101,33 @@
                     </div>
                 </form>
             @endif
+
+            <div class="forum-panel">
+                <div class="forum-panel-head"><i class="fas fa-ranking-star"></i> Student Participation</div>
+                @forelse ($participationLeaderboard as $row)
+                    <div class="forum-participation-row">
+                        <span class="forum-avatar">{{ $row->user->initials() }}</span>
+                        <span class="forum-participation-name">{{ $row->user->name }}</span>
+                        <span class="forum-muted">Posts: {{ $row->posts }}</span>
+                        <span class="forum-score-tag">Score: {{ $row->score }}%</span>
+                    </div>
+                @empty
+                    <p class="forum-muted">No student activity in this group yet.</p>
+                @endforelse
+            </div>
+
+            <div class="forum-panel">
+                <div class="forum-panel-head"><i class="fas fa-bolt"></i> Recent Activity</div>
+                @forelse ($recentActivity as $event)
+                    <div class="forum-activity-row">
+                        <span class="forum-activity-icon"><i class="fas {{ $event->icon }}"></i></span>
+                        <span class="forum-activity-text">{{ $event->text }}</span>
+                        <span class="forum-muted">{{ $event->at->diffForHumans() }}</span>
+                    </div>
+                @empty
+                    <p class="forum-muted">No recent activity yet.</p>
+                @endforelse
+            </div>
         </main>
     </div>
 </div>

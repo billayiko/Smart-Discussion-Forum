@@ -169,14 +169,53 @@
 
                 <section class="pulse-card pulse-pad" style="margin-top:18px;">
                     <div class="pulse-section-head">
-                        <h2>Upcoming Quizzes</h2>
-                        <a href="#">View all</a>
+                        <h2>Participation Criteria</h2>
                     </div>
-                    <div class="pulse-list">
-                        <div class="pulse-row"><span class="pulse-time">10:00<br>AM</span><span><strong>Algorithms Quiz 3</strong><p>20 questions · 6 days left</p></span><span class="pulse-tag orange">Due soon</span></div>
-                        <div class="pulse-row"><span class="pulse-time">01:00<br>PM</span><span><strong>Data Structures Quiz 2</strong><p>15 questions · 9 days left</p></span><span class="pulse-tag">Scheduled</span></div>
-                        <div class="pulse-row"><span class="pulse-time">03:30<br>PM</span><span><strong>Database Systems Quiz 1</strong><p>12 questions · 12 days left</p></span><span class="pulse-tag green">Planned</span></div>
-                    </div>
+                    <p class="pulse-muted" style="margin:-6px 0 16px;">Set how many points students earn per forum activity. These points are used to score participation across your topics.</p>
+
+                    @if (session('success'))
+                        <div class="pulse-card pulse-pad" style="margin-bottom:16px; color: var(--pulse-green, #1a7f37);">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <form class="pulse-form" method="POST" action="{{ route('lecturer.participation-criteria.update') }}">
+                        @csrf
+                        @method('PATCH')
+                        <div class="pulse-form-row" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px;">
+                            <div class="pulse-field">
+                                <label for="points_per_question">Points per question asked</label>
+                                <div class="pulse-input">
+                                    <input id="points_per_question" type="number" min="0" max="100" name="points_per_question" value="{{ old('points_per_question', $participationCriteria->points_per_question) }}" required>
+                                </div>
+                                @error('points_per_question')<span style="color:#d33;font-size:.75rem;">{{ $message }}</span>@enderror
+                            </div>
+                            <div class="pulse-field">
+                                <label for="points_per_answer">Points per answer given</label>
+                                <div class="pulse-input">
+                                    <input id="points_per_answer" type="number" min="0" max="100" name="points_per_answer" value="{{ old('points_per_answer', $participationCriteria->points_per_answer) }}" required>
+                                </div>
+                                @error('points_per_answer')<span style="color:#d33;font-size:.75rem;">{{ $message }}</span>@enderror
+                            </div>
+                            <div class="pulse-field">
+                                <label for="points_per_like_received">Points per like received</label>
+                                <div class="pulse-input">
+                                    <input id="points_per_like_received" type="number" min="0" max="100" name="points_per_like_received" value="{{ old('points_per_like_received', $participationCriteria->points_per_like_received) }}" required>
+                                </div>
+                                @error('points_per_like_received')<span style="color:#d33;font-size:.75rem;">{{ $message }}</span>@enderror
+                            </div>
+                            <div class="pulse-field">
+                                <label for="target_points">Points for 100% score</label>
+                                <div class="pulse-input">
+                                    <input id="target_points" type="number" min="1" max="1000" name="target_points" value="{{ old('target_points', $participationCriteria->target_points) }}" required>
+                                </div>
+                                @error('target_points')<span style="color:#d33;font-size:.75rem;">{{ $message }}</span>@enderror
+                            </div>
+                        </div>
+                        <div>
+                            <button class="pulse-btn" type="submit"><i class="fas fa-floppy-disk"></i> Save criteria</button>
+                        </div>
+                    </form>
                 </section>
             </main>
         </div>
