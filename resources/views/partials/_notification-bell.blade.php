@@ -22,9 +22,18 @@
         <div class="notif-list">
             @forelse ($unreadNotifications as $notification)
                 <a href="{{ route('notifications.open', $notification->id) }}" class="notif-item">
-                    <strong>{{ $notification->data['answerer_name'] ?? 'Someone' }}</strong> replied to
-                    <em>{{ $notification->data['question_title'] ?? 'your question' }}</em>
-                    <p>{{ $notification->data['excerpt'] ?? '' }}</p>
+                    @if ($notification->type === \App\Notifications\QuizScheduled::class)
+                        <strong>New quiz scheduled:</strong> <em>{{ $notification->data['quiz_title'] ?? 'A quiz' }}</em>
+                        <p>{{ $notification->data['subject'] ?? '' }} &middot; {{ $notification->data['duration_minutes'] ?? '?' }} min
+                            @if (! empty($notification->data['scheduled_at']))
+                                &middot; starts {{ \Illuminate\Support\Carbon::parse($notification->data['scheduled_at'])->diffForHumans() }}
+                            @endif
+                        </p>
+                    @else
+                        <strong>{{ $notification->data['answerer_name'] ?? 'Someone' }}</strong> replied to
+                        <em>{{ $notification->data['question_title'] ?? 'your question' }}</em>
+                        <p>{{ $notification->data['excerpt'] ?? '' }}</p>
+                    @endif
                     <span>{{ $notification->created_at->diffForHumans() }}</span>
                 </a>
             @empty

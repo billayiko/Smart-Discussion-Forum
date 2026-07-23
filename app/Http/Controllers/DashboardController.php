@@ -72,7 +72,9 @@ class DashboardController extends Controller
 
         $stats = [
             'quizzes' => Quiz::count(),
-            'active_quizzes' => Quiz::whereIn('status', ['scheduled', 'due_soon', 'active'])->count(),
+            'active_quizzes' => Quiz::where('status', '!=', 'draft')->get()
+                ->filter(fn (Quiz $quiz) => in_array($quiz->stage(), ['scheduled', 'due_soon', 'active'], true))
+                ->count(),
             'published_this_week' => Quiz::where('status', '!=', 'draft')->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
             'students' => User::where('role', 'student')->count(),
         ];
@@ -150,10 +152,10 @@ class DashboardController extends Controller
      */
     protected function quizzesByStatus(User $user): Collection
     {
-        $counts = $user->quizzes()
-            ->selectRaw('status, count(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
+        // Grouped from the live stage(), not the stored status column: nothing
+        // ever updates that column after creation, so a raw SQL groupBy would
+        // just reflect whatever the lecturer picked once and never touched again.
+        $counts = $user->quizzes()->get()->countBy(fn (Quiz $quiz) => $quiz->stage());
 
         $stages = ['draft', 'planned', 'scheduled', 'due_soon', 'active', 'closed'];
         $max = max($counts->max() ?: 1, 1);

@@ -6,7 +6,10 @@ use App\Models\CourseTopic;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\QuizQuestion;
+use App\Models\User;
+use App\Notifications\QuizScheduled;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
@@ -16,7 +19,7 @@ class QuizController extends Controller
         $this->authorize('viewAny', Quiz::class);
 
         $stats = $this->lecturerCardStats();
-        $quizzes = auth()->user()->quizzes()->withCount('questions')->latest()->paginate(10);
+        $quizzes = auth()->user()->quizzes()->withCount('questions')->latest()->paginate(5);
 
         return view('quizzes.index', compact('quizzes', 'stats'));
     }
@@ -49,6 +52,55 @@ class QuizController extends Controller
 
         return redirect()->route('quizzes.questions.create', $quiz)
             ->with('success', 'Quiz details saved. Now add its questions.');
+    }
+
+    /**
+     * Editing a published quiz's own details (not its questions) is only
+     * allowed up until its scheduled start — once that passes, students may
+     * already be relying on what was announced.
+     */
+    public function edit(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        abort_unless($quiz->isEditable(), 403, 'This quiz can no longer be edited once its scheduled time has passed.');
+
+        $topics = CourseTopic::orderBy('title')->get();
+
+        return view('quizzes.edit', compact('quiz', 'topics'));
+    }
+
+    public function update(Request $request, Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        abort_unless($quiz->isEditable(), 403, 'This quiz can no longer be edited once its scheduled time has passed.');
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'subject' => ['required', 'string', 'max:255'],
+            'total_questions' => ['required', 'integer', 'min:1'],
+            'scheduled_at' => ['nullable', 'date'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'status' => ['nullable', 'in:draft,planned,scheduled,due_soon,active,closed'],
+            'course_topic_id' => ['nullable', 'exists:course_topics,id'],
+            'proctored' => ['nullable', 'boolean'],
+        ]);
+
+        if ($quiz->isFinalized()) {
+            // The question count is locked in once finalized; changing it here
+            // would contradict the questions that already exist for this quiz.
+            $validated['total_questions'] = $quiz->total_questions;
+        }
+
+        // An unchecked checkbox is simply absent from the request, so without
+        // this the key would be missing from $validated entirely and update()
+        // would silently leave a previously-true value untouched.
+        $validated['proctored'] = $request->boolean('proctored');
+
+        $quiz->update($validated);
+
+        return redirect()->route('quizzes.index')->with('success', 'Quiz details updated.');
     }
 
     public function import(Request $request)
@@ -127,7 +179,7 @@ class QuizController extends Controller
         $request->merge(['correct_option' => strtolower(trim((string) $request->input('correct_option')))]);
 
         $validated = $request->validate([
-            'question' => ['required', 'string'],
+            'question' => ['required', 'string', 'max:255'],
             'option_a' => ['required', 'string', 'max:255'],
             'option_b' => ['required', 'string', 'max:255'],
             'option_c' => ['required', 'string', 'max:255'],
@@ -230,6 +282,8 @@ class QuizController extends Controller
 
         $quiz->markQuestionsFinalized();
 
+        $this->announceQuiz($quiz);
+
         return redirect()->route('quizzes.index')->with('success', 'Quiz questions saved. Students will see an announcement and be taken to it once it starts.');
     }
 
@@ -330,12 +384,30 @@ class QuizController extends Controller
         return view('quizzes.result', compact('quiz', 'attempt', 'report'));
     }
 
+    /**
+     * Notify the quiz's category of students that it's been scheduled. A
+     * quiz tied to a topic announces only to that topic's subscribers;
+     * an untargeted quiz announces to every student.
+     */
+    protected function announceQuiz(Quiz $quiz): void
+    {
+        $students = $quiz->course_topic_id
+            ? $quiz->topic->subscribers
+            : User::where('role', 'student')->get();
+
+        if ($students->isNotEmpty()) {
+            Notification::send($students, new QuizScheduled($quiz));
+        }
+    }
+
     protected function lecturerCardStats(): array
     {
         $user = auth()->user();
 
         $activeCount = $user->quizzes()
-            ->whereIn('status', ['scheduled', 'due_soon', 'active'])
+            ->where('status', '!=', 'draft')
+            ->get()
+            ->filter(fn (Quiz $quiz) => in_array($quiz->stage(), ['scheduled', 'due_soon', 'active'], true))
             ->count();
 
         $publishedThisWeek = $user->quizzes()

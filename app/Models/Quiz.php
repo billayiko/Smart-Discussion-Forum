@@ -118,4 +118,51 @@ class Quiz extends Model
     {
         return $this->scheduled_at && now()->greaterThanOrEqualTo($this->scheduled_at);
     }
+
+    /**
+     * A published quiz stays editable right up until its scheduled start;
+     * once students could be sitting it, its details are locked.
+     */
+    public function isEditable(): bool
+    {
+        return ! $this->hasStarted();
+    }
+
+    /**
+     * The quiz's real-world lifecycle stage, computed live from time and
+     * finalization rather than trusting a stored value that nothing ever
+     * updates. "draft" and "closed" remain the lecturer's own authored
+     * choices (a hard "don't show this" / "force end this" override);
+     * every other stage is derived from scheduled_at, endsAt(), and
+     * isFinalized() so it can never go stale.
+     */
+    public function stage(): string
+    {
+        if ($this->status === 'draft') {
+            return 'draft';
+        }
+
+        if ($this->status === 'closed') {
+            return 'closed';
+        }
+
+        if (! $this->scheduled_at) {
+            return 'planned';
+        }
+
+        $now = now();
+        $endsAt = $this->endsAt();
+
+        if ($endsAt !== null && $now->greaterThanOrEqualTo($endsAt)) {
+            return 'closed';
+        }
+
+        if ($this->isLive()) {
+            return 'active';
+        }
+
+        $hoursUntilStart = ($this->scheduled_at->getTimestamp() - $now->getTimestamp()) / 3600;
+
+        return $hoursUntilStart <= 24 ? 'due_soon' : 'scheduled';
+    }
 }

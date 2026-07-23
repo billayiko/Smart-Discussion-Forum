@@ -1,4 +1,4 @@
-﻿<x-layouts.academic-pulse title="Create Quiz">
+<x-layouts.academic-pulse title="Edit Quiz">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -35,8 +35,8 @@
             <main class="pulse-main">
                 <header class="pulse-topbar">
                     <div class="pulse-title">
-                        <h1>Create a new quiz</h1>
-                        <p>Set up the quiz details, then add its multiple-choice questions.</p>
+                        <h1>Edit quiz</h1>
+                        <p>You can edit this quiz until it starts at {{ $quiz->scheduled_at?->format('M j, Y g:i A') ?? 'its scheduled time' }}.</p>
                     </div>
                 </header>
 
@@ -51,38 +51,44 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('quizzes.store') }}" method="POST" class="pulse-form">
+                    <form action="{{ route('quizzes.update', $quiz) }}" method="POST" class="pulse-form">
                         @csrf
+                        @method('PATCH')
                         <div class="pulse-field">
                             <label>Title</label>
-                            <div class="pulse-input"><input type="text" name="title" value="{{ old('title') }}" required></div>
+                            <div class="pulse-input"><input type="text" name="title" value="{{ old('title', $quiz->title) }}" required></div>
                         </div>
                         <div class="pulse-field">
                             <label>Subject</label>
-                            <div class="pulse-input"><input type="text" name="subject" value="{{ old('subject') }}" required></div>
+                            <div class="pulse-input"><input type="text" name="subject" value="{{ old('subject', $quiz->subject) }}" required></div>
                         </div>
                         <div class="pulse-grid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
                             <div class="pulse-field">
                                 <label>Total questions</label>
-                                <div class="pulse-input"><input type="number" name="total_questions" value="{{ old('total_questions', 10) }}" min="1" required></div>
+                                <div class="pulse-input">
+                                    <input type="number" name="total_questions" value="{{ old('total_questions', $quiz->total_questions) }}" min="1" required @disabled($quiz->isFinalized())>
+                                </div>
+                                @if ($quiz->isFinalized())
+                                    <p class="pulse-muted" style="margin:6px 0 0; font-size:.78rem;">Locked — this quiz's questions are already saved.</p>
+                                @endif
                             </div>
                             <div class="pulse-field">
                                 <label>Duration (minutes)</label>
-                                <div class="pulse-input"><input type="number" name="duration_minutes" value="{{ old('duration_minutes', 30) }}" min="1" required></div>
+                                <div class="pulse-input"><input type="number" name="duration_minutes" value="{{ old('duration_minutes', $quiz->duration_minutes) }}" min="1" required></div>
                             </div>
                         </div>
                         <div class="pulse-grid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
                             <div class="pulse-field">
                                 <label>Scheduled at</label>
-                                <div class="pulse-input"><input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at') }}"></div>
+                                <div class="pulse-input"><input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at', $quiz->scheduled_at?->format('Y-m-d\TH:i')) }}"></div>
                             </div>
                             <div class="pulse-field">
                                 <label>Status</label>
                                 <div class="pulse-input">
                                     <select name="status">
-                                        <option value="draft" @selected(old('status', 'draft') === 'draft')>Draft (hidden from students)</option>
-                                        <option value="scheduled" @selected(old('status') !== 'draft' && old('status') !== 'closed')>Published</option>
-                                        <option value="closed" @selected(old('status') === 'closed')>Closed (force end early)</option>
+                                        <option value="draft" @selected(old('status', $quiz->status) === 'draft')>Draft (hidden from students)</option>
+                                        <option value="scheduled" @selected(old('status', $quiz->status) !== 'draft' && old('status', $quiz->status) !== 'closed')>Published</option>
+                                        <option value="closed" @selected(old('status', $quiz->status) === 'closed')>Closed (force end early)</option>
                                     </select>
                                 </div>
                                 <p class="pulse-muted" style="margin-top:6px; font-size:.78rem;">Once published, whether it shows as Scheduled, Due Soon, or Active updates automatically based on its start time.</p>
@@ -95,20 +101,19 @@
                                     <select name="course_topic_id">
                                         <option value="">None</option>
                                         @foreach ($topics as $topic)
-                                            <option value="{{ $topic->id }}" @selected(old('course_topic_id') == $topic->id)>{{ $topic->title }}</option>
+                                            <option value="{{ $topic->id }}" @selected(old('course_topic_id', $quiz->course_topic_id) == $topic->id)>{{ $topic->title }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
                             <label style="display:flex; align-items:center; gap:8px; font-size:.82rem; font-weight:700; color: var(--pulse-muted); padding-top:28px;">
-                                <input type="checkbox" name="proctored" value="1" @checked(old('proctored'))>
+                                <input type="checkbox" name="proctored" value="1" @checked(old('proctored', $quiz->proctored))>
                                 Proctored quiz
                             </label>
                         </div>
-                        <p class="pulse-muted">Students will see an announcement with the date and time, and will be taken straight to it once it starts, as soon as you save its questions below.</p>
 
                         <div style="display:flex; gap:12px;">
-                            <button type="submit" class="pulse-btn"><i class="fas fa-arrow-right"></i> Continue to add questions</button>
+                            <button type="submit" class="pulse-btn"><i class="fas fa-floppy-disk"></i> Save changes</button>
                             <a href="{{ route('quizzes.index') }}" class="pulse-btn light" style="text-decoration:none;">Cancel</a>
                         </div>
                     </form>

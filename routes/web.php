@@ -107,6 +107,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quizzes', [QuizController::class, 'index'])->name('quizzes.index');
     Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
     Route::post('/quizzes', [QuizController::class, 'store'])->name('quizzes.store');
+    Route::get('/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizzes.edit');
+    Route::patch('/quizzes/{quiz}', [QuizController::class, 'update'])->name('quizzes.update');
     Route::post('/quizzes/import', [QuizController::class, 'import'])->name('quizzes.import');
     Route::get('/quizzes/{quiz}/questions', [QuizController::class, 'questionsBuilder'])->name('quizzes.questions.create');
     Route::post('/quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
