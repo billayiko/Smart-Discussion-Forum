@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\AuthController;
@@ -20,4 +21,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/questions/{question}', [QuestionController::class, 'show']);
     Route::post('/questions', [QuestionController::class, 'store']);
     Route::post('/questions/{question}/answers', [QuestionController::class, 'storeAnswer']);
+
+    Route::get('/conversations', [MessageController::class, 'index']);
+    Route::get('/conversations/{conversation}', [MessageController::class, 'show']);
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'storeMessage']);
+    Route::post('/conversations/start', [MessageController::class, 'start']);
+    Route::get('/conversation-contacts', [MessageController::class, 'contacts']);
 });
