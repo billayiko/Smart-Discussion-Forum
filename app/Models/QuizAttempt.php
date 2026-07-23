@@ -16,6 +16,7 @@ class QuizAttempt extends Model
         'score',
         'total',
         'answers',
+        'proctoring_violations',
         'submitted_at',
     ];
 

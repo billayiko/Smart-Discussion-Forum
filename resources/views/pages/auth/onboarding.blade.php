@@ -72,6 +72,12 @@
 
                 <button type="submit" class="pulse-btn" style="width:100%;">Continue to my dashboard</button>
             </form>
+
+            <form method="POST" action="{{ route('onboarding.decline') }}" style="margin-top:10px;" onsubmit="return confirm('Decline the platform rules? Your registration will be cancelled and your account deleted.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="pulse-btn light" style="width:100%;">I do not agree — cancel my registration</button>
+            </form>
         </section>
     </main>
 </x-layouts.academic-pulse>

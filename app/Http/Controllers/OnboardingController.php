@@ -7,6 +7,7 @@ use App\Concerns\SecurityQuestionValidationRules;
 use App\Support\SecurityQuestion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
@@ -59,5 +60,27 @@ class OnboardingController extends Controller
         }
 
         return redirect()->route($user->dashboardRouteName());
+    }
+
+    /**
+     * The member declined the platform rules: their registration never
+     * completes, so the pending account is removed and they're signed out.
+     */
+    public function decline(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'member') {
+            return redirect()->route($user->dashboardRouteName());
+        }
+
+        Auth::guard('web')->logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('status', 'Your registration was cancelled because you did not agree to the platform rules.');
     }
 }

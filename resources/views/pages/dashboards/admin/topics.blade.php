@@ -1,4 +1,4 @@
-<x-layouts.academic-pulse title="Topic Management">
+﻿<x-layouts.academic-pulse title="Topic Management">
     <div class="pulse-page">
         <div class="pulse-app">
             <aside class="pulse-sidebar">
@@ -15,7 +15,7 @@
                     <a href="{{ route('admin.members.index') }}"><i class="fas fa-user-shield"></i> Members</a>
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a href="{{ route('admin.analytics.index') }}"><i class="fas fa-chart-line"></i> Analytics</a>
-                    <a href="#"><i class="fas fa-gear"></i> Settings</a>
+                    <a href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
                 <div class="pulse-sidebar-footer">
@@ -137,6 +137,7 @@
                                         </td>
                                         <td>
                                             <div class="pulse-actions" style="justify-content:flex-end;">
+                                                <a class="pulse-icon-btn" href="{{ route('admin.analytics.show', $topic) }}" title="View statistics"><i class="fas fa-chart-line"></i></a>
                                                 <form method="POST" action="{{ route('admin.topics.destroy', $topic) }}" onsubmit="return confirm('Remove this topic? This cannot be undone.');">
                                                     @csrf
                                                     @method('DELETE')

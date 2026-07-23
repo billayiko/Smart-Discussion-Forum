@@ -23,6 +23,9 @@
                         <strong>{{ $message->user->id === $user->id ? 'You' : $message->user->name }}</strong>
                         <p>{{ $message->body }}</p>
                         <span class="pulse-muted">{{ $message->created_at->diffForHumans() }}</span>
+                        @if ($message->user->id === $user->id && $message->excludedUsers->isNotEmpty())
+                            <span class="pulse-tag orange">Hidden from {{ $message->excludedUsers->pluck('name')->join(', ') }}</span>
+                        @endif
                     </span>
                 </div>
             @empty
@@ -37,6 +40,23 @@
                     <textarea name="body" rows="3" placeholder="Write a message..." style="width:100%; border:0; outline:0; background:transparent; resize:vertical;" required></textarea>
                 </div>
             </div>
+
+            @if ($conversation->isGroup())
+                <details class="pulse-field" style="background:var(--pulse-surface-2, #f6f7f9); border-radius:10px; padding:10px 14px; margin-bottom:12px;">
+                    <summary style="cursor:pointer; font-weight:700; font-size:.86rem;">Exclude specific members from this message (optional)</summary>
+                    <div style="display:grid; gap:6px; margin-top:10px;">
+                        @foreach ($conversation->participants as $participant)
+                            @if ($participant->id !== $user->id)
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:.86rem;">
+                                    <input type="checkbox" name="excluded_user_ids[]" value="{{ $participant->id }}">
+                                    {{ $participant->name }}
+                                </label>
+                            @endif
+                        @endforeach
+                    </div>
+                </details>
+            @endif
+
             <div>
                 <button class="pulse-btn" type="submit"><i class="fas fa-paper-plane"></i> Send</button>
             </div>

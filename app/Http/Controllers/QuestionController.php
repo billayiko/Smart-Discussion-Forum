@@ -42,6 +42,16 @@ class QuestionController extends Controller
             'course_topic_id' => ['nullable', 'exists:course_topics,id'],
         ]);
 
+        $isDuplicate = Question::where('user_id', $request->user()->id)
+            ->where('title', $validated['title'])
+            ->where('body', $validated['body'])
+            ->where('created_at', '>=', now()->subMinutes(5))
+            ->exists();
+
+        if ($isDuplicate) {
+            return back()->withErrors(['title' => "You've already posted this question recently — avoid posting duplicates."])->withInput();
+        }
+
         $request->user()->questions()->create($validated);
 
         return back()->with('success', 'Your question has been posted.');
@@ -111,6 +121,16 @@ class QuestionController extends Controller
             'excluded_user_ids' => ['nullable', 'array'],
             'excluded_user_ids.*' => ['integer', 'exists:users,id'],
         ]);
+
+        $isDuplicate = $question->answers()
+            ->where('user_id', $request->user()->id)
+            ->where('body', $validated['body'])
+            ->where('created_at', '>=', now()->subMinutes(5))
+            ->exists();
+
+        if ($isDuplicate) {
+            return back()->withErrors(['body' => "You've already posted this reply recently — avoid posting duplicates."])->withInput();
+        }
 
         $answer = $question->answers()->create([
             'user_id' => $request->user()->id,

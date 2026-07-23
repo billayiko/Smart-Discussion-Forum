@@ -102,7 +102,11 @@ class MessageController extends Controller
 
         $this->authorizeParticipant($conversation, $user);
 
-        $conversation->load(['messages.user', 'participants']);
+        $conversation->load(['messages.user', 'messages.excludedUsers', 'participants']);
+        $conversation->setRelation(
+            'messages',
+            $conversation->messages->reject(fn ($message) => $message->isExcludedFor($user))->values()
+        );
 
         $canManageMembers = $conversation->isGroup() && $conversation->created_by === $user->id;
 
@@ -121,12 +125,23 @@ class MessageController extends Controller
 
         $validated = $request->validate([
             'body' => ['required', 'string'],
+            'excluded_user_ids' => ['nullable', 'array'],
+            'excluded_user_ids.*' => ['integer'],
         ]);
 
-        $conversation->messages()->create([
+        $message = $conversation->messages()->create([
             'user_id' => $user->id,
             'body' => $validated['body'],
         ]);
+
+        if ($conversation->isGroup() && ! empty($validated['excluded_user_ids'])) {
+            // Only ever exclude actual participants of this conversation, never arbitrary user IDs.
+            $validExclusions = $conversation->participants->pluck('id')
+                ->intersect($validated['excluded_user_ids'])
+                ->reject(fn ($id) => $id === $user->id);
+
+            $message->excludedUsers()->sync($validExclusions);
+        }
 
         $conversation->touch();
         $user->recordCommunication();
