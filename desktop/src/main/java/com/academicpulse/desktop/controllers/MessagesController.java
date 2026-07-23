@@ -40,9 +40,10 @@ public class MessagesController {
                 var conversations = Router.api().getConversations();
                 Platform.runLater(() -> {
                     conversationsListView.setItems(FXCollections.observableArrayList(conversations));
-                    statusLabel.setText(conversations.isEmpty()
+                    String base = conversations.isEmpty()
                             ? "No conversations yet — start a new message."
-                            : conversations.size() + " conversation(s).");
+                            : conversations.size() + " conversation(s).";
+                    statusLabel.setText(Router.api().isOffline() ? "Offline — showing saved data. " + base : base);
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> statusLabel.setText("Failed to load conversations: " + describe(e)));

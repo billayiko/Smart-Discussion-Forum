@@ -527,9 +527,12 @@
         });
 
         const syncBtn = document.getElementById('forum-sync-btn');
-        syncBtn?.addEventListener('click', async () => {
-            const original = syncBtn.innerHTML;
-            syncBtn.innerHTML = '<i class="fas fa-arrows-rotate fa-spin"></i> Syncing...';
+
+        async function syncForumThread(showSpinner) {
+            const original = syncBtn?.innerHTML;
+            if (showSpinner && syncBtn) {
+                syncBtn.innerHTML = '<i class="fas fa-arrows-rotate fa-spin"></i> Syncing...';
+            }
             try {
                 const res = await fetch(window.location.href, { headers: { 'X-Sync': '1' } });
                 const html = await res.text();
@@ -546,10 +549,19 @@
                 });
 
                 tickQuizCountdown();
+            } catch (e) {
+                // leave the thread as-is on network failure; the next tick will retry
             } finally {
-                syncBtn.innerHTML = original;
+                if (showSpinner && syncBtn) {
+                    syncBtn.innerHTML = original;
+                }
             }
-        });
+        }
+
+        syncBtn?.addEventListener('click', () => syncForumThread(true));
+
+        // Poll for new replies every 5s so the thread updates without a manual sync.
+        setInterval(() => syncForumThread(false), 5000);
 
         function tickQuizCountdown() {
             const countdownEl = document.getElementById('forum-quiz-countdown');

@@ -15,7 +15,7 @@
             @endif
         </div>
 
-        <div class="pulse-list">
+        <div class="pulse-list" id="messages-list">
             @forelse ($conversation->messages as $message)
                 <div class="pulse-row" style="align-items:flex-start;">
                     <span class="pulse-soft-icon"><i class="fas fa-comment"></i></span>
@@ -104,3 +104,26 @@
         </article>
     @endif
 </section>
+
+<script>
+    (function () {
+        async function syncMessages() {
+            try {
+                const res = await fetch(window.location.href, { headers: { 'X-Sync': '1' } });
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                const fresh = doc.getElementById('messages-list');
+                const current = document.getElementById('messages-list');
+                if (fresh && current) {
+                    current.replaceWith(fresh);
+                }
+            } catch (e) {
+                // leave the thread as-is on network failure; the next tick will retry
+            }
+        }
+
+        // Poll for new messages every 5s so the conversation updates without a manual reload.
+        setInterval(syncMessages, 5000);
+    })();
+</script>
