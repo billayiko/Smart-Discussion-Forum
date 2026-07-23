@@ -134,6 +134,47 @@ class Quiz extends Model
     }
 
     /**
+     * The single quiz currently live and available to this student, if any.
+     * Shared by the dashboard's immediate redirect and the site-wide
+     * middleware that keeps the "pop up and interrupt" behavior working
+     * from any page, not just the dashboard.
+     */
+    public static function liveFor(User $user): ?self
+    {
+        $attemptedQuizIds = QuizAttempt::where('user_id', $user->id)->pluck('quiz_id');
+
+        return static::where('status', '!=', 'draft')
+            ->whereNotNull('scheduled_at')
+            ->whereNotNull('questions_finalized_at')
+            ->where('scheduled_at', '<=', now())
+            ->whereNotIn('id', $attemptedQuizIds)
+            ->orderBy('scheduled_at')
+            ->get()
+            ->first(fn (Quiz $quiz) => $quiz->isLive() && $quiz->isTargetedAt($user));
+    }
+
+    /**
+     * This student's not-yet-live, not-yet-attempted, targeted quizzes,
+     * soonest first. Shared by the dashboard's announcement list and the
+     * site-wide client-side watcher that redirects the moment one goes
+     * live while the student is sitting on any page.
+     */
+    public static function upcomingFor(User $user): \Illuminate\Support\Collection
+    {
+        $attemptedQuizIds = QuizAttempt::where('user_id', $user->id)->pluck('quiz_id');
+
+        return static::where('status', '!=', 'draft')
+            ->whereNotNull('scheduled_at')
+            ->whereNotNull('questions_finalized_at')
+            ->where('scheduled_at', '>', now())
+            ->whereNotIn('id', $attemptedQuizIds)
+            ->orderBy('scheduled_at')
+            ->get()
+            ->filter(fn (Quiz $quiz) => $quiz->isTargetedAt($user))
+            ->values();
+    }
+
+    /**
      * A published quiz stays editable right up until its scheduled start;
      * once students could be sitting it, its details are locked.
      */

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Quiz;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->shareNotifications();
+        $this->shareQuizWatch();
     }
 
     /**
@@ -39,6 +41,27 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('unreadNotifications', $user ? $user->unreadNotifications()->latest()->take(8)->get() : collect());
             $view->with('unreadNotificationsCount', $user ? $user->unreadNotifications()->count() : 0);
+        });
+    }
+
+    /**
+     * Share a student's upcoming targeted quizzes with every view, so the
+     * "quiz pops up" behavior works from any page the student is sitting
+     * on, not just the dashboard.
+     */
+    protected function shareQuizWatch(): void
+    {
+        View::composer('*', function ($view): void {
+            $user = auth()->user();
+
+            $quizzes = ($user && $user->role === 'student')
+                ? Quiz::upcomingFor($user)->map(fn (Quiz $quiz) => [
+                    'url' => route('quizzes.take', $quiz),
+                    'startsAt' => $quiz->scheduled_at->toIso8601String(),
+                ])->values()
+                : collect();
+
+            $view->with('quizWatchForJs', $quizzes);
         });
     }
 

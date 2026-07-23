@@ -7,7 +7,6 @@ use App\Models\CourseTopic;
 use App\Models\ParticipationCriterion;
 use App\Models\Question;
 use App\Models\Quiz;
-use App\Models\QuizAttempt;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -18,16 +17,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $attemptedQuizIds = QuizAttempt::where('user_id', $user->id)->pluck('quiz_id');
-
-        $liveQuiz = Quiz::where('status', '!=', 'draft')
-            ->whereNotNull('scheduled_at')
-            ->whereNotNull('questions_finalized_at')
-            ->where('scheduled_at', '<=', now())
-            ->whereNotIn('id', $attemptedQuizIds)
-            ->orderBy('scheduled_at')
-            ->get()
-            ->first(fn (Quiz $quiz) => $quiz->isLive() && $quiz->isTargetedAt($user));
+        $liveQuiz = Quiz::liveFor($user);
 
         if ($liveQuiz) {
             return redirect()->route('quizzes.take', $liveQuiz);
@@ -47,16 +37,7 @@ class DashboardController extends Controller
             ->take(4)
             ->values();
 
-        $upcomingQuizAnnouncements = Quiz::where('status', '!=', 'draft')
-            ->whereNotNull('scheduled_at')
-            ->whereNotNull('questions_finalized_at')
-            ->where('scheduled_at', '>', now())
-            ->whereNotIn('id', $attemptedQuizIds)
-            ->orderBy('scheduled_at')
-            ->get()
-            ->filter(fn (Quiz $quiz) => $quiz->isTargetedAt($user))
-            ->take(3)
-            ->values();
+        $upcomingQuizAnnouncements = Quiz::upcomingFor($user)->take(3)->values();
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
