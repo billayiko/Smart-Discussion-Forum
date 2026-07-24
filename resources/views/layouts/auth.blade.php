@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --color-blue-dark: #0a1628; --color-blue-mid: #0f2b4b; --color-blue-light: #1a3a5e;
-            --color-white: #ffffff; --color-body-bg: #eef2f7;
-            --color-gold-primary: #c9a84c; --color-gold-light: #f0d060; --color-gold-glow: rgba(201, 168, 76, 0.15);
-            --color-text-dark: #0a1628; --color-text-muted: #4a6a8a; --color-text-light: #6a8aaa;
-            --color-border-subtle: rgba(201, 168, 76, 0.12);
-            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04); --shadow-gold: 0 0 30px rgba(201, 168, 76, 0.06);
-            --gradient-gold: linear-gradient(135deg, #c9a84c, #f0d060); --gradient-gold-hover: linear-gradient(135deg, #d4b85a, #f0d880);
+            --color-blue-dark: #1e1b2e; --color-blue-mid: #2b2650; --color-blue-light: #3d3570;
+            --color-white: #ffffff; --color-body-bg: #f7f7fb;
+            --color-gold-primary: #7c6ef4; --color-gold-light: #9b8afb; --color-gold-glow: rgba(124, 110, 244, 0.2);
+            --color-text-dark: #1e1b2e; --color-text-muted: #71717a; --color-text-light: #a79fc9;
+            --color-border-subtle: rgba(124, 110, 244, 0.16);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04); --shadow-gold: 0 0 30px rgba(124, 110, 244, 0.14);
+            --gradient-gold: linear-gradient(135deg, #7c6ef4, #9b8afb); --gradient-gold-hover: linear-gradient(135deg, #6a5ce0, #8a79f0);
             --radius-md: 14px; --radius-xl: 28px; --glass-backdrop: blur(20px);
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--color-body-bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; margin:0; }

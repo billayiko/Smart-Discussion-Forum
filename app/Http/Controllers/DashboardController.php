@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Complaint;
 use App\Models\CourseTopic;
 use App\Models\ParticipationCriterion;
@@ -24,11 +25,21 @@ class DashboardController extends Controller
             return redirect()->route('quizzes.take', $liveQuiz);
         }
 
+        $upcomingQuizAnnouncements = Quiz::upcomingFor($user)->take(3)->values();
+
+        $ownAttempts = QuizAttempt::where('user_id', $user->id)->get();
+        $averageGradePercent = $ownAttempts->isNotEmpty()
+            ? (int) round($ownAttempts->avg(fn (QuizAttempt $a) => $a->total > 0 ? ($a->score / $a->total) * 100 : 0))
+            : null;
+
         $stats = [
-            'enrolled_lectures' => 6,
+            'enrolled_lectures' => $user->subscribedTopics()->count(),
+            'new_subscriptions_this_week' => $user->subscribedTopics()->wherePivot('created_at', '>=', now()->subDays(7))->count(),
             'quizzes' => Quiz::where('status', '!=', 'draft')->count(),
-            'upcoming_classes' => 4,
-            'average_grade' => 'A-',
+            'upcoming_classes' => $upcomingQuizAnnouncements->count(),
+            'next_class' => $upcomingQuizAnnouncements->first(),
+            'average_grade' => $averageGradePercent !== null ? $averageGradePercent.'%' : '—',
+            'graded_quiz_count' => $ownAttempts->count(),
         ];
 
         $upcomingQuizzes = Quiz::where('status', '!=', 'draft')
@@ -37,8 +48,6 @@ class DashboardController extends Controller
             ->filter(fn (Quiz $quiz) => $quiz->isTargetedAt($user))
             ->take(4)
             ->values();
-
-        $upcomingQuizAnnouncements = Quiz::upcomingFor($user)->take(3)->values();
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
@@ -56,6 +65,17 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        $ownQuizzes = $user->quizzes()->get();
+        $upcomingOwnQuizzes = $ownQuizzes
+            ->filter(fn (Quiz $quiz) => $quiz->status !== 'draft' && ! $quiz->hasStarted())
+            ->sortBy('scheduled_at')
+            ->values();
+
+        $ownAttempts = QuizAttempt::whereIn('quiz_id', $ownQuizzes->pluck('id'))->get();
+        $averageScorePercent = $ownAttempts->isNotEmpty()
+            ? (int) round($ownAttempts->avg(fn (QuizAttempt $a) => $a->total > 0 ? ($a->score / $a->total) * 100 : 0))
+            : null;
+
         $stats = [
             'quizzes' => Quiz::count(),
             'active_quizzes' => Quiz::where('status', '!=', 'draft')->get()
@@ -63,6 +83,10 @@ class DashboardController extends Controller
                 ->count(),
             'published_this_week' => Quiz::where('status', '!=', 'draft')->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
             'students' => User::where('role', 'student')->count(),
+            'total_topics' => $user->assignedTopics()->count(),
+            'upcoming_classes' => $upcomingOwnQuizzes->count(),
+            'next_class' => $upcomingOwnQuizzes->first(),
+            'average_score_percent' => $averageScorePercent,
         ];
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
@@ -71,7 +95,9 @@ class DashboardController extends Controller
 
         $participationCriteria = ParticipationCriterion::forLecturer($user);
 
-        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesByStatus', 'participationCriteria'));
+        $discussionStats = $this->lecturerDiscussionStats($user);
+
+        return view('pages.dashboards.lecturer', compact('user', 'stats', 'recentQuestions', 'unansweredQuestionsCount', 'quizzesByStatus', 'participationCriteria', 'discussionStats'));
     }
 
     public function admin(Request $request)
@@ -90,9 +116,16 @@ class DashboardController extends Controller
             'lecturers' => User::where('role', 'lecturer')->count(),
         ];
 
+        $statusFilter = $request->query('status');
+        $search = $request->query('q');
+
         // Marks stay invisible to the admin until the owning lecturer
         // confirms them, so unconfirmed quizzes are left out entirely here.
         $quizzes = Quiz::whereNotNull('marks_confirmed_at')
+            ->when($statusFilter === 'published', fn ($query) => $query->where('status', '!=', 'draft'))
+            ->when($statusFilter === 'draft', fn ($query) => $query->where('status', 'draft'))
+            ->when($statusFilter === 'scheduled', fn ($query) => $query->where('status', 'scheduled'))
+            ->when($search, fn ($query) => $query->where(fn ($q) => $q->where('title', 'like', "%{$search}%")->orWhere('subject', 'like', "%{$search}%")))
             ->withCount('attempts')
             ->latest()
             ->take(5)
@@ -104,7 +137,37 @@ class DashboardController extends Controller
                     : null;
             });
 
-        return view('pages.dashboards.admin', compact('user', 'bubbles', 'quizzes'));
+        return view('pages.dashboards.admin', compact('user', 'bubbles', 'quizzes', 'statusFilter', 'search'));
+    }
+
+    /**
+     * A lecturer's discussion activity scoped to their own assigned topics:
+     * new threads this week, unresolved questions, distinct participants,
+     * and the topic with the most questions.
+     */
+    protected function lecturerDiscussionStats(User $user): array
+    {
+        $topicIds = $user->assignedTopics()->pluck('id');
+        $questions = Question::whereIn('course_topic_id', $topicIds)->withCount('answers')->get();
+
+        $newThreadsThisWeek = $questions->where('created_at', '>=', now()->startOfWeek())->count();
+        $unresolvedCount = $questions->where('answers_count', 0)->count();
+
+        $participantIds = $questions->pluck('user_id');
+        $answererIds = Answer::whereIn('question_id', $questions->pluck('id'))->pluck('user_id');
+        $participantsCount = $participantIds->merge($answererIds)->unique()->count();
+
+        $topTopic = $topicIds->isEmpty() ? null : CourseTopic::whereIn('id', $topicIds)
+            ->withCount(['questions'])
+            ->orderByDesc('questions_count')
+            ->first();
+
+        return [
+            'new_threads_this_week' => $newThreadsThisWeek,
+            'unresolved_count' => $unresolvedCount,
+            'participants_count' => $participantsCount,
+            'top_topic' => ($topTopic && $topTopic->questions_count > 0) ? $topTopic : null,
+        ];
     }
 
     protected function questionsPanelData(): array

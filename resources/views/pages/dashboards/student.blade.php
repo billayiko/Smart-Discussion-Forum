@@ -48,26 +48,26 @@
                             <input type="search" placeholder="Search anything...">
                         </label>
                         @include('partials._notification-bell')
-                        <span class="pulse-avatar">AJ</span>
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'U', 0, 2)) }}</span>
                     </div>
                 </header>
 
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
-                        <span><small>Enrolled Lectures</small><b>{{ $stats['enrolled_lectures'] }}</b><span class="pulse-trend">2 new this week</span></span>
+                        <span><small>Enrolled Lectures</small><b>{{ $stats['enrolled_lectures'] }}</b><span class="pulse-trend">{{ $stats['new_subscriptions_this_week'] }} new this week</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon purple"><i class="fas fa-clipboard-question"></i></span>
-                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">3 upcoming</span></span>
+                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">{{ $stats['upcoming_classes'] }} upcoming</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-calendar-check"></i></span>
-                        <span><small>Upcoming Classes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">Today</span></span>
+                        <span><small>Upcoming Classes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">{{ $stats['next_class'] ? 'Next '.$stats['next_class']->scheduled_at->diffForHumans() : 'None scheduled' }}</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-award"></i></span>
-                        <span><small>Average Grade</small><b>{{ $stats['average_grade'] }}</b><span class="pulse-trend">88.5%</span></span>
+                        <span><small>Average Grade</small><b>{{ $stats['average_grade'] }}</b><span class="pulse-trend">{{ $stats['graded_quiz_count'] }} quiz(zes) graded</span></span>
                     </article>
                 </section>
 
@@ -100,7 +100,6 @@
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Upcoming Quizzes</h2>
-                            <a href="#">View all</a>
                         </div>
                         <div class="pulse-list">
                             @forelse ($upcomingQuizzes as $quiz)
@@ -153,30 +152,18 @@
                         </div>
                     </article>
 
-                    {{-- <article class="pulse-card pulse-pad">
+                    <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Recent Announcements</h2>
-                            <a href="#">View all</a>
                         </div>
                         <div class="pulse-list">
-                            @foreach ($upcomingQuizAnnouncements as $announcement)
+                            @forelse ($upcomingQuizAnnouncements as $announcement)
                                 <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-bullhorn"></i></span><span><strong>Upcoming quiz: {{ $announcement->title }}</strong><p>{{ $announcement->subject }} &middot; {{ $announcement->scheduled_at->format('M j, Y g:i A') }} &middot; {{ $announcement->duration_minutes }} mins</p></span><span class="pulse-tag orange">{{ $announcement->scheduled_at->diffForHumans() }}</span></div>
-                            @endforeach
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-user-tie"></i></span><span><strong>Guest Lecture on ML</strong><p>Guest lecture on Machine Learning by Dr. Sarah Johnson.</p></span><span class="pulse-muted">2d</span></div>
+                            @empty
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-bullhorn"></i></span><span><strong>No announcements</strong><p>Upcoming quizzes will appear here.</p></span></div>
+                            @endforelse
                         </div>
-                    </article> --}}
-
-                    {{-- <article class="pulse-card pulse-pad">
-                        <div class="pulse-section-head">
-                            <h2>Quick Resources</h2>
-                        </div>
-                        <div class="pulse-list">
-                            <a class="pulse-resource" href="#"><span class="pulse-stat-icon green"><i class="fas fa-file-lines"></i></span><span><strong>Lecture Notes</strong><span class="pulse-muted">Access materials</span></span></a>
-                            <a class="pulse-resource" href="#"><span class="pulse-stat-icon purple"><i class="fas fa-clipboard-list"></i></span><span><strong>Past Quizzes</strong><span class="pulse-muted">Review quizzes</span></span></a>
-                            <a class="pulse-resource" href="#"><span class="pulse-stat-icon orange"><i class="fas fa-comments"></i></span><span><strong>Discussion Forum</strong><span class="pulse-muted">Join discussions</span></span></a>
-                            <a class="pulse-resource" href="#"><span class="pulse-stat-icon cyan"><i class="fas fa-calendar-days"></i></span><span><strong>Academic Calendar</strong><span class="pulse-muted">View events</span></span></a>
-                        </div>
-                    </article> --}}
+                    </article>
                 </section>
             </main>
         </div>

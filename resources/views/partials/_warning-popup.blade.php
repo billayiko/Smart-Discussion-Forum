@@ -29,8 +29,8 @@
             width: min(420px, 100%);
             padding: 28px;
             border-radius: 16px;
-            background: var(--bg, #eef2f7);
-            color: var(--text, #0a1628);
+            background: var(--bg, #f7f7fb);
+            color: var(--text, #1e1b2e);
             text-align: center;
             box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
         }
