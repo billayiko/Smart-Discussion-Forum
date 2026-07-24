@@ -34,10 +34,7 @@
                 <header class="pulse-topbar">
                     <div class="pulse-title">
                         <h1>Monitoring & Management</h1>
-                        <p>Create, manage and analyze quizzes for your students.</p>
-                    </div>
-                    <div class="pulse-tools">
-                        <a href="{{ route('quizzes.create') }}" class="pulse-btn" style="text-decoration:none;"><i class="fas fa-plus"></i> Create Quiz</a>
+                        <p>Create, manage and analyze performance data for your lecturers and students.</p>
                     </div>
                 </header>
 
