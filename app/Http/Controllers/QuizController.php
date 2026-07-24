@@ -388,6 +388,22 @@ class QuizController extends Controller
     }
 
     /**
+     * A lecturer's sign-off that a quiz's marks are ready for the admin to
+     * see. Admin-facing views filter attempts/averages on this so results
+     * only surface once the owning lecturer has reviewed them.
+     */
+    public function confirmMarks(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        abort_unless($quiz->hasStarted(), 403, 'Marks cannot be confirmed before the quiz starts.');
+
+        $quiz->markMarksConfirmed();
+
+        return back()->with('success', 'Marks confirmed. The admin can now view this quiz\'s results.');
+    }
+
+    /**
      * Notify the quiz's category of students that it's been scheduled. A
      * quiz tied to a topic announces only to that topic's subscribers;
      * an untargeted quiz announces to every student.

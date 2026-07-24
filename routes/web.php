@@ -49,13 +49,13 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::delete('/topics/{topic}/subscribe', [TopicController::class, 'unsubscribe'])->name('topics.unsubscribe');
     Route::get('/quizzes/{quiz}/take', [QuizController::class, 'take'])->name('quizzes.take');
     Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
-    Route::get('/quizzes/{quiz}/result', [QuizController::class, 'result'])->name('quizzes.result');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
     Route::get('/lecturer/students', [LecturerStudentController::class, 'index'])->name('lecturer.students');
     Route::patch('/lecturer/participation-criteria', [ParticipationCriteriaController::class, 'update'])->name('lecturer.participation-criteria.update');
+    Route::post('/quizzes/{quiz}/confirm-marks', [QuizController::class, 'confirmMarks'])->name('quizzes.confirm-marks');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -83,6 +83,7 @@ Route::middleware(['auth', 'role:student,lecturer,admin'])->group(function () {
     Route::get('/topics/{topic}/discussions', [TopicController::class, 'show'])->name('topics.show');
     Route::get('/topics/{topic}/export', [TopicController::class, 'exportPdf'])->name('topics.export');
     Route::get('/topics/{topic}/participation.csv', [TopicController::class, 'exportParticipationCsv'])->name('topics.participation.export');
+    Route::get('/quizzes/{quiz}/result', [QuizController::class, 'result'])->name('quizzes.result');
 });
 
 Route::middleware(['auth', 'role:student,lecturer'])->group(function () {

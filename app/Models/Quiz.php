@@ -35,6 +35,7 @@ class Quiz extends Model
         'scheduled_at' => 'datetime',
         'proctored' => 'boolean',
         'questions_finalized_at' => 'datetime',
+        'marks_confirmed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -77,6 +78,22 @@ class Quiz extends Model
     public function markQuestionsFinalized(): void
     {
         $this->update(['questions_finalized_at' => now()]);
+    }
+
+    /**
+     * Whether the lecturer has confirmed this quiz's marks. Admin-facing
+     * attempts/scores stay hidden until this is set, so a lecturer gets a
+     * chance to review results before they're shared upward.
+     */
+    public function marksConfirmed(): bool
+    {
+        return $this->marks_confirmed_at !== null;
+    }
+
+    public function markMarksConfirmed(): void
+    {
+        $this->marks_confirmed_at = now();
+        $this->save();
     }
 
     public function endsAt(): ?CarbonInterface

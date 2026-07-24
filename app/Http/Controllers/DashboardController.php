@@ -7,6 +7,7 @@ use App\Models\CourseTopic;
 use App\Models\ParticipationCriterion;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -89,7 +90,19 @@ class DashboardController extends Controller
             'lecturers' => User::where('role', 'lecturer')->count(),
         ];
 
-        $quizzes = Quiz::latest()->take(5)->get();
+        // Marks stay invisible to the admin until the owning lecturer
+        // confirms them, so unconfirmed quizzes are left out entirely here.
+        $quizzes = Quiz::whereNotNull('marks_confirmed_at')
+            ->withCount('attempts')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->each(function (Quiz $quiz) {
+                $attempts = QuizAttempt::where('quiz_id', $quiz->id)->get();
+                $quiz->average_score_percent = $attempts->isNotEmpty()
+                    ? (int) round($attempts->avg(fn (QuizAttempt $a) => $a->total > 0 ? ($a->score / $a->total) * 100 : 0))
+                    : null;
+            });
 
         return view('pages.dashboards.admin', compact('user', 'bubbles', 'quizzes'));
     }

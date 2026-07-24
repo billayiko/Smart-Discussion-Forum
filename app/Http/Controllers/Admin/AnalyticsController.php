@@ -78,6 +78,7 @@ class AnalyticsController extends Controller
         $topic->load('lecturer');
 
         $questionIds = $topic->questions()->pluck('id');
+        $confirmedQuizIds = $topic->quizzes()->whereNotNull('marks_confirmed_at')->pluck('id');
 
         $summary = [
             'subscribers' => $topic->subscribers_count,
@@ -85,10 +86,12 @@ class AnalyticsController extends Controller
             'unanswered_questions' => $topic->questions()->doesntHave('answers')->count(),
             'answers' => Answer::whereIn('question_id', $questionIds)->count(),
             'pending_complaints' => Complaint::whereIn('question_id', $questionIds)->where('status', 'pending')->count(),
-            'quizzes' => $topic->quizzes()->count(),
+            'quizzes' => $confirmedQuizIds->count(),
         ];
 
-        $attempts = QuizAttempt::whereIn('quiz_id', $topic->quizzes()->pluck('id'))->get();
+        // Only quizzes whose lecturer has confirmed marks feed the average
+        // shown here — unconfirmed results stay hidden from the admin.
+        $attempts = QuizAttempt::whereIn('quiz_id', $confirmedQuizIds)->get();
         $summary['average_quiz_score'] = $attempts->isNotEmpty()
             ? (int) round($attempts->avg(fn (QuizAttempt $attempt) => $attempt->total > 0 ? ($attempt->score / $attempt->total) * 100 : 0))
             : null;

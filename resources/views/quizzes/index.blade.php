@@ -103,6 +103,9 @@
                                         @if ($quiz->isEditable())
                                             <a href="{{ route('quizzes.edit', $quiz) }}" class="pulse-icon-btn" title="Edit quiz details"><i class="fas fa-pen"></i></a>
                                         @endif
+                                        @if ($quiz->hasStarted())
+                                            <a href="{{ route('quizzes.result', $quiz) }}" class="pulse-icon-btn" title="View marks &amp; confirm for admin"><i class="fas fa-chart-simple"></i></a>
+                                        @endif
                                         @if ($quiz->questions_finalized_at)
                                             <a href="{{ route('quizzes.questions.create', $quiz) }}" class="pulse-btn light" style="text-decoration:none;"><i class="fas fa-eye"></i> View questions</a>
                                         @elseif ($quiz->questions_count < $quiz->total_questions)
