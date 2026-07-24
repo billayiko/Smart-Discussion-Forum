@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Answer;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 
@@ -18,7 +19,19 @@ class QuestionAnswered extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $question = $this->answer->question;
+
+        return (new MailMessage)
+            ->subject("{$this->answer->user->name} replied to your question")
+            ->greeting("Hi {$notifiable->name},")
+            ->line("{$this->answer->user->name} replied to your question \"{$question->title}\":")
+            ->line(Str::limit($this->answer->body, 160))
+            ->action('View the reply', route('questions.show', $question));
     }
 
     /**
