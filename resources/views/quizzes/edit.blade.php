@@ -69,6 +69,7 @@
                                     <input type="number" name="total_questions" value="{{ old('total_questions', $quiz->total_questions) }}" min="1" required @disabled($quiz->isFinalized())>
                                 </div>
                                 @if ($quiz->isFinalized())
+                                    <input type="hidden" name="total_questions" value="{{ $quiz->total_questions }}">
                                     <p class="pulse-muted" style="margin:6px 0 0; font-size:.78rem;">Locked — this quiz's questions are already saved.</p>
                                 @endif
                             </div>
