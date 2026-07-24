@@ -28,6 +28,19 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.17.2</version>
         </dependency>
+        <dependency>
+            <!-- Local read-cache for offline browsing, not direct app-database
+                 access — the app still talks to Laravel exclusively over HTTP. -->
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.46.0.0</version>
+        </dependency>
+        <dependency>
+            <!-- Transitive requirement of sqlite-jdbc's JDBC class init. -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+        </dependency>
     </dependencies>
 
     <build>

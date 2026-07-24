@@ -12,7 +12,10 @@ set "M2=%USERPROFILE%\.m2\repository"
 set "FX=%M2%\org\openjfx"
 set "JACKSON=%M2%\com\fasterxml\jackson"
 
-set "CP=%JACKSON%\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;%JACKSON%\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;%JACKSON%\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;%JACKSON%\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar"
+set "SQLITE=%M2%\org\xerial\sqlite-jdbc\3.46.0.0\sqlite-jdbc-3.46.0.0.jar"
+set "SLF4J=%M2%\org\slf4j\slf4j-api\1.7.36\slf4j-api-1.7.36.jar"
+
+set "CP=%JACKSON%\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;%JACKSON%\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;%JACKSON%\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;%JACKSON%\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;%SQLITE%;%SLF4J%"
 
 set "MODPATH=%FX%\javafx-base\21.0.2\javafx-base-21.0.2-win.jar;%FX%\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar;%FX%\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar;%FX%\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar"
 
