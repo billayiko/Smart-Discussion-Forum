@@ -7,6 +7,7 @@ use App\Models\CourseTopic;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Notifications\QuestionAnswered;
+use App\Support\TopicClassifier;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -50,6 +51,13 @@ class QuestionController extends Controller
 
         if ($isDuplicate) {
             return back()->withErrors(['title' => "You've already posted this question recently — avoid posting duplicates."])->withInput();
+        }
+
+        // Left as "Other / General" — try to auto-file it under the topic
+        // its own content actually matches, instead of leaving it stranded.
+        if (empty($validated['course_topic_id'])) {
+            $classified = (new TopicClassifier)->classify($validated['title'].' '.$validated['body']);
+            $validated['course_topic_id'] = $classified?->id;
         }
 
         $request->user()->questions()->create($validated);
