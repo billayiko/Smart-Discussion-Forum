@@ -53,12 +53,38 @@ class QuestionController extends Controller
             return back()->withErrors(['title' => "You've already posted this question recently — avoid posting duplicates."])->withInput();
         }
 
-        // Left as "Other / General" — try to auto-file it under the topic
-        // its own content actually matches, instead of leaving it stranded.
-        if (empty($validated['course_topic_id'])) {
-            $classified = (new TopicClassifier)->classify($validated['title'].' '.$validated['body']);
-            $validated['course_topic_id'] = $classified?->id;
+        // Separate from the account-wide throttle: catches someone burying
+        // one specific topic's thread in posts even if they're nowhere
+        // near their overall hourly limit.
+        if (! empty($validated['course_topic_id'])) {
+            $recentInTopic = Question::where('user_id', $request->user()->id)
+                ->where('course_topic_id', $validated['course_topic_id'])
+                ->where('created_at', '>=', now()->subMinutes(10))
+                ->count();
+
+            if ($recentInTopic >= 3) {
+                return back()->withErrors(['title' => "You've posted several questions in this topic recently — please wait a bit before posting more."])->withInput();
+            }
         }
+
+        $classifier = new TopicClassifier;
+        $flaggedOffTopic = false;
+
+        if (empty($validated['course_topic_id'])) {
+            // Left as "Other / General" — try to auto-file it under the
+            // topic its own content actually matches, instead of leaving
+            // it stranded.
+            $classified = $classifier->classify($validated['title'].' '.$validated['body']);
+            $validated['course_topic_id'] = $classified?->id;
+        } elseif ($topic = CourseTopic::find($validated['course_topic_id'])) {
+            // Posted directly into a topic's thread — flag it for
+            // moderator review if its content clearly belongs elsewhere,
+            // rather than silently letting off-topic material bury the
+            // thread it was posted in.
+            $flaggedOffTopic = $classifier->suggestBetterTopic($validated['title'].' '.$validated['body'], $topic) !== null;
+        }
+
+        $validated['flagged_off_topic'] = $flaggedOffTopic;
 
         $request->user()->questions()->create($validated);
 
