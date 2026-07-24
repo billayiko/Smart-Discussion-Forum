@@ -18,6 +18,11 @@ class Question extends Model
         'title',
         'body',
         'views',
+        'flagged_off_topic',
+    ];
+
+    protected $casts = [
+        'flagged_off_topic' => 'boolean',
     ];
 
     public function user(): BelongsTo

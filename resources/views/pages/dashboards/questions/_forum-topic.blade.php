@@ -75,6 +75,9 @@
                             <div class="forum-message-head">
                                 <strong>{{ $thread->title }}</strong>
                                 <span class="forum-role-badge small" data-role="{{ $thread->user->role }}">{{ $thread->user->roleLabel() }}</span>
+                                @if ($thread->flagged_off_topic && auth()->user()->role !== 'student')
+                                    <span class="forum-role-badge small" style="background:#e2a13e;" title="Content doesn't seem to match this topic"><i class="fas fa-triangle-exclamation"></i> Off-topic?</span>
+                                @endif
                                 <span class="forum-muted">asked by {{ $thread->user->name }} &middot; {{ $thread->created_at->diffForHumans() }}</span>
                             </div>
                             <p>{{ \Illuminate\Support\Str::limit($thread->body, 140) }}</p>

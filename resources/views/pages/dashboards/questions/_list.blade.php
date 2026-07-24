@@ -62,7 +62,12 @@
             <tbody>
                 @forelse ($questions as $question)
                     <tr>
-                        <td><strong>{{ $question->title }}</strong></td>
+                        <td>
+                            <strong>{{ $question->title }}</strong>
+                            @if ($question->flagged_off_topic)
+                                <span class="pulse-tag orange" title="Content doesn't seem to match this topic"><i class="fas fa-triangle-exclamation"></i> Possibly off-topic</span>
+                            @endif
+                        </td>
                         <td><span class="pulse-tag">{{ $question->topic->title ?? 'Other' }}</span></td>
                         <td>{{ $question->user->name }}</td>
                         <td>
