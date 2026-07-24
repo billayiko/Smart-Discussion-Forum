@@ -88,6 +88,7 @@
                                 <th>Status</th>
                                 <th>Questions</th>
                                 <th>Scheduled</th>
+                                <th>Marks</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -99,12 +100,18 @@
                                     <td><span class="pulse-tag {{ $quiz->stage() === 'active' ? 'green' : ($quiz->stage() === 'due_soon' ? 'orange' : ($quiz->stage() === 'draft' ? 'gray' : '')) }}">{{ str_replace('_', ' ', ucfirst($quiz->stage())) }}</span></td>
                                     <td>{{ $quiz->questions_count }} / {{ $quiz->total_questions }}</td>
                                     <td>{{ $quiz->scheduled_at?->format('M j, Y g:i A') ?? '—' }}</td>
+                                    <td>
+                                        @if (! $quiz->hasStarted())
+                                            <span class="pulse-muted">—</span>
+                                        @elseif ($quiz->marksConfirmed())
+                                            <a href="{{ route('quizzes.result', $quiz) }}" class="pulse-tag green" style="text-decoration:none;"><i class="fas fa-circle-check"></i> Confirmed</a>
+                                        @else
+                                            <a href="{{ route('quizzes.result', $quiz) }}" class="pulse-tag orange" style="text-decoration:none;"><i class="fas fa-triangle-exclamation"></i> Confirm marks</a>
+                                        @endif
+                                    </td>
                                     <td class="pulse-actions">
                                         @if ($quiz->isEditable())
                                             <a href="{{ route('quizzes.edit', $quiz) }}" class="pulse-icon-btn" title="Edit quiz details"><i class="fas fa-pen"></i></a>
-                                        @endif
-                                        @if ($quiz->hasStarted())
-                                            <a href="{{ route('quizzes.result', $quiz) }}" class="pulse-icon-btn" title="View marks &amp; confirm for admin"><i class="fas fa-chart-simple"></i></a>
                                         @endif
                                         @if ($quiz->questions_finalized_at)
                                             <a href="{{ route('quizzes.questions.create', $quiz) }}" class="pulse-btn light" style="text-decoration:none;"><i class="fas fa-eye"></i> View questions</a>
@@ -117,7 +124,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" style="text-align:center; padding:32px; color:var(--pulse-muted);">No quizzes yet.</td>
+                                    <td colspan="7" style="text-align:center; padding:32px; color:var(--pulse-muted);">No quizzes yet.</td>
                                 </tr>
                             @endforelse
                         </tbody>

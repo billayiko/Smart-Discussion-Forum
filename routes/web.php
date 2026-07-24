@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
     Route::post('/topics/{topic}/subscribe', [TopicController::class, 'subscribe'])->name('topics.subscribe');
     Route::delete('/topics/{topic}/subscribe', [TopicController::class, 'unsubscribe'])->name('topics.unsubscribe');
+    Route::post('/topics/{topic}/ignore-suggestion', [TopicController::class, 'ignoreSuggestion'])->name('topics.ignore-suggestion');
     Route::get('/quizzes/{quiz}/take', [QuizController::class, 'take'])->name('quizzes.take');
     Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->name('quizzes.submit');
 });

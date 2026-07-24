@@ -8,7 +8,9 @@ use App\Models\ParticipationCriterion;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Models\TopicSuggestionDismissal;
 use App\Models\User;
+use App\Notifications\TopicSuggested;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -120,6 +122,8 @@ class TopicController extends Controller
     {
         $request->user()->subscribedTopics()->syncWithoutDetaching([$topic->id]);
 
+        $this->clearSuggestion($request->user(), $topic);
+
         return back()->with('success', "Subscribed to {$topic->title}.");
     }
 
@@ -128,6 +132,40 @@ class TopicController extends Controller
         $request->user()->subscribedTopics()->detach($topic->id);
 
         return back()->with('success', "Unsubscribed from {$topic->title}.");
+    }
+
+    /**
+     * A student dismissing a suggested topic. It keeps resurfacing daily for
+     * a week in case they change their mind, then stops for good.
+     */
+    public function ignoreSuggestion(Request $request, CourseTopic $topic)
+    {
+        $user = $request->user();
+
+        $dismissal = TopicSuggestionDismissal::firstOrNew([
+            'user_id' => $user->id,
+            'course_topic_id' => $topic->id,
+        ]);
+
+        if (! $dismissal->exists) {
+            $dismissal->first_dismissed_at = now();
+        }
+
+        $dismissal->last_dismissed_at = now();
+        $dismissal->save();
+
+        $this->clearSuggestion($user, $topic);
+
+        return back()->with('success', "Won't suggest {$topic->title} again for now.");
+    }
+
+    protected function clearSuggestion(User $user, CourseTopic $topic): void
+    {
+        $user->unreadNotifications()
+            ->where('type', TopicSuggested::class)
+            ->get()
+            ->filter(fn ($notification) => ($notification->data['topic_id'] ?? null) === $topic->id)
+            ->each->markAsRead();
     }
 
     /**
