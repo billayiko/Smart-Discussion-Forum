@@ -1,5 +1,11 @@
 @php
     $pct = $attempt && $attempt->total > 0 ? (int) round(($attempt->score / $attempt->total) * 100) : null;
+    $canConfirm = auth()->user()->can('update', $quiz);
+    $backRoute = match (auth()->user()->role) {
+        'lecturer' => 'quizzes.index',
+        'admin' => 'admin.dashboard',
+        default => 'student.dashboard',
+    };
 @endphp
 <x-layouts.academic-pulse title="{{ $quiz->title }} - Result">
     <div class="form-shell">
@@ -26,6 +32,22 @@
                 <strong>Class report:</strong> {{ $report['attempts_count'] }} student(s) attempted
                 &middot; average score {{ $report['average_score_percent'] !== null ? $report['average_score_percent'].'%' : '—' }}
             </div>
+
+            @if ($canConfirm)
+                <div class="notice" style="margin-top:14px; {{ $quiz->marksConfirmed() ? 'background:#f0fdf4; color:#166534;' : 'background:#fffbeb; color:#92400e;' }}">
+                    @if ($quiz->marksConfirmed())
+                        <i class="fas fa-circle-check"></i> Marks confirmed on {{ $quiz->marks_confirmed_at->format('M j, Y g:i A') }} &mdash; visible to admin.
+                    @else
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                            <span><i class="fas fa-triangle-exclamation"></i> Not yet confirmed &mdash; admin cannot see these marks until you confirm them.</span>
+                            <form method="POST" action="{{ route('quizzes.confirm-marks', $quiz) }}">
+                                @csrf
+                                <button type="submit" class="ap-btn primary"><i class="fas fa-clipboard-check"></i> Confirm marks</button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             @if ($report['top_scorers']->isNotEmpty())
                 <div style="margin-top:14px; display:grid; gap:8px;">
@@ -62,7 +84,7 @@
                 </div>
             @endif
 
-            <a href="{{ route('student.dashboard') }}" class="ap-btn primary" style="margin-top:24px; display:inline-flex;"><i class="fas fa-house"></i> Back to dashboard</a>
+            <a href="{{ route($backRoute) }}" class="ap-btn primary" style="margin-top:24px; display:inline-flex;"><i class="fas fa-house"></i> Back to dashboard</a>
         </div>
     </div>
 </x-layouts.academic-pulse>

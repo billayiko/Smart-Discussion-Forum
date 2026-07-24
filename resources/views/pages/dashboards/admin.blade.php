@@ -106,8 +106,8 @@
                                         <td>{{ $quiz->subject }}</td>
                                         <td>{{ $quiz->total_questions }}</td>
                                         <td>{{ $quiz->duration_minutes }} mins</td>
-                                        <td>-</td>
-                                        <td>-</td>
+                                        <td>{{ $quiz->attempts_count }}</td>
+                                        <td>{{ $quiz->average_score_percent !== null ? $quiz->average_score_percent.'%' : '—' }}</td>
                                         <td><span class="pulse-tag {{ $quiz->stage() === 'active' ? 'green' : ($quiz->stage() === 'due_soon' ? 'orange' : 'gray') }}">{{ ucfirst(str_replace('_', ' ', $quiz->stage())) }}</span></td>
                                         <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
                                     </tr>
