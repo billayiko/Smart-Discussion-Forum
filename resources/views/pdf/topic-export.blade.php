@@ -3,16 +3,16 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body { font-family: sans-serif; color: #14213d; font-size: 12px; }
+        body { font-family: sans-serif; color: #1e1b2e; font-size: 12px; }
         h1 { font-size: 20px; margin-bottom: 4px; }
-        .meta { color: #7182a8; font-size: 11px; margin-bottom: 20px; }
-        .thread { margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid #dbe2ee; }
+        .meta { color: #71717a; font-size: 11px; margin-bottom: 20px; }
+        .thread { margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid #e2e2ea; }
         .thread h2 { font-size: 15px; margin: 0 0 4px; }
-        .thread .by { color: #7182a8; font-size: 10px; margin-bottom: 8px; }
+        .thread .by { color: #71717a; font-size: 10px; margin-bottom: 8px; }
         .thread p { margin: 0 0 10px; line-height: 1.5; }
-        .answer { margin: 0 0 8px 18px; padding: 8px 10px; background: #f6f7fb; border-radius: 6px; }
-        .answer .by { color: #7182a8; font-size: 10px; margin-bottom: 4px; }
-        .empty { color: #7182a8; font-style: italic; }
+        .answer { margin: 0 0 8px 18px; padding: 8px 10px; background: #f5f4fb; border-radius: 6px; }
+        .answer .by { color: #71717a; font-size: 10px; margin-bottom: 4px; }
+        .empty { color: #71717a; font-style: italic; }
     </style>
 </head>
 <body>

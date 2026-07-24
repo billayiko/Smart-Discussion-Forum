@@ -98,7 +98,7 @@
                 </div>
                 <div class="pulse-field">
                     <label>Add members</label>
-                    <div style="max-height:200px; overflow:auto; display:grid; gap:8px; padding:10px; border:1px solid #dce5f5; border-radius:12px;">
+                    <div style="max-height:200px; overflow:auto; display:grid; gap:8px; padding:10px; border:1px solid #e2e2ea; border-radius:12px;">
                         @foreach ($allUsers as $person)
                             <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
                                 <input type="checkbox" name="member_ids[]" value="{{ $person->id }}">

@@ -37,7 +37,7 @@
                         <p>Create, manage and analyze quizzes for your students.</p>
                     </div>
                     <div class="pulse-tools">
-                        <button class="pulse-btn"><i class="fas fa-plus"></i> Create Quiz</button>
+                        <a href="{{ route('quizzes.create') }}" class="pulse-btn" style="text-decoration:none;"><i class="fas fa-plus"></i> Create Quiz</a>
                     </div>
                 </header>
 
@@ -58,32 +58,35 @@
                         <span class="pulse-stat-icon green"><i class="fas fa-clipboard-list"></i></span>
                         <span><small>Quizzes</small><b>{{ $bubbles['quizzes'] }}</b><span class="pulse-muted">{{ $bubbles['published_quizzes'] }} published</span></span>
                     </a>
-                    <article class="pulse-card pulse-stat">
+                    <a class="pulse-card pulse-stat" href="{{ route('admin.members.index') }}" style="text-decoration:none;">
                         <span class="pulse-stat-icon purple"><i class="fas fa-user-graduate"></i></span>
                         <span><small>Students</small><b>{{ $bubbles['students'] }}</b><span class="pulse-muted">enrolled</span></span>
-                    </article>
-                    <article class="pulse-card pulse-stat">
+                    </a>
+                    <a class="pulse-card pulse-stat" href="{{ route('admin.members.index') }}" style="text-decoration:none;">
                         <span class="pulse-stat-icon purple"><i class="fas fa-chalkboard-user"></i></span>
                         <span><small>Lecturers</small><b>{{ $bubbles['lecturers'] }}</b><span class="pulse-muted">teaching</span></span>
-                    </article>
+                    </a>
                 </section>
 
                 <section class="pulse-card pulse-pad" style="margin-top:22px;">
-                    <div class="pulse-section-head">
+                    <form method="GET" action="{{ route('admin.dashboard') }}" class="pulse-section-head">
                         <div class="pulse-tools" style="gap:6px;">
-                            <span class="pulse-tag">All Quizzes</span>
-                            <span class="pulse-tag gray">Published</span>
-                            <span class="pulse-tag gray">Drafts</span>
-                            <span class="pulse-tag gray">Scheduled</span>
+                            <a href="{{ route('admin.dashboard') }}" class="pulse-tag {{ ! $statusFilter ? '' : 'gray' }}">All Quizzes</a>
+                            <a href="{{ route('admin.dashboard', ['status' => 'published']) }}" class="pulse-tag {{ $statusFilter === 'published' ? '' : 'gray' }}">Published</a>
+                            <a href="{{ route('admin.dashboard', ['status' => 'draft']) }}" class="pulse-tag {{ $statusFilter === 'draft' ? '' : 'gray' }}">Drafts</a>
+                            <a href="{{ route('admin.dashboard', ['status' => 'scheduled']) }}" class="pulse-tag {{ $statusFilter === 'scheduled' ? '' : 'gray' }}">Scheduled</a>
                         </div>
                         <div class="pulse-tools">
                             <label class="pulse-search">
                                 <i class="fas fa-magnifying-glass"></i>
-                                <input type="search" placeholder="Search quizzes...">
+                                <input type="search" name="q" value="{{ $search }}" placeholder="Search quizzes...">
                             </label>
-                            <button class="pulse-btn light"><i class="fas fa-filter"></i> Filters</button>
+                            @if ($statusFilter)
+                                <input type="hidden" name="status" value="{{ $statusFilter }}">
+                            @endif
+                            <button type="submit" class="pulse-btn light"><i class="fas fa-magnifying-glass"></i> Search</button>
                         </div>
-                    </div>
+                    </form>
 
                     <div style="overflow:auto;">
                         <table class="pulse-table">
@@ -109,7 +112,7 @@
                                         <td>{{ $quiz->attempts_count }}</td>
                                         <td>{{ $quiz->average_score_percent !== null ? $quiz->average_score_percent.'%' : '—' }}</td>
                                         <td><span class="pulse-tag {{ $quiz->stage() === 'active' ? 'green' : ($quiz->stage() === 'due_soon' ? 'orange' : 'gray') }}">{{ ucfirst(str_replace('_', ' ', $quiz->stage())) }}</span></td>
-                                        <td><div class="pulse-actions"><span class="pulse-icon-btn" style="width:32px;height:32px;"><i class="fas fa-ellipsis"></i></span></div></td>
+                                        <td><div class="pulse-actions"><a href="{{ route('quizzes.result', $quiz) }}" class="pulse-icon-btn" style="width:32px;height:32px;" title="View marks report"><i class="fas fa-eye"></i></a></div></td>
                                     </tr>
                                 @empty
                                     <tr>

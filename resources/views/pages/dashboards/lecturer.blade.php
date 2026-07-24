@@ -48,26 +48,26 @@
                             <input type="search" placeholder="Search anything...">
                         </label>
                         @include('partials._notification-bell')
-                        <span class="pulse-avatar">AC</span>
+                        <span class="pulse-avatar">{{ strtoupper(substr($user->name ?? 'LC', 0, 2)) }}</span>
                     </div>
                 </header>
 
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon green"><i class="fas fa-clipboard-check"></i></span>
-                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">+15% this month</span></span>
+                        <span><small>Quizzes</small><b>{{ $stats['quizzes'] }}</b><span class="pulse-trend">{{ $stats['published_this_week'] }} published this week</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
-                        <span><small>Total Lectures</small><b>128</b><span class="pulse-trend">+12% this month</span></span>
+                        <span><small>Total Lectures</small><b>{{ $stats['total_topics'] }}</b><span class="pulse-trend">Assigned to you</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon purple"><i class="fas fa-users"></i></span>
-                        <span><small>Students</small><b>{{ $stats['students'] }}</b><span class="pulse-trend">+8% this month</span></span>
+                        <span><small>Students</small><b>{{ $stats['students'] }}</b><span class="pulse-trend">Registered on the platform</span></span>
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-calendar"></i></span>
-                        <span><small>Upcoming Classes</small><b>6</b><span class="pulse-trend">Today</span></span>
+                        <span><small>Upcoming Classes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">{{ $stats['next_class'] ? 'Next '.$stats['next_class']->scheduled_at->diffForHumans() : 'None scheduled' }}</span></span>
                     </article>
                 </section>
 
@@ -80,17 +80,6 @@
                         <div class="pulse-list">
                             <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-clipboard-question"></i></span><span><strong>{{ $stats['active_quizzes'] }} active quizzes</strong><p>{{ $stats['published_this_week'] }} published this week</p></span><span class="pulse-tag green">Ready</span></div>
                             <div class="pulse-row"><a href="{{ route('quizzes.create') }}" style="display: contents;"><span class="pulse-soft-icon"><i class="fas fa-plus"></i></span><span><strong>Create new quiz</strong><p>Bulk import from templates</p></span><span class="pulse-tag">New</span></a></div>
-                        </div>
-                    </article>
-
-                    <article class="pulse-card pulse-pad">
-                        <div class="pulse-section-head">
-                            <h2>Submissions</h2>
-                            <a href="#">Review</a>
-                        </div>
-                        <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-file-lines"></i></span><span><strong>186 submissions</strong><p>42 pending review</p></span><span class="pulse-tag orange">Pending</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-check-double"></i></span><span><strong>82% reviewed</strong><p>Average turnaround 2h</p></span><span class="pulse-tag green">On track</span></div>
                         </div>
                     </article>
 
@@ -147,22 +136,25 @@
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Performance</h2>
-                            <a href="#">Details</a>
+                            <a href="{{ route('lecturer.marks') }}">Details</a>
                         </div>
                         <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-award"></i></span><span><strong>Avg. score 78%</strong><p>Up 6% from last week</p></span><span class="pulse-tag green">Strong</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-chart-line"></i></span><span><strong>Attendance 91%</strong><p>Steady engagement</p></span><span class="pulse-tag">Stable</span></div>
+                            @if ($stats['average_score_percent'] !== null)
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-award"></i></span><span><strong>Avg. score {{ $stats['average_score_percent'] }}%</strong><p>Across your quizzes' attempts</p></span><span class="pulse-tag {{ $stats['average_score_percent'] >= 70 ? 'green' : 'orange' }}">{{ $stats['average_score_percent'] >= 70 ? 'Strong' : 'Needs attention' }}</span></div>
+                            @else
+                                <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-award"></i></span><span><strong>No attempts yet</strong><p>Scores will appear once students take your quizzes.</p></span></div>
+                            @endif
                         </div>
                     </article>
 
                     <article class="pulse-card pulse-pad">
                         <div class="pulse-section-head">
                             <h2>Discussions</h2>
-                            <a href="#">Open</a>
+                            <a href="{{ route('questions.index') }}">Open</a>
                         </div>
                         <div class="pulse-list">
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-comments"></i></span><span><strong>12 new threads</strong><p>6 unresolved questions</p></span><span class="pulse-tag orange">Active</span></div>
-                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-user-group"></i></span><span><strong>48 participants</strong><p>Top topic: assignment tips</p></span><span class="pulse-tag">Hot</span></div>
+                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-comments"></i></span><span><strong>{{ $discussionStats['new_threads_this_week'] }} new thread(s) this week</strong><p>{{ $discussionStats['unresolved_count'] }} unresolved question(s)</p></span><span class="pulse-tag {{ $discussionStats['unresolved_count'] > 0 ? 'orange' : 'green' }}">{{ $discussionStats['unresolved_count'] > 0 ? 'Active' : 'Clear' }}</span></div>
+                            <div class="pulse-row"><span class="pulse-soft-icon"><i class="fas fa-user-group"></i></span><span><strong>{{ $discussionStats['participants_count'] }} participant(s)</strong><p>{{ $discussionStats['top_topic'] ? 'Top topic: '.$discussionStats['top_topic']->title : 'No activity yet' }}</p></span></div>
                         </div>
                     </article>
                 </section>
