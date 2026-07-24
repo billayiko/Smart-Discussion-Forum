@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/acknowledge', [NotificationController::class, 'acknowledge'])->name('notifications.acknowledge');
 });
 
 Route::middleware(['auth', 'role:student'])->group(function () {

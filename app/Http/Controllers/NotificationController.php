@@ -21,4 +21,15 @@ class NotificationController extends Controller
 
         return back();
     }
+
+    /**
+     * Dismiss an interrupting popup notification (e.g. an inactivity
+     * warning) without navigating away from the page it appeared on.
+     */
+    public function acknowledge(Request $request, string $notification): RedirectResponse
+    {
+        $request->user()->notifications()->findOrFail($notification)->markAsRead();
+
+        return back();
+    }
 }

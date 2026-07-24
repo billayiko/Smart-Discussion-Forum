@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\ModerationSetting;
 use App\Models\User;
+use App\Notifications\MembershipBlacklisted;
+use App\Notifications\MembershipWarning;
 use Illuminate\Console\Command;
 
 class CheckMemberInactivity extends Command
@@ -35,6 +37,7 @@ class CheckMemberInactivity extends Command
         if ($member->warning_count === 0) {
             if ($lastActive->diffInDays($now) >= $settings->inactivity_threshold_days) {
                 $member->forceFill(['warning_count' => 1, 'last_warned_at' => $now])->save();
+                $member->notify(new MembershipWarning(1, $settings->inactivity_threshold_days));
             }
 
             return;
@@ -43,6 +46,7 @@ class CheckMemberInactivity extends Command
         if ($member->warning_count === 1) {
             if ($member->last_warned_at && $member->last_warned_at->diffInDays($now) >= $settings->inactivity_threshold_days) {
                 $member->forceFill(['warning_count' => 2, 'last_warned_at' => $now])->save();
+                $member->notify(new MembershipWarning(2, $settings->inactivity_threshold_days));
             }
 
             return;
@@ -50,10 +54,14 @@ class CheckMemberInactivity extends Command
 
         if ($member->warning_count >= 2 && $member->last_warned_at
             && $member->last_warned_at->diffInDays($now) >= $settings->compliance_days) {
+            $until = $now->copy()->addDays($settings->blacklist_duration_days);
+
             $member->forceFill([
                 'blacklisted' => true,
-                'blacklisted_until' => $now->copy()->addDays($settings->blacklist_duration_days),
+                'blacklisted_until' => $until,
             ])->save();
+
+            $member->notify(new MembershipBlacklisted($until));
         }
     }
 

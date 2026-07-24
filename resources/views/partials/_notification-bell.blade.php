@@ -46,6 +46,12 @@
                                     &middot; starts {{ \Illuminate\Support\Carbon::parse($notification->data['scheduled_at'])->diffForHumans() }}
                                 @endif
                             </p>
+                        @elseif ($notification->type === \App\Notifications\MembershipBlacklisted::class)
+                            <strong>Account suspended</strong>
+                            <p>{{ $notification->data['message'] ?? '' }}</p>
+                        @elseif ($notification->type === \App\Notifications\MembershipWarning::class)
+                            <strong>Inactivity warning</strong>
+                            <p>{{ $notification->data['message'] ?? '' }}</p>
                         @else
                             <strong>{{ $notification->data['answerer_name'] ?? 'Someone' }}</strong> replied to
                             <em>{{ $notification->data['question_title'] ?? 'your question' }}</em>

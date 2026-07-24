@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Quiz;
+use App\Notifications\MembershipBlacklisted;
+use App\Notifications\MembershipWarning;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->shareNotifications();
         $this->shareQuizWatch();
+        $this->shareWarningPopup();
     }
 
     /**
@@ -62,6 +65,32 @@ class AppServiceProvider extends ServiceProvider
                 : collect();
 
             $view->with('quizWatchForJs', $quizzes);
+        });
+    }
+
+    /**
+     * Share the current user's most recent unread membership warning or
+     * suspension notice (if any) with every view, so it can interrupt
+     * whatever page they're on with a popup instead of waiting to be
+     * noticed in the bell dropdown.
+     */
+    protected function shareWarningPopup(): void
+    {
+        View::composer('*', function ($view): void {
+            $user = auth()->user();
+
+            $notification = $user
+                ? $user->unreadNotifications()
+                    ->whereIn('type', [MembershipWarning::class, MembershipBlacklisted::class])
+                    ->latest()
+                    ->first()
+                : null;
+
+            $view->with('warningPopup', $notification ? [
+                'id' => $notification->id,
+                'title' => $notification->type === MembershipBlacklisted::class ? 'Account suspended' : 'Inactivity warning',
+                'message' => $notification->data['message'] ?? 'You have a new membership notice.',
+            ] : null);
         });
     }
 
