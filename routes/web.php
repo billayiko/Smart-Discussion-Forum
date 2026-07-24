@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\Auth\SecurityQuestionPasswordController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Lecturer\MarksController as LecturerMarksController;
 use App\Http\Controllers\Lecturer\ParticipationCriteriaController;
 use App\Http\Controllers\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\MessageController;
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer-dashboard', [DashboardController::class, 'lecturer'])->name('lecturer.dashboard');
     Route::get('/lecturer/students', [LecturerStudentController::class, 'index'])->name('lecturer.students');
+    Route::get('/lecturer/marks', [LecturerMarksController::class, 'index'])->name('lecturer.marks');
     Route::patch('/lecturer/participation-criteria', [ParticipationCriteriaController::class, 'update'])->name('lecturer.participation-criteria.update');
     Route::post('/quizzes/{quiz}/confirm-marks', [QuizController::class, 'confirmMarks'])->name('quizzes.confirm-marks');
 });
