@@ -10,6 +10,9 @@ public class Topic {
     public long questionsCount;
     public long subscribersCount;
 
+    // Only populated on analytics responses.
+    public User lecturer;
+
     @Override
     public String toString() {
         return title;

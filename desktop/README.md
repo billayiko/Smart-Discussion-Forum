@@ -7,10 +7,12 @@ source of truth.
 
 Currently implemented: login, the Discussion Forum (browse your
 subscribed/taught topics, view a topic's threads, ask a question, open a
-thread and reply), and direct messaging (list conversations, start a new
-1:1 conversation, view/send messages). Thread and conversation screens
-poll for updates every few seconds, and all reads fall back to a local
-cache when offline (see the dev log below).
+thread and reply), direct messaging (list conversations, start a new
+1:1 conversation, view/send messages), and — for admins only — the same
+Analytics dashboard the web app has (site-wide stats plus per-topic
+drill-down). Thread and conversation screens poll for updates every few
+seconds, and all reads fall back to a local cache when offline (see the
+dev log below).
 
 ## Architecture
 
@@ -42,6 +44,8 @@ src/main/java/com/academicpulse/desktop/
     MessagesController          messages.fxml — the user's direct conversations
     ConversationDetailController conversation-detail.fxml — one conversation + replies
     NewMessageController        new-message.fxml — pick a contact to start a conversation
+    AnalyticsController          analytics.fxml — admin-only site-wide stats
+    TopicAnalyticsController     topic-analytics.fxml — admin-only per-topic stats
     SidebarController           sidebar.fxml — shared left nav (see below)
 
 src/main/resources/
@@ -161,3 +165,18 @@ rendering pipeline.
   on the classpath even though nothing here actually logs). Offline mode
   is read-only by design — composing new questions/answers/messages still
   requires connectivity; there's no offline outbox/queue in this pass.
+- **Analytics (admin-only)**: added `Api\AnalyticsController` (`/api/analytics`,
+  `/api/analytics/topics/{topic}`), a JSON-returning mirror of the existing
+  `Admin\AnalyticsController` used by the web dashboard — same queries, same
+  numbers, gated by the existing `role:admin` route middleware (a student
+  token gets a 403, verified directly against the running server). Added
+  matching `AnalyticsController`/`TopicAnalyticsController` screens
+  (`analytics.fxml`/`topic-analytics.fxml`): site-wide counts plus "most
+  active students / most helpful repliers / most subscribed topics /
+  lecturers by workload", and clicking a topic drills into that topic's own
+  numbers, same as the web version's group-scoped statistics page. The
+  sidebar's "Analytics" button only appears for admins
+  (`SidebarController` checks `Router.currentUser().role`); the API check is
+  the real enforcement, the hidden button is just so non-admins don't see a
+  dead end. Reuses the existing cached-GET path in `ApiClient`, so this also
+  gets the offline-fallback behavior above for free.

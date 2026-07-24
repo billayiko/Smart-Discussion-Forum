@@ -9,6 +9,11 @@ public class User {
     public String email;
     public String role;
 
+    // Only populated on analytics responses (withCount columns) — 0 elsewhere.
+    public long questionsCount;
+    public long answersCount;
+    public long assignedTopicsCount;
+
     public String roleLabel() {
         if (role == null || role.isEmpty()) {
             return "User";

@@ -61,3 +61,31 @@
 .app-logout-btn:hover {
     -fx-background-color: rgba(239, 68, 68, 0.28);
 }
+
+.app-stat-card {
+    -fx-background-color: #f4f6fb;
+    -fx-background-radius: 10;
+    -fx-padding: 12 16 12 16;
+    -fx-min-width: 140;
+}
+
+.app-stat-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f2b4b;
+}
+
+.app-stat-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7182a8;
+}
+
+.app-list-row {
+    -fx-padding: 6 8 6 8;
+    -fx-background-color: #f4f6fb;
+    -fx-background-radius: 6;
+}
+
+.app-list-row:hover {
+    -fx-background-color: #e6ebf5;
+}
