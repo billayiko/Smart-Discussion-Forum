@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\TopicController;
@@ -27,4 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'storeMessage']);
     Route::post('/conversations/start', [MessageController::class, 'start']);
     Route::get('/conversation-contacts', [MessageController::class, 'contacts']);
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/analytics', [AnalyticsController::class, 'index']);
+        Route::get('/analytics/topics/{topic}', [AnalyticsController::class, 'show']);
+    });
 });

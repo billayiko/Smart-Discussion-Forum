@@ -17,6 +17,7 @@
 
     <Button text="Discussion Forum" maxWidth="Infinity" styleClass="app-nav-btn, active" onAction="#handleDiscussionForum"/>
     <Button text="Messages" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleMessages"/>
+    <Button fx:id="analyticsButton" text="Analytics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleAnalytics"/>
 
     <Region VBox.vgrow="ALWAYS"/>
 

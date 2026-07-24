@@ -1,10 +1,12 @@
 package com.academicpulse.desktop.api;
 
 import com.academicpulse.desktop.cache.LocalCache;
+import com.academicpulse.desktop.model.AnalyticsSummary;
 import com.academicpulse.desktop.model.Answer;
 import com.academicpulse.desktop.model.Conversation;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.Topic;
+import com.academicpulse.desktop.model.TopicAnalytics;
 import com.academicpulse.desktop.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -151,6 +153,16 @@ public class ApiClient {
 
     public List<User> getContacts() throws ApiException, InterruptedException {
         return fetchCached("contacts", "/conversation-contacts", new TypeReference<List<User>>() {});
+    }
+
+    /** Admin-only; the server returns 403 for any other role. */
+    public AnalyticsSummary getAnalytics() throws ApiException, InterruptedException {
+        return fetchCached("analytics", "/analytics", AnalyticsSummary.class);
+    }
+
+    /** Admin-only; the server returns 403 for any other role. */
+    public TopicAnalytics getTopicAnalytics(long topicId) throws ApiException, InterruptedException {
+        return fetchCached("analytics:topic:" + topicId, "/analytics/topics/" + topicId, TopicAnalytics.class);
     }
 
     /**
