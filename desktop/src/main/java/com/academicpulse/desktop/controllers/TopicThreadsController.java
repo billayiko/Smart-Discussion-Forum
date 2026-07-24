@@ -51,9 +51,10 @@ public class TopicThreadsController {
                 var threads = Router.api().getTopicQuestions(topic.id);
                 Platform.runLater(() -> {
                     threadsListView.setItems(FXCollections.observableArrayList(threads));
-                    statusLabel.setText(threads.isEmpty()
+                    String base = threads.isEmpty()
                             ? "No discussions yet — ask the first question below."
-                            : threads.size() + " thread(s).");
+                            : threads.size() + " thread(s).";
+                    statusLabel.setText(Router.api().isOffline() ? "Offline — showing saved data. " + base : base);
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> statusLabel.setText("Failed to load threads: " + describe(e)));
