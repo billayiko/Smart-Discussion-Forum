@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ModerationSetting;
 use App\Models\User;
+use App\Notifications\MembershipBlacklisted;
+use App\Notifications\MembershipWarning;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
@@ -52,10 +54,15 @@ class MemberController extends Controller
 
     public function warn(Request $request, User $member)
     {
+        $settings = ModerationSetting::current();
+        $warningCount = min(2, $member->warning_count + 1);
+
         $member->forceFill([
-            'warning_count' => min(2, $member->warning_count + 1),
+            'warning_count' => $warningCount,
             'last_warned_at' => now(),
         ])->save();
+
+        $member->notify(new MembershipWarning($warningCount, $settings->inactivity_threshold_days));
 
         return back()->with('success', "Warning issued to {$member->name}.");
     }
@@ -63,11 +70,14 @@ class MemberController extends Controller
     public function blacklist(Request $request, User $member)
     {
         $settings = ModerationSetting::current();
+        $until = now()->addDays($settings->blacklist_duration_days);
 
         $member->forceFill([
             'blacklisted' => true,
-            'blacklisted_until' => now()->addDays($settings->blacklist_duration_days),
+            'blacklisted_until' => $until,
         ])->save();
+
+        $member->notify(new MembershipBlacklisted($until));
 
         return back()->with('success', "{$member->name} has been blacklisted.");
     }
