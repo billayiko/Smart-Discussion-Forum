@@ -12,7 +12,7 @@
                     <a href="{{ route('messages.index') }}"><i class="fas fa-message"></i> Messages</a>
                     <a class="active" href="{{ route('lecturer.students') }}"><i class="fas fa-users"></i> Students</a>
                     <a href="{{ route('questions.index') }}"><i class="fas fa-circle-question"></i> Discussion Forum</a>
-                    <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a href="{{ route('lecturer.marks') }}"><i class="fas fa-chart-line"></i> Student Marks</a>
                     <a href="{{ route('profile.edit') }}"><i class="fas fa-gear"></i> Settings</a>
                 </nav>
 
