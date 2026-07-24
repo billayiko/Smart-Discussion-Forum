@@ -11,3 +11,5 @@ Schedule::call(function () {
 })->daily()->description('Delete expired team invitations');
 
 Schedule::command('members:check-inactivity')->daily()->description('Warn and blacklist inactive members');
+
+Schedule::command('topics:generate-suggestions')->daily()->description('Suggest relevant topics to students based on peer engagement');

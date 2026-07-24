@@ -21,21 +21,39 @@
         </div>
         <div class="notif-list">
             @forelse ($unreadNotifications as $notification)
-                <a href="{{ route('notifications.open', $notification->id) }}" class="notif-item">
-                    @if ($notification->type === \App\Notifications\QuizScheduled::class)
-                        <strong>New quiz scheduled:</strong> <em>{{ $notification->data['quiz_title'] ?? 'A quiz' }}</em>
-                        <p>{{ $notification->data['subject'] ?? '' }} &middot; {{ $notification->data['duration_minutes'] ?? '?' }} min
-                            @if (! empty($notification->data['scheduled_at']))
-                                &middot; starts {{ \Illuminate\Support\Carbon::parse($notification->data['scheduled_at'])->diffForHumans() }}
-                            @endif
-                        </p>
-                    @else
-                        <strong>{{ $notification->data['answerer_name'] ?? 'Someone' }}</strong> replied to
-                        <em>{{ $notification->data['question_title'] ?? 'your question' }}</em>
-                        <p>{{ $notification->data['excerpt'] ?? '' }}</p>
-                    @endif
-                    <span>{{ $notification->created_at->diffForHumans() }}</span>
-                </a>
+                @if ($notification->type === \App\Notifications\TopicSuggested::class)
+                    <div class="notif-item">
+                        <strong>Suggested topic:</strong> <em>{{ $notification->data['topic_title'] ?? 'A topic' }}</em>
+                        <p>Students with similar recent activity are engaging with this{{ ! empty($notification->data['topic_description']) ? ' &mdash; '.$notification->data['topic_description'] : '' }}.</p>
+                        <div class="notif-actions">
+                            <form method="POST" action="{{ route('topics.subscribe', $notification->data['topic_id']) }}">
+                                @csrf
+                                <button type="submit" class="notif-action-btn primary">Subscribe</button>
+                            </form>
+                            <form method="POST" action="{{ route('topics.ignore-suggestion', $notification->data['topic_id']) }}">
+                                @csrf
+                                <button type="submit" class="notif-action-btn">Ignore</button>
+                            </form>
+                        </div>
+                        <span>{{ $notification->created_at->diffForHumans() }}</span>
+                    </div>
+                @else
+                    <a href="{{ route('notifications.open', $notification->id) }}" class="notif-item">
+                        @if ($notification->type === \App\Notifications\QuizScheduled::class)
+                            <strong>New quiz scheduled:</strong> <em>{{ $notification->data['quiz_title'] ?? 'A quiz' }}</em>
+                            <p>{{ $notification->data['subject'] ?? '' }} &middot; {{ $notification->data['duration_minutes'] ?? '?' }} min
+                                @if (! empty($notification->data['scheduled_at']))
+                                    &middot; starts {{ \Illuminate\Support\Carbon::parse($notification->data['scheduled_at'])->diffForHumans() }}
+                                @endif
+                            </p>
+                        @else
+                            <strong>{{ $notification->data['answerer_name'] ?? 'Someone' }}</strong> replied to
+                            <em>{{ $notification->data['question_title'] ?? 'your question' }}</em>
+                            <p>{{ $notification->data['excerpt'] ?? '' }}</p>
+                        @endif
+                        <span>{{ $notification->created_at->diffForHumans() }}</span>
+                    </a>
+                @endif
             @empty
                 <p class="notif-empty">No new notifications.</p>
             @endforelse
@@ -127,6 +145,22 @@
     .notif-item em { font-style: normal; color: #2563eb; font-weight: 700; }
     .notif-item p { margin: 4px 0 0; color: #7182a8; font-weight: 600; }
     .notif-item span { display: block; margin-top: 6px; color: #a2acc2; font-size: .7rem; font-weight: 700; }
+
+    .notif-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+    .notif-action-btn {
+        flex: 1;
+        border: 1px solid rgba(15, 31, 61, .12);
+        background: #fff;
+        color: #2a3a5c;
+        border-radius: 8px;
+        padding: 6px 0;
+        font-size: .76rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .notif-action-btn.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
 
     .notif-empty { padding: 20px 14px; text-align: center; color: #7182a8; font-size: .82rem; font-weight: 650; }
 </style>
