@@ -9,51 +9,84 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.RegisterController" styleClass="app-welcome-root">
-    <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
-        <StackPane alignment="CENTER" style="-fx-background-color: transparent;">
-        <VBox alignment="CENTER" spacing="12" maxWidth="420">
+<?import javafx.scene.shape.Circle?>
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.RegisterController" style="-fx-background-color: #f7f7fb;">
+
+    <!-- Decorative side panel, mirrors pages/auth/register.blade.php's .pulse-auth-side + .pulse-illustration -->
+    <StackPane minWidth="380" prefWidth="380" maxWidth="380" HBox.hgrow="NEVER"
+               style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #dcf7f1 0%, #ffffff 55%, #f7f7fb 100%);">
+        <VBox alignment="TOP_LEFT" spacing="18">
             <padding>
-                <Insets top="36" right="40" bottom="36" left="40"/>
+                <Insets top="48" right="36" bottom="40" left="40"/>
             </padding>
-
-            <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
-
-            <Label text="Academic Pulse Forum" styleClass="app-welcome-brand"/>
-            <Label text="Create your account" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <Label text="Join Academic Pulse Forum and start your learning journey."
-                   styleClass="app-welcome-subtitle" wrapText="true" textAlignment="CENTER"/>
-
-            <TextField fx:id="nameField" promptText="Full name" maxWidth="Infinity"/>
-            <TextField fx:id="emailField" promptText="Email address" maxWidth="Infinity"/>
-            <ComboBox fx:id="roleCombo" promptText="Select your role" maxWidth="Infinity"/>
-            <PasswordField fx:id="passwordField" promptText="Create a password" maxWidth="Infinity"/>
-            <PasswordField fx:id="confirmField" promptText="Confirm your password" maxWidth="Infinity"/>
-
-            <Label text="Security question" style="-fx-font-weight: bold;"/>
-            <Label text="Choose one question and answer it. You'll use this to recover your account if you forget your password."
-                   wrapText="true" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
-            <VBox fx:id="securityQuestionBox" spacing="6" alignment="CENTER_LEFT"/>
-            <TextField fx:id="securityAnswerField" promptText="Your answer" maxWidth="Infinity"/>
-
-            <VBox spacing="6" style="-fx-background-color: #f5f4fb; -fx-background-radius: 10; -fx-padding: 12;">
-                <Label text="Platform rules" style="-fx-font-weight: bold;"/>
-                <Label wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #71717a;"
-                       text="- Keep discussion on-topic; don't flood the forum with unrelated material.&#10;- Be respectful - harassment or abusive language may result in warnings or a blacklist.&#10;- Members inactive for a prolonged period will receive up to two warnings before a temporary blacklist.&#10;- Content you post may be visible to other members of your group and can be exported by them."/>
-            </VBox>
-            <CheckBox fx:id="agreeCheckbox" text="I have read and agree to the platform rules above" wrapText="true"/>
-
-            <Button fx:id="registerButton" text="Create Account" styleClass="app-btn-primary" maxWidth="Infinity"
-                    onAction="#handleRegister" defaultButton="true"/>
-            <Label fx:id="errorLabel" wrapText="true" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;"/>
-
-            <HBox alignment="CENTER" spacing="4">
-                <Label text="Already have an account?" style="-fx-text-fill: #71717a;"/>
-                <Hyperlink text="Log in" onAction="#handleGoToLogin"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="&#127891;" style="-fx-font-size: 22px;"/>
+                <Label text="Academic Pulse Forum" styleClass="app-welcome-brand"/>
             </HBox>
+            <VBox spacing="8">
+                <Label text="Join us!" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e1b2e;" wrapText="true"/>
+                <Label text="Create your account and start your learning journey today." style="-fx-text-fill: #52525b; -fx-font-size: 13px;" wrapText="true"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <StackPane prefHeight="280" maxWidth="280" alignment="CENTER">
+                <Region style="-fx-background-color: linear-gradient(to bottom right, #14b8a6, #7c6ef4); -fx-background-radius: 36;" prefWidth="270" prefHeight="270"/>
+                <Circle radius="42" fill="#ffd6a5" translateY="-86"/>
+                <Circle radius="78" fill="#1e1b2e" translateY="-8"/>
+                <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(30,27,46,0.25), 16, 0, 0, 6);" prefWidth="190" prefHeight="86" translateY="86"/>
+                <Region style="-fx-background-color: #ec4899; -fx-background-radius: 6;" prefWidth="76" prefHeight="14" translateY="124" translateX="-56"/>
+            </StackPane>
+
+            <Region VBox.vgrow="ALWAYS"/>
         </VBox>
+    </StackPane>
+
+    <!-- The actual registration form -->
+    <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <StackPane alignment="CENTER" style="-fx-background-color: transparent;">
+            <VBox alignment="CENTER" spacing="12" maxWidth="420" styleClass="app-topic-card">
+                <padding>
+                    <Insets top="36" right="40" bottom="36" left="40"/>
+                </padding>
+
+                <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
+
+                <Label text="Create your account" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Fill in your details to get started."
+                       style="-fx-text-fill: #71717a;" wrapText="true" textAlignment="CENTER"/>
+
+                <TextField fx:id="nameField" promptText="Full name" maxWidth="Infinity"/>
+                <TextField fx:id="emailField" promptText="Email address" maxWidth="Infinity"/>
+                <ComboBox fx:id="roleCombo" promptText="Select your role" maxWidth="Infinity"/>
+                <PasswordField fx:id="passwordField" promptText="Create a password" maxWidth="Infinity"/>
+                <PasswordField fx:id="confirmField" promptText="Confirm your password" maxWidth="Infinity"/>
+
+                <Label text="Security question" style="-fx-font-weight: bold;"/>
+                <Label text="Choose one question and answer it. You'll use this to recover your account if you forget your password."
+                       wrapText="true" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
+                <VBox fx:id="securityQuestionBox" spacing="6" alignment="CENTER_LEFT"/>
+                <TextField fx:id="securityAnswerField" promptText="Your answer" maxWidth="Infinity"/>
+
+                <VBox spacing="6" style="-fx-background-color: #f5f4fb; -fx-background-radius: 10; -fx-padding: 12;">
+                    <Label text="Platform rules" style="-fx-font-weight: bold;"/>
+                    <Label wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #71717a;"
+                           text="- Keep discussion on-topic; don't flood the forum with unrelated material.&#10;- Be respectful - harassment or abusive language may result in warnings or a blacklist.&#10;- Members inactive for a prolonged period will receive up to two warnings before a temporary blacklist.&#10;- Content you post may be visible to other members of your group and can be exported by them."/>
+                </VBox>
+                <CheckBox fx:id="agreeCheckbox" text="I have read and agree to the platform rules above" wrapText="true"/>
+
+                <Button fx:id="registerButton" text="Create Account" styleClass="app-btn-primary" maxWidth="Infinity"
+                        onAction="#handleRegister" defaultButton="true"/>
+                <Label fx:id="errorLabel" wrapText="true" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;"/>
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Label text="Already have an account?" style="-fx-text-fill: #71717a;"/>
+                    <Hyperlink text="Log in" onAction="#handleGoToLogin"/>
+                </HBox>
+            </VBox>
         </StackPane>
     </ScrollPane>
-</StackPane>
+</HBox>

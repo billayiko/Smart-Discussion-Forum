@@ -4,20 +4,57 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.LoginController">
-    <VBox alignment="CENTER" spacing="12" maxWidth="360">
-        <padding>
-            <Insets top="60" right="60" bottom="60" left="60"/>
-        </padding>
-        <Button text="&#8592; Back" onAction="#handleBack"/>
-        <Label text="Academic Pulse Forum" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-        <Label text="Sign in to continue" style="-fx-text-fill: #71717a;"/>
-        <TextField fx:id="emailField" promptText="Email"/>
-        <PasswordField fx:id="passwordField" promptText="Password"/>
-        <Button fx:id="loginButton" text="Log In" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity"/>
-        <Button text="Forgot password?" styleClass="app-btn-light" onAction="#handleForgotPassword"/>
-        <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;" wrapText="true"/>
-    </VBox>
-</StackPane>
+<?import javafx.scene.shape.Circle?>
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.LoginController" style="-fx-background-color: #f7f7fb;">
+
+    <!-- Decorative side panel, mirrors pages/auth/login.blade.php's .pulse-auth-side + .pulse-illustration -->
+    <StackPane minWidth="380" prefWidth="380" maxWidth="380" HBox.hgrow="NEVER"
+               style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #ede9fe 0%, #ffffff 55%, #f7f7fb 100%);">
+        <VBox alignment="TOP_LEFT" spacing="18">
+            <padding>
+                <Insets top="48" right="36" bottom="40" left="40"/>
+            </padding>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="&#127891;" style="-fx-font-size: 22px;"/>
+                <Label text="Academic Pulse Forum" styleClass="app-welcome-brand"/>
+            </HBox>
+            <VBox spacing="8">
+                <Label text="Welcome back!" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e1b2e;" wrapText="true"/>
+                <Label text="Sign in to continue your learning journey." style="-fx-text-fill: #52525b; -fx-font-size: 13px;" wrapText="true"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <StackPane prefHeight="280" maxWidth="280" alignment="CENTER">
+                <Region style="-fx-background-color: linear-gradient(to bottom right, #7c6ef4, #14b8a6); -fx-background-radius: 36;" prefWidth="270" prefHeight="270"/>
+                <Circle radius="42" fill="#ffd6a5" translateY="-86"/>
+                <Circle radius="78" fill="#1e1b2e" translateY="-8"/>
+                <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(30,27,46,0.25), 16, 0, 0, 6);" prefWidth="190" prefHeight="86" translateY="86"/>
+                <Region style="-fx-background-color: #ffb86b; -fx-background-radius: 6;" prefWidth="76" prefHeight="14" translateY="124" translateX="-56"/>
+            </StackPane>
+
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </StackPane>
+
+    <!-- The actual login card -->
+    <StackPane HBox.hgrow="ALWAYS" alignment="CENTER">
+        <VBox alignment="CENTER" spacing="12" maxWidth="360" styleClass="app-topic-card">
+            <padding>
+                <Insets top="40" right="40" bottom="40" left="40"/>
+            </padding>
+            <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
+            <Label text="Log in to your account" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Enter your details to continue" style="-fx-text-fill: #71717a;"/>
+            <TextField fx:id="emailField" promptText="Email"/>
+            <PasswordField fx:id="passwordField" promptText="Password"/>
+            <Button fx:id="loginButton" text="Log In" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity" styleClass="app-btn-primary"/>
+            <Button text="Forgot password?" styleClass="app-btn-light" onAction="#handleForgotPassword"/>
+            <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;" wrapText="true"/>
+        </VBox>
+    </StackPane>
+</HBox>
