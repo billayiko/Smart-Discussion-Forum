@@ -7,7 +7,7 @@ rem Maven repository, so no Maven install is required. It also makes sure
 rem the Laravel dev server is running first, starting it in its own
 rem minimized window if it isn't.
 
-set "JDK=%USERPROFILE%\.jdk\jdk-25.0.2\bin"
+set "JDK=C:\Program Files\Java\jdk-25\bin"
 set "M2=%USERPROFILE%\.m2\repository"
 set "FX=%M2%\org\openjfx"
 set "JACKSON=%M2%\com\fasterxml\jackson"

@@ -11,6 +11,7 @@
         <padding>
             <Insets top="60" right="60" bottom="60" left="60"/>
         </padding>
+        <Button text="&#8592; Back" onAction="#handleBack"/>
         <Label text="Academic Pulse Forum" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
         <Label text="Sign in to continue" style="-fx-text-fill: #7182a8;"/>
         <TextField fx:id="emailField" promptText="Email"/>

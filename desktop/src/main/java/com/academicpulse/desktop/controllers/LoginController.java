@@ -38,6 +38,15 @@ public class LoginController {
         }).start();
     }
 
+    @FXML
+    private void handleBack() {
+        try {
+            Router.navigate("/welcome.fxml", "Academic Pulse Forum");
+        } catch (Exception e) {
+            errorLabel.setText("Failed to go back: " + describe(e));
+        }
+    }
+
     private void goToTopics() {
         try {
             Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");

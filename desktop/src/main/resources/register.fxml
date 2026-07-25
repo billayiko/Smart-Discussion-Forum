@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.RegisterController" styleClass="app-welcome-root">
+    <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+        <StackPane alignment="CENTER" style="-fx-background-color: transparent;">
+        <VBox alignment="CENTER" spacing="12" maxWidth="420">
+            <padding>
+                <Insets top="36" right="40" bottom="36" left="40"/>
+            </padding>
+
+            <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
+
+            <Label text="Academic Pulse Forum" styleClass="app-welcome-brand"/>
+            <Label text="Create your account" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Join Academic Pulse Forum and start your learning journey."
+                   styleClass="app-welcome-subtitle" wrapText="true" textAlignment="CENTER"/>
+
+            <TextField fx:id="nameField" promptText="Full name" maxWidth="Infinity"/>
+            <TextField fx:id="emailField" promptText="Email address" maxWidth="Infinity"/>
+            <ComboBox fx:id="roleCombo" promptText="Select your role" maxWidth="Infinity"/>
+            <PasswordField fx:id="passwordField" promptText="Create a password" maxWidth="Infinity"/>
+            <PasswordField fx:id="confirmField" promptText="Confirm your password" maxWidth="Infinity"/>
+
+            <Label text="Security question" style="-fx-font-weight: bold;"/>
+            <Label text="Choose one question and answer it. You'll use this to recover your account if you forget your password."
+                   wrapText="true" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
+            <VBox fx:id="securityQuestionBox" spacing="6" alignment="CENTER_LEFT"/>
+            <TextField fx:id="securityAnswerField" promptText="Your answer" maxWidth="Infinity"/>
+
+            <VBox spacing="6" style="-fx-background-color: #f5f4fb; -fx-background-radius: 10; -fx-padding: 12;">
+                <Label text="Platform rules" style="-fx-font-weight: bold;"/>
+                <Label wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #71717a;"
+                       text="- Keep discussion on-topic; don't flood the forum with unrelated material.&#10;- Be respectful - harassment or abusive language may result in warnings or a blacklist.&#10;- Members inactive for a prolonged period will receive up to two warnings before a temporary blacklist.&#10;- Content you post may be visible to other members of your group and can be exported by them."/>
+            </VBox>
+            <CheckBox fx:id="agreeCheckbox" text="I have read and agree to the platform rules above" wrapText="true"/>
+
+            <Button fx:id="registerButton" text="Create Account" styleClass="app-btn-primary" maxWidth="Infinity"
+                    onAction="#handleRegister" defaultButton="true"/>
+            <Label fx:id="errorLabel" wrapText="true" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;"/>
+
+            <HBox alignment="CENTER" spacing="4">
+                <Label text="Already have an account?" style="-fx-text-fill: #71717a;"/>
+                <Hyperlink text="Log in" onAction="#handleGoToLogin"/>
+            </HBox>
+        </VBox>
+        </StackPane>
+    </ScrollPane>
+</StackPane>
