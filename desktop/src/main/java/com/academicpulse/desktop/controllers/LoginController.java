@@ -47,6 +47,15 @@ public class LoginController {
         }
     }
 
+    @FXML
+    private void handleForgotPassword() {
+        try {
+            Router.navigate("/forgot-password.fxml", "Academic Pulse - Forgot Password");
+        } catch (Exception e) {
+            errorLabel.setText("Failed to open: " + describe(e));
+        }
+    }
+
     private void goToTopics() {
         try {
             String role = Router.currentUser() != null ? Router.currentUser().role : null;
@@ -57,6 +66,8 @@ public class LoginController {
             } else if ("student".equals(role)) {
                 Router.startLiveQuizWatch();
                 Router.navigate("/student-dashboard.fxml", "Academic Pulse - Student Dashboard");
+            } else if ("member".equals(role)) {
+                Router.navigate("/onboarding.fxml", "Academic Pulse - Welcome");
             } else {
                 Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
             }

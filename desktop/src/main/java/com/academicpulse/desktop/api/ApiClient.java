@@ -4,6 +4,7 @@ import com.academicpulse.desktop.cache.LocalCache;
 import com.academicpulse.desktop.model.AdminComplaint;
 import com.academicpulse.desktop.model.AdminDashboard;
 import com.academicpulse.desktop.model.AdminMembersData;
+import com.academicpulse.desktop.model.AdminQuestionsData;
 import com.academicpulse.desktop.model.AdminTopicsData;
 import com.academicpulse.desktop.model.AnalyticsSummary;
 import com.academicpulse.desktop.model.Answer;
@@ -12,6 +13,7 @@ import com.academicpulse.desktop.model.LecturerDashboard;
 import com.academicpulse.desktop.model.LecturerMark;
 import com.academicpulse.desktop.model.LecturerStudentsData;
 import com.academicpulse.desktop.model.LiveQuizStatus;
+import com.academicpulse.desktop.model.NotificationsData;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.QuizBuilderData;
 import com.academicpulse.desktop.model.QuizEditData;
@@ -20,7 +22,9 @@ import com.academicpulse.desktop.model.QuizTakeData;
 import com.academicpulse.desktop.model.QuizzesData;
 import com.academicpulse.desktop.model.StudentDashboard;
 import com.academicpulse.desktop.model.Topic;
+import com.academicpulse.desktop.model.TopicActivityData;
 import com.academicpulse.desktop.model.TopicAnalytics;
+import com.academicpulse.desktop.model.TopicBrowseData;
 import com.academicpulse.desktop.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,10 +40,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Talks to the Laravel API (routes/api.php) over HTTP using Sanctum bearer
@@ -453,6 +461,160 @@ public class ApiClient {
         }
     }
 
+    // ---- Topics: browse/subscribe (student) ----
+
+    public TopicBrowseData getBrowseTopics() throws ApiException, InterruptedException {
+        return fetchCached("topics-browse", "/topics/browse", TopicBrowseData.class);
+    }
+
+    public void subscribeTopic(long topicId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/topics/" + topicId + "/subscribe", null, true));
+    }
+
+    public void unsubscribeTopic(long topicId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/topics/" + topicId + "/subscribe", null, true));
+    }
+
+    public void ignoreTopicSuggestion(long topicId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/topics/" + topicId + "/ignore-suggestion", null, true));
+    }
+
+    // ---- Discussion Forum: likes, complaints, leaderboard/activity, export ----
+
+    public boolean toggleQuestionLike(long questionId) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("POST", "/questions/" + questionId + "/like", null, true);
+        requireSuccess(response);
+        return mapper.readTree(response.body()).get("liked").asBoolean();
+    }
+
+    public boolean toggleAnswerLike(long answerId) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("POST", "/answers/" + answerId + "/like", null, true);
+        requireSuccess(response);
+        return mapper.readTree(response.body()).get("liked").asBoolean();
+    }
+
+    public void reportQuestion(long questionId, String reason) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/questions/" + questionId + "/complaints", Map.of("reason", reason), true));
+    }
+
+    public TopicActivityData getTopicLeaderboardAndActivity(long topicId) throws ApiException, InterruptedException {
+        return fetchCached("topic-activity:" + topicId, "/topics/" + topicId + "/leaderboard-and-activity", TopicActivityData.class);
+    }
+
+    /** Downloads the topic's discussion PDF and saves it to the given path. */
+    public void exportTopicPdf(long topicId, Path destination) throws ApiException, IOException, InterruptedException {
+        byte[] bytes = sendForBytes("/topics/" + topicId + "/export-pdf");
+        Files.write(destination, bytes);
+    }
+
+    /** Downloads the topic's participation CSV and saves it to the given path. */
+    public void exportTopicParticipationCsv(long topicId, Path destination) throws ApiException, IOException, InterruptedException {
+        byte[] bytes = sendForBytes("/topics/" + topicId + "/export-participation-csv");
+        Files.write(destination, bytes);
+    }
+
+    // ---- Admin: Discussion Forum (flat moderation list) ----
+
+    public AdminQuestionsData getAdminQuestions() throws ApiException, InterruptedException {
+        return fetchCached("admin-questions", "/admin/questions", AdminQuestionsData.class);
+    }
+
+    public void deleteQuestion(long questionId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/questions/" + questionId, null, true));
+    }
+
+    // ---- Notifications ----
+
+    public NotificationsData getNotifications() throws ApiException, InterruptedException {
+        return fetchCached("notifications", "/notifications", NotificationsData.class);
+    }
+
+    public void markAllNotificationsRead() throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/notifications/read-all", null, true));
+    }
+
+    public void markNotificationRead(String notificationId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/notifications/" + notificationId + "/read", null, true));
+    }
+
+    // ---- Forgot password (security question) ----
+
+    /** Returns a short-lived reset token to pass to {@link #resetPassword}. */
+    public String verifyForgotPassword(String email, String securityQuestion, String securityAnswer)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of(
+                "email", email,
+                "security_question", securityQuestion,
+                "security_answer", securityAnswer);
+        ApiResponse response = send("POST", "/forgot-password/verify", payload, false);
+        requireSuccess(response);
+        return mapper.readTree(response.body()).get("reset_token").asText();
+    }
+
+    public void resetPassword(String resetToken, String password, String passwordConfirmation)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of(
+                "reset_token", resetToken,
+                "password", password,
+                "password_confirmation", passwordConfirmation);
+        requireSuccess(send("POST", "/forgot-password/reset", payload, false));
+    }
+
+    // ---- Onboarding (role='member' accounts only) ----
+
+    public User completeOnboarding(String role, String securityQuestion, String securityAnswer)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("role", role);
+        payload.put("rules_agreement", true);
+        payload.put("security_question", securityQuestion);
+        payload.put("security_answer", securityAnswer);
+        ApiResponse response = send("PATCH", "/onboarding", payload, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), User.class);
+    }
+
+    public void declineOnboarding() throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/onboarding", null, true));
+    }
+
+    // ---- Messaging: groups ----
+
+    public Conversation createGroup(String name, List<Long> memberIds) throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = Map.of("name", name, "member_ids", memberIds);
+        ApiResponse response = send("POST", "/conversations/groups", payload, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), Conversation.class);
+    }
+
+    public void addConversationMember(long conversationId, long userId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/conversations/" + conversationId + "/members", Map.of("user_id", userId), true));
+    }
+
+    public void removeConversationMember(long conversationId, long userId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/conversations/" + conversationId + "/members/" + userId, null, true));
+    }
+
+    /** Like {@link #sendMessage} but for a group conversation's per-message member exclusions. */
+    public void sendMessage(long conversationId, String body, List<Long> excludedUserIds) throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = Map.of("body", body, "excluded_user_ids", excludedUserIds);
+        requireSuccess(send("POST", "/conversations/" + conversationId + "/messages", payload, true));
+    }
+
+    // ---- Quiz CSV bulk import ----
+
+    public String importQuizzesCsv(Path csvFile) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = sendMultipart("/quizzes/import", csvFile);
+        requireSuccess(response);
+        return mapper.readTree(response.body()).get("message").asText();
+    }
+
+    public String importQuizQuestionsCsv(long quizId, Path csvFile) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = sendMultipart("/quizzes/" + quizId + "/questions/import", csvFile);
+        requireSuccess(response);
+        return mapper.readTree(response.body()).get("message").asText();
+    }
+
     // ---- Settings ----
 
     public User updateProfile(String name, String email) throws ApiException, IOException, InterruptedException {
@@ -553,6 +715,63 @@ public class ApiClient {
             // fall through to raw body below
         }
         return body == null || body.isBlank() ? "Request failed" : body;
+    }
+
+    /** GETs a binary response (PDF/CSV export) rather than JSON. */
+    private byte[] sendForBytes(String path) throws IOException, InterruptedException, ApiException {
+        if (token == null) {
+            throw new ApiException("Not logged in", 401);
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + path))
+                .timeout(Duration.ofSeconds(30))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new ApiException(extractErrorMessage(new String(response.body(), StandardCharsets.UTF_8)), response.statusCode());
+        }
+        return response.body();
+    }
+
+    /**
+     * POSTs a single file as {@code multipart/form-data} under the field
+     * name "file" — java.net.http has no built-in multipart support, so the
+     * body is hand-built here.
+     */
+    private ApiResponse sendMultipart(String path, Path file) throws IOException, InterruptedException, ApiException {
+        if (token == null) {
+            throw new ApiException("Not logged in", 401);
+        }
+
+        String boundary = "----AcademicPulseBoundary" + UUID.randomUUID();
+        String fileName = file.getFileName().toString();
+        String mimeType = Files.probeContentType(file);
+        if (mimeType == null) {
+            mimeType = "text/csv";
+        }
+
+        List<byte[]> parts = new ArrayList<>();
+        parts.add(("--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"\r\n"
+                + "Content-Type: " + mimeType + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+        parts.add(Files.readAllBytes(file));
+        parts.add(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + path))
+                .timeout(Duration.ofSeconds(30))
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofByteArrays(parts))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return new ApiResponse(response.statusCode(), response.body());
     }
 
     private ApiResponse send(String method, String path, Object payload, boolean authRequired)

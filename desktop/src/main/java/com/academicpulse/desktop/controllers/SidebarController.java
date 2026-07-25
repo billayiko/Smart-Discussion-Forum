@@ -21,6 +21,10 @@ public class SidebarController {
     @FXML private Button lecturerMarksButton;
     @FXML private Button quizzesButton;
     @FXML private Button studentDashboardButton;
+    @FXML private Button studentTopicsButton;
+    @FXML private Button notificationsButton;
+    @FXML private Button lightThemeButton;
+    @FXML private Button darkThemeButton;
 
     @FXML
     public void initialize() {
@@ -43,8 +47,54 @@ public class SidebarController {
         }
 
         boolean isStudent = user != null && "student".equals(user.role);
-        studentDashboardButton.setVisible(isStudent);
-        studentDashboardButton.setManaged(isStudent);
+        for (Button studentOnlyButton : new Button[]{studentDashboardButton, studentTopicsButton}) {
+            studentOnlyButton.setVisible(isStudent);
+            studentOnlyButton.setManaged(isStudent);
+        }
+
+        boolean hasRole = user != null && (isAdmin || isLecturer || isStudent);
+        notificationsButton.setVisible(hasRole);
+        notificationsButton.setManaged(hasRole);
+
+        updateThemeButtonState();
+    }
+
+    private void updateThemeButtonState() {
+        boolean dark = "dark".equals(Router.currentTheme());
+        lightThemeButton.getStyleClass().removeAll("app-btn-primary", "app-btn-light");
+        lightThemeButton.getStyleClass().add(dark ? "app-btn-light" : "app-btn-primary");
+        darkThemeButton.getStyleClass().removeAll("app-btn-primary", "app-btn-light");
+        darkThemeButton.getStyleClass().add(dark ? "app-btn-primary" : "app-btn-light");
+    }
+
+    @FXML
+    private void handleLightTheme() {
+        Router.setTheme("light");
+        updateThemeButtonState();
+    }
+
+    @FXML
+    private void handleDarkTheme() {
+        Router.setTheme("dark");
+        updateThemeButtonState();
+    }
+
+    @FXML
+    private void handleStudentTopics() {
+        try {
+            Router.navigate("/topics-browse.fxml", "Academic Pulse - Topics");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleNotifications() {
+        try {
+            Router.navigate("/notifications.fxml", "Academic Pulse - Notifications");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
     }
 
     @FXML
@@ -140,7 +190,12 @@ public class SidebarController {
     @FXML
     private void handleDiscussionForum() {
         try {
-            Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            User user = Router.currentUser();
+            if (user != null && "admin".equals(user.role)) {
+                Router.navigate("/admin-questions.fxml", "Academic Pulse - Questions");
+            } else {
+                Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            }
         } catch (Exception ignored) {
             // nothing sensible to show here; the target screen will report its own load errors
         }

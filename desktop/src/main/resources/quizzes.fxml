@@ -37,6 +37,12 @@
 
             <FlowPane fx:id="statsBox" hgap="12" vgap="12"/>
 
+            <HBox styleClass="app-stat-card" spacing="10" alignment="CENTER_LEFT">
+                <Label text="Bulk import quizzes from CSV" style="-fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Choose file &amp; import" styleClass="app-btn-light" onAction="#handleImportCsv"/>
+            </HBox>
+
             <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="170"/>

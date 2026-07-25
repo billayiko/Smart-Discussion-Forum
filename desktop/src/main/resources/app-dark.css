@@ -1,0 +1,122 @@
+/* Dark theme overrides — layered on top of app.css, matching the web app's
+   .pulse-page[data-theme="dark"] palette (see _pulse-styles.blade.php):
+   bg #13111f, ink #f2f0fa, card rgba(30,27,46,.82), line rgba(255,255,255,.12). */
+
+.root {
+    -fx-background-color: #13111f;
+}
+
+/* Labels default to near-black text with no explicit style; this repaints
+   every label that doesn't set its own -fx-text-fill (inline styles still
+   win, which is why the muted-gray labels used throughout the app stay
+   readable in both themes without needing a dark-specific override). */
+.label {
+    -fx-text-fill: #f2f0fa;
+}
+
+.app-stat-card, .app-topic-card, .app-forum-card, .app-composer {
+    -fx-background-color: rgba(30, 27, 46, 0.9);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 14, 0, 0, 4);
+}
+
+.app-stat-value {
+    -fx-text-fill: #f2f0fa;
+}
+
+.app-list-row {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+
+.app-list-row:hover {
+    -fx-background-color: rgba(155, 138, 251, 0.16);
+}
+
+.app-composer-input {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+
+.table-view {
+    -fx-background-color: rgba(30, 27, 46, 0.9);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(30, 27, 46, 0.95);
+}
+
+.table-view .column-header {
+    -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: rgba(155, 138, 251, 0.12);
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: rgba(155, 138, 251, 0.22);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #d9d3ee;
+}
+
+.text-field, .text-area, .combo-box, .date-picker {
+    -fx-background-color: rgba(255,255,255,0.07);
+    -fx-border-color: rgba(255,255,255,0.16);
+    -fx-text-fill: #f2f0fa;
+}
+
+.text-field, .combo-box .list-cell, .combo-box-popup .list-view {
+    -fx-text-fill: #f2f0fa;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #f2f0fa;
+}
+
+.app-btn-light {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-text-fill: #c7bce8;
+}
+
+.app-btn-light:hover {
+    -fx-background-color: rgba(155, 138, 251, 0.22);
+}
+
+.app-filter-btn {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-text-fill: #c7bce8;
+}
+
+.app-icon-btn {
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+.app-count-badge {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: #d9d3ee;
+}
+
+.app-bar-track {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+.app-welcome-root {
+    -fx-background-color: #13111f;
+}
+
+.app-welcome-title, .app-welcome-brand {
+    -fx-text-fill: #f2f0fa;
+}
+
+.app-feature-card {
+    -fx-background-color: rgba(30, 27, 46, 0.9);
+}
+
+.app-feature-title {
+    -fx-text-fill: #f2f0fa;
+}

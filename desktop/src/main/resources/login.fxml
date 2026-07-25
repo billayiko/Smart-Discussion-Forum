@@ -17,6 +17,7 @@
         <TextField fx:id="emailField" promptText="Email"/>
         <PasswordField fx:id="passwordField" promptText="Password"/>
         <Button fx:id="loginButton" text="Log In" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity"/>
+        <Button text="Forgot password?" styleClass="app-btn-light" onAction="#handleForgotPassword"/>
         <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;" wrapText="true"/>
     </VBox>
 </StackPane>

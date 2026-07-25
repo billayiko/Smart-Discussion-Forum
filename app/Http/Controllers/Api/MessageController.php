@@ -14,7 +14,6 @@ class MessageController extends Controller
         $user = $request->user();
 
         $conversations = $user->conversations()
-            ->where('type', 'direct')
             ->with(['participants', 'messages' => fn ($query) => $query->latest()->limit(1)->with('user')])
             ->get()
             ->sortByDesc(fn (Conversation $conversation) => optional($conversation->messages->first())->created_at ?? $conversation->created_at)
@@ -30,24 +29,43 @@ class MessageController extends Controller
 
         $this->authorizeParticipant($conversation, $user);
 
-        $conversation->load(['messages.user', 'messages.excludedUsers']);
+        $conversation->load(['messages.user', 'messages.excludedUsers', 'participants']);
         $conversation->setRelation(
             'messages',
             $conversation->messages->reject(fn ($message) => $message->isExcludedFor($user))->values()
         );
 
+        $canManageMembers = $conversation->isGroup() && $conversation->created_by === $user->id;
+
+        $addableUsers = $canManageMembers
+            ? User::whereNotIn('id', $conversation->participants->pluck('id'))->orderBy('name')->get(['id', 'name', 'role'])
+            : collect();
+
         return response()->json([
             'id' => $conversation->id,
             'display_name' => $conversation->displayNameFor($user),
+            'is_group' => $conversation->isGroup(),
+            'created_by' => $conversation->created_by,
+            'can_manage_members' => $canManageMembers,
             'updated_at' => $conversation->updated_at,
+            'participants' => $conversation->participants->map(fn (User $p) => [
+                'id' => $p->id,
+                'name' => $p->id === $user->id ? 'You' : $p->name,
+                'role' => $p->role,
+                'is_creator' => $p->id === $conversation->created_by,
+            ]),
+            'addable_users' => $addableUsers->map(fn (User $p) => ['id' => $p->id, 'name' => $p->name, 'role' => $p->role]),
             'messages' => $conversation->messages->map(fn ($message) => [
                 'id' => $message->id,
                 'body' => $message->body,
                 'created_at' => $message->created_at,
                 'user' => [
                     'id' => $message->user->id,
-                    'name' => $message->user->name,
+                    'name' => $message->user->id === $user->id ? 'You' : $message->user->name,
                 ],
+                'excluded_names' => $message->user_id === $user->id
+                    ? $message->excludedUsers->pluck('name')
+                    : [],
             ]),
         ]);
     }
@@ -60,12 +78,22 @@ class MessageController extends Controller
 
         $validated = $request->validate([
             'body' => ['required', 'string'],
+            'excluded_user_ids' => ['nullable', 'array'],
+            'excluded_user_ids.*' => ['integer'],
         ]);
 
-        $conversation->messages()->create([
+        $message = $conversation->messages()->create([
             'user_id' => $user->id,
             'body' => $validated['body'],
         ]);
+
+        if ($conversation->isGroup() && ! empty($validated['excluded_user_ids'])) {
+            $validExclusions = $conversation->participants->pluck('id')
+                ->intersect($validated['excluded_user_ids'])
+                ->reject(fn ($id) => $id === $user->id);
+
+            $message->excludedUsers()->sync($validExclusions);
+        }
 
         $conversation->touch();
         $user->recordCommunication();
@@ -103,6 +131,57 @@ class MessageController extends Controller
         ], 201);
     }
 
+    public function storeGroup(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'member_ids' => ['required', 'array', 'min:1'],
+            'member_ids.*' => ['exists:users,id'],
+        ]);
+
+        $conversation = Conversation::create([
+            'type' => 'group',
+            'name' => $validated['name'],
+            'created_by' => $user->id,
+        ]);
+
+        $memberIds = collect($validated['member_ids'])->map(fn ($id) => (int) $id)->push($user->id)->unique();
+        $conversation->participants()->attach($memberIds);
+
+        return response()->json(['id' => $conversation->id, 'display_name' => $conversation->displayNameFor($user)], 201);
+    }
+
+    public function addMember(Request $request, Conversation $conversation)
+    {
+        $user = $request->user();
+
+        abort_unless($conversation->isGroup(), 404);
+        abort_unless($conversation->created_by === $user->id, 403);
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $conversation->participants()->syncWithoutDetaching([$validated['user_id']]);
+
+        return response()->json(['message' => 'Member added.']);
+    }
+
+    public function removeMember(Request $request, Conversation $conversation, User $member)
+    {
+        $user = $request->user();
+
+        abort_unless($conversation->isGroup(), 404);
+        abort_unless($conversation->created_by === $user->id, 403);
+        abort_if($member->id === $conversation->created_by, 422, 'The group creator cannot be removed.');
+
+        $conversation->participants()->detach($member->id);
+
+        return response()->json(['message' => 'Member removed.']);
+    }
+
     public function contacts(Request $request)
     {
         $contacts = User::where('id', '!=', $request->user()->id)
@@ -119,6 +198,7 @@ class MessageController extends Controller
         return [
             'id' => $conversation->id,
             'display_name' => $conversation->displayNameFor($user),
+            'is_group' => $conversation->isGroup(),
             'updated_at' => $conversation->updated_at,
             'last_message' => $lastMessage ? [
                 'body' => $lastMessage->body,

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\QuizScheduled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 /** JSON mirror of QuizController for the desktop client. */
 class QuizController extends Controller
@@ -32,6 +33,121 @@ class QuizController extends Controller
     public function formTopics()
     {
         return response()->json(CourseTopic::orderBy('title')->get(['id', 'title']));
+    }
+
+    public function import(Request $request)
+    {
+        $this->authorize('create', Quiz::class);
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,xlsx,xls,txt'],
+        ]);
+
+        $path = $request->file('file')->store('imports/quizzes', 'local');
+        $contents = Storage::disk('local')->get($path);
+        $rows = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $contents) ?: [])));
+
+        if (count($rows) < 2) {
+            return response()->json(['message' => 'The uploaded file does not contain any quiz rows.'], 422);
+        }
+
+        $header = str_getcsv($rows[0]);
+        $imported = 0;
+
+        foreach (array_slice($rows, 1) as $row) {
+            $values = str_getcsv($row);
+
+            if (count($values) !== count($header)) {
+                continue;
+            }
+
+            $data = array_combine($header, $values);
+
+            if (empty($data['title']) || empty($data['subject'])) {
+                continue;
+            }
+
+            $payload = [
+                'title' => trim((string) ($data['title'] ?? '')),
+                'subject' => trim((string) ($data['subject'] ?? '')),
+                'total_questions' => (int) ($data['total_questions'] ?? 0),
+                'duration_minutes' => (int) ($data['duration_minutes'] ?? 0),
+                'scheduled_at' => ! empty($data['scheduled_at']) ? now()->parse($data['scheduled_at']) : null,
+                'status' => ! empty($data['status']) ? $data['status'] : 'draft',
+            ];
+
+            if ($payload['total_questions'] < 1 || $payload['duration_minutes'] < 1) {
+                continue;
+            }
+
+            $request->user()->quizzes()->create($payload);
+            $imported++;
+        }
+
+        return response()->json(['message' => "Imported {$imported} quiz(es) successfully.", 'imported' => $imported]);
+    }
+
+    public function importQuestions(Request $request, Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $remaining = max($quiz->total_questions - $quiz->questions()->count(), 0);
+
+        if ($remaining === 0) {
+            return response()->json(['message' => 'This quiz already has its required number of questions.'], 422);
+        }
+
+        $path = $request->file('file')->store('imports/quiz-questions', 'local');
+        $contents = Storage::disk('local')->get($path);
+        $rows = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $contents) ?: [])));
+
+        if (count($rows) < 2) {
+            return response()->json(['message' => 'The uploaded file does not contain any question rows.'], 422);
+        }
+
+        $header = str_getcsv($rows[0]);
+        $imported = 0;
+
+        foreach (array_slice($rows, 1) as $row) {
+            if ($imported >= $remaining) {
+                break;
+            }
+
+            $values = str_getcsv($row);
+
+            if (count($values) !== count($header)) {
+                continue;
+            }
+
+            $data = array_combine($header, $values);
+            $correctOption = strtolower(trim((string) ($data['correct_option'] ?? '')));
+
+            if (
+                empty($data['question'])
+                || empty($data['option_a']) || empty($data['option_b'])
+                || empty($data['option_c']) || empty($data['option_d'])
+                || ! in_array($correctOption, ['a', 'b', 'c', 'd'], true)
+            ) {
+                continue;
+            }
+
+            $quiz->questions()->create([
+                'question' => trim((string) $data['question']),
+                'option_a' => trim((string) $data['option_a']),
+                'option_b' => trim((string) $data['option_b']),
+                'option_c' => trim((string) $data['option_c']),
+                'option_d' => trim((string) $data['option_d']),
+                'correct_option' => $correctOption,
+            ]);
+
+            $imported++;
+        }
+
+        return response()->json(['message' => "Imported {$imported} question(s) successfully.", 'imported' => $imported]);
     }
 
     public function store(Request $request)

@@ -16,7 +16,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /** Lecturer's quiz list — mirrors quizzes/index.blade.php. */
@@ -130,6 +132,30 @@ public class QuizzesController {
         } catch (Exception e) {
             statusLabel.setText("Failed to open create quiz screen: " + describe(e));
         }
+    }
+
+    @FXML
+    private void handleImportCsv() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose a quiz CSV file");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files", "*.csv", "*.txt", "*.xlsx", "*.xls"));
+        java.io.File file = chooser.showOpenDialog(quizzesTable.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        Path csvPath = file.toPath();
+        statusLabel.setText("Importing...");
+        new Thread(() -> {
+            try {
+                String message = Router.api().importQuizzesCsv(csvPath);
+                Platform.runLater(() -> {
+                    statusLabel.setText(message);
+                    load();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> statusLabel.setText("Failed to import: " + describe(e)));
+            }
+        }).start();
     }
 
     private void load() {

@@ -21,6 +21,8 @@
             <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
             <Label fx:id="titleLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Export PDF" styleClass="app-btn-light" onAction="#handleExportPdf"/>
+            <Button fx:id="exportCsvButton" text="Export Participation CSV" styleClass="app-btn-light" onAction="#handleExportCsv" visible="false" managed="false"/>
             <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
         </HBox>
     </top>
@@ -41,6 +43,16 @@
                         <TextArea fx:id="questionBodyField" promptText="Describe your question..." prefRowCount="2" wrapText="true" styleClass="app-composer-input" HBox.hgrow="ALWAYS"/>
                         <Button text="Ask" styleClass="app-btn-primary" onAction="#handleAsk"/>
                     </HBox>
+                </VBox>
+
+                <VBox styleClass="app-stat-card" spacing="8">
+                    <Label text="Student Participation" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                    <VBox fx:id="leaderboardBox" spacing="6"/>
+                </VBox>
+
+                <VBox styleClass="app-stat-card" spacing="8">
+                    <Label text="Recent Activity" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                    <VBox fx:id="activityBox" spacing="6"/>
                 </VBox>
             </VBox>
         </ScrollPane>
