@@ -97,9 +97,11 @@ public class LecturerDashboardController {
                 statCard("Upcoming Classes", String.valueOf(s.upcomingClasses), s.nextClassScheduledAt != null ? "Next class scheduled" : "None scheduled")
         );
 
-        quizManagementBox.getChildren().setAll(
-                listRow(s.activeQuizzes + " active quizzes", s.publishedThisWeek + " published this week", "Ready", "app-tag-green")
-        );
+        HBox activeQuizzesRow = listRow(s.activeQuizzes + " active quizzes", s.publishedThisWeek + " published this week", "Ready", "app-tag-green");
+        activeQuizzesRow.setOnMouseClicked(e -> openQuizzes());
+        HBox createQuizRow = listRow("Create new quiz", "Set it up, then add its questions", "New", "app-tag-purple");
+        createQuizRow.setOnMouseClicked(e -> openCreateQuiz());
+        quizManagementBox.getChildren().setAll(activeQuizzesRow, createQuizRow);
 
         questionsBox.getChildren().clear();
         if (data.unansweredQuestionsCount > 0) {
@@ -154,6 +156,22 @@ public class LecturerDashboardController {
         pointsPerLikeField.setText(String.valueOf(pc.pointsPerLikeReceived));
         targetPointsField.setText(String.valueOf(pc.targetPoints));
         criteriaStatusLabel.setText("");
+    }
+
+    private void openQuizzes() {
+        try {
+            Router.navigate("/quizzes.fxml", "Academic Pulse - Quiz Management");
+        } catch (Exception e) {
+            statusLabel.setText("Failed to open quizzes: " + describe(e));
+        }
+    }
+
+    private void openCreateQuiz() {
+        try {
+            Router.navigate("/quiz-create.fxml", "Academic Pulse - Create Quiz");
+        } catch (Exception e) {
+            statusLabel.setText("Failed to open create quiz screen: " + describe(e));
+        }
     }
 
     private VBox statCard(String label, String value, String sub) {

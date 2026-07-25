@@ -123,6 +123,7 @@ public class RegisterController {
             } else if ("lecturer".equals(role)) {
                 Router.navigate("/lecturer-dashboard.fxml", "Academic Pulse - Lecturer Dashboard");
             } else if ("student".equals(role)) {
+                Router.startLiveQuizWatch();
                 Router.navigate("/student-dashboard.fxml", "Academic Pulse - Student Dashboard");
             } else {
                 Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
