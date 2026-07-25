@@ -2,11 +2,13 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.SidebarController"
-      styleClass="app-sidebar" spacing="6">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.SidebarController"
+            fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="app-sidebar-scroll">
+<VBox styleClass="app-sidebar" spacing="6">
     <padding>
         <Insets top="24" right="16" bottom="16" left="16"/>
     </padding>
@@ -46,3 +48,4 @@
         </VBox.margin>
     </Button>
 </VBox>
+</ScrollPane>

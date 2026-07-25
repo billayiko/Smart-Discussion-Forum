@@ -17,13 +17,17 @@
         <fx:include source="sidebar.fxml"/>
     </left>
     <top>
-        <VBox>
+        <HBox alignment="CENTER_LEFT">
             <padding>
                 <Insets top="16" right="16" bottom="8" left="16"/>
             </padding>
-            <Label text="Monitoring &amp; Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <Label text="Create, manage and analyze performance data for your lecturers and students." style="-fx-text-fill: #71717a;"/>
-        </VBox>
+            <VBox>
+                <Label text="Monitoring &amp; Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Create, manage and analyze performance data for your lecturers and students." style="-fx-text-fill: #71717a;"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Logout" styleClass="app-logout-btn" onAction="#handleLogout"/>
+        </HBox>
     </top>
     <center>
         <VBox spacing="14">
