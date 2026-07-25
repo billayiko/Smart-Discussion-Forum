@@ -39,13 +39,13 @@
                 <fx:define>
                     <ToggleGroup fx:id="filterGroup"/>
                 </fx:define>
-                <ToggleButton fx:id="allFilterBtn" text="All Quizzes" selected="true" toggleGroup="$filterGroup" onAction="#handleFilterAll"/>
-                <ToggleButton fx:id="publishedFilterBtn" text="Published" toggleGroup="$filterGroup" onAction="#handleFilterPublished"/>
-                <ToggleButton fx:id="draftFilterBtn" text="Drafts" toggleGroup="$filterGroup" onAction="#handleFilterDraft"/>
-                <ToggleButton fx:id="scheduledFilterBtn" text="Scheduled" toggleGroup="$filterGroup" onAction="#handleFilterScheduled"/>
+                <ToggleButton fx:id="allFilterBtn" text="All Quizzes" selected="true" styleClass="app-filter-btn" toggleGroup="$filterGroup" onAction="#handleFilterAll"/>
+                <ToggleButton fx:id="publishedFilterBtn" text="Published" styleClass="app-filter-btn" toggleGroup="$filterGroup" onAction="#handleFilterPublished"/>
+                <ToggleButton fx:id="draftFilterBtn" text="Drafts" styleClass="app-filter-btn" toggleGroup="$filterGroup" onAction="#handleFilterDraft"/>
+                <ToggleButton fx:id="scheduledFilterBtn" text="Scheduled" styleClass="app-filter-btn" toggleGroup="$filterGroup" onAction="#handleFilterScheduled"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <TextField fx:id="searchField" promptText="Search quizzes..."/>
-                <Button text="Search" onAction="#handleSearch"/>
+                <Button text="Search" styleClass="app-btn-light" onAction="#handleSearch"/>
             </HBox>
 
             <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">

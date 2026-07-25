@@ -81,7 +81,6 @@ public class AdminMembersController {
 
             {
                 warnButton.getStyleClass().add("app-btn-light");
-                blacklistButton.getStyleClass().add("app-btn-light");
                 warnButton.setOnAction(e -> warn(rowItem()));
                 blacklistButton.setOnAction(e -> toggleBlacklist(rowItem()));
                 roleCombo.setOnAction(e -> {
@@ -105,6 +104,8 @@ public class AdminMembersController {
                 }
                 warnButton.setDisable(member.warningCount >= 2 || member.blacklisted);
                 blacklistButton.setText(member.blacklisted ? "Reinstate" : "Blacklist");
+                blacklistButton.getStyleClass().removeAll("app-btn-light", "app-btn-danger");
+                blacklistButton.getStyleClass().add(member.blacklisted ? "app-btn-light" : "app-btn-danger");
                 roleCombo.setValue(member.role);
                 setGraphic(box);
             }

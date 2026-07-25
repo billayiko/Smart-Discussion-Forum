@@ -63,10 +63,11 @@
 }
 
 .app-stat-card {
-    -fx-background-color: #f5f4fb;
-    -fx-background-radius: 10;
+    -fx-background-color: white;
+    -fx-background-radius: 16;
     -fx-padding: 12 16 12 16;
     -fx-min-width: 140;
+    -fx-effect: dropshadow(gaussian, rgba(30,27,46,0.08), 12, 0, 0, 4);
 }
 
 .app-stat-value {
@@ -138,6 +139,20 @@
 
 .app-btn-light:hover {
     -fx-background-color: #e0d9fc;
+}
+
+.app-btn-danger {
+    -fx-background-color: #dd3333;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 999;
+    -fx-cursor: hand;
+}
+
+.app-btn-danger:hover {
+    -fx-background-color: #c02929;
 }
 
 .app-feature-card {
@@ -271,6 +286,115 @@
     -fx-font-weight: bold;
     -fx-text-fill: #2b2650;
     -fx-alignment: CENTER;
+}
+
+/* TableView — card-styled to match the web app's pulse-table (white card,
+   bottom-border-only rows, no vertical grid lines, muted header). */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 6;
+    -fx-effect: dropshadow(gaussian, rgba(30,27,46,0.08), 12, 0, 0, 4);
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: white;
+    -fx-background-radius: 16 16 0 0;
+}
+
+.table-view .column-header-background .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(30,27,46,0.08) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-size: 38;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #71717a;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent rgba(30,27,46,0.07) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: #f7f7fb;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #ede9fe;
+}
+
+.table-view .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #52525b;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10;
+}
+
+/* Form inputs — rounded bordered fields matching the web app's pulse-input. */
+.text-field, .text-area, .combo-box, .date-picker {
+    -fx-background-color: rgba(255,255,255,0.82);
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e2ea;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e1b2e;
+}
+
+.text-field, .combo-box {
+    -fx-min-height: 40;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #1e1b2e;
+    -fx-font-weight: bold;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #7c6ef4;
+}
+
+/* Pill-shaped filter toggles, matching the web app's pulse-tag filter links. */
+.app-filter-btn {
+    -fx-background-color: #f1f1f5;
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-padding: 5 14 5 14;
+    -fx-cursor: hand;
+}
+
+.app-filter-btn:hover {
+    -fx-background-color: #ede9fe;
+}
+
+.app-filter-btn:selected {
+    -fx-background-color: #7c6ef4;
+    -fx-text-fill: white;
 }
 
 /* Small icon-style round action buttons */
