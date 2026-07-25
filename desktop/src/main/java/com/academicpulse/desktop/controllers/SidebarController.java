@@ -12,6 +12,10 @@ public class SidebarController {
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
     @FXML private Button analyticsButton;
+    @FXML private Button adminDashboardButton;
+    @FXML private Button topicsButton;
+    @FXML private Button complaintsButton;
+    @FXML private Button membersButton;
 
     @FXML
     public void initialize() {
@@ -22,8 +26,55 @@ public class SidebarController {
         }
 
         boolean isAdmin = user != null && "admin".equals(user.role);
-        analyticsButton.setVisible(isAdmin);
-        analyticsButton.setManaged(isAdmin);
+        for (Button adminOnlyButton : new Button[]{analyticsButton, adminDashboardButton, topicsButton, complaintsButton, membersButton}) {
+            adminOnlyButton.setVisible(isAdmin);
+            adminOnlyButton.setManaged(isAdmin);
+        }
+    }
+
+    @FXML
+    private void handleAdminDashboard() {
+        try {
+            Router.navigate("/admin-dashboard.fxml", "Academic Pulse - Admin Dashboard");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleTopics() {
+        try {
+            Router.navigate("/admin-topics.fxml", "Academic Pulse - Topics");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleComplaints() {
+        try {
+            Router.navigate("/admin-complaints.fxml", "Academic Pulse - Complaints");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleMembers() {
+        try {
+            Router.navigate("/admin-members.fxml", "Academic Pulse - Members");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleSettings() {
+        try {
+            Router.navigate("/settings.fxml", "Academic Pulse - Settings");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
     }
 
     @FXML

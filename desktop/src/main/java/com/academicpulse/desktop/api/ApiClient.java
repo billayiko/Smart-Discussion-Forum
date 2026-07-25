@@ -1,6 +1,10 @@
 package com.academicpulse.desktop.api;
 
 import com.academicpulse.desktop.cache.LocalCache;
+import com.academicpulse.desktop.model.AdminComplaint;
+import com.academicpulse.desktop.model.AdminDashboard;
+import com.academicpulse.desktop.model.AdminMembersData;
+import com.academicpulse.desktop.model.AdminTopicsData;
 import com.academicpulse.desktop.model.AnalyticsSummary;
 import com.academicpulse.desktop.model.Answer;
 import com.academicpulse.desktop.model.Conversation;
@@ -17,9 +21,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
@@ -188,6 +194,113 @@ public class ApiClient {
     /** Admin-only; the server returns 403 for any other role. */
     public TopicAnalytics getTopicAnalytics(long topicId) throws ApiException, InterruptedException {
         return fetchCached("analytics:topic:" + topicId, "/analytics/topics/" + topicId, TopicAnalytics.class);
+    }
+
+    /**
+     * Admin-only; the server returns 403 for any other role. {@code status}
+     * (one of "published"/"draft"/"scheduled") and {@code search} are both
+     * optional — pass null to omit either filter.
+     */
+    public AdminDashboard getAdminDashboard(String status, String search) throws ApiException, InterruptedException {
+        StringBuilder path = new StringBuilder("/admin/dashboard");
+        StringBuilder cacheKey = new StringBuilder("admin-dashboard");
+        String separator = "?";
+
+        if (status != null && !status.isBlank()) {
+            path.append(separator).append("status=").append(URLEncoder.encode(status, StandardCharsets.UTF_8));
+            cacheKey.append(":status=").append(status);
+            separator = "&";
+        }
+        if (search != null && !search.isBlank()) {
+            path.append(separator).append("q=").append(URLEncoder.encode(search, StandardCharsets.UTF_8));
+            cacheKey.append(":q=").append(search);
+        }
+
+        return fetchCached(cacheKey.toString(), path.toString(), AdminDashboard.class);
+    }
+
+    // ---- Admin: Topics ----
+
+    public AdminTopicsData getAdminTopics() throws ApiException, InterruptedException {
+        return fetchCached("admin-topics", "/admin/topics", AdminTopicsData.class);
+    }
+
+    public void createTopic(String title, String description, Long lecturerId) throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("title", title);
+        payload.put("description", description);
+        payload.put("lecturer_id", lecturerId);
+        requireSuccess(send("POST", "/admin/topics", payload, true));
+    }
+
+    public void assignTopicLecturer(long topicId, Long lecturerId) throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("lecturer_id", lecturerId);
+        requireSuccess(send("PATCH", "/admin/topics/" + topicId + "/assign", payload, true));
+    }
+
+    public void deleteTopic(long topicId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/admin/topics/" + topicId, null, true));
+    }
+
+    // ---- Admin: Complaints ----
+
+    public List<AdminComplaint> getAdminComplaints() throws ApiException, InterruptedException {
+        return fetchCached("admin-complaints", "/admin/complaints", new TypeReference<List<AdminComplaint>>() {});
+    }
+
+    public void resolveComplaint(long complaintId, String action) throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of("action", action);
+        requireSuccess(send("PATCH", "/admin/complaints/" + complaintId, payload, true));
+    }
+
+    // ---- Admin: Members ----
+
+    public AdminMembersData getAdminMembers() throws ApiException, InterruptedException {
+        return fetchCached("admin-members", "/admin/members", AdminMembersData.class);
+    }
+
+    public void updateModerationSettings(int inactivityThresholdDays, int complianceDays, int blacklistDurationDays)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = Map.of(
+                "inactivity_threshold_days", inactivityThresholdDays,
+                "compliance_days", complianceDays,
+                "blacklist_duration_days", blacklistDurationDays);
+        requireSuccess(send("PATCH", "/admin/members/settings", payload, true));
+    }
+
+    public void updateMemberRole(long memberId, String role) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("PATCH", "/admin/members/" + memberId + "/role", Map.of("role", role), true));
+    }
+
+    public void warnMember(long memberId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/admin/members/" + memberId + "/warn", null, true));
+    }
+
+    public void blacklistMember(long memberId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/admin/members/" + memberId + "/blacklist", null, true));
+    }
+
+    public void unblacklistMember(long memberId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/admin/members/" + memberId + "/unblacklist", null, true));
+    }
+
+    // ---- Settings ----
+
+    public User updateProfile(String name, String email) throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of("name", name, "email", email);
+        ApiResponse response = send("PATCH", "/me", payload, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), User.class);
+    }
+
+    public void changePassword(String currentPassword, String newPassword, String confirmPassword)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = Map.of(
+                "current_password", currentPassword,
+                "password", newPassword,
+                "password_confirmation", confirmPassword);
+        requireSuccess(send("PUT", "/password", payload, true));
     }
 
     /**

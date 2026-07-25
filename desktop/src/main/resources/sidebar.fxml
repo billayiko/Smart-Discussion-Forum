@@ -15,9 +15,14 @@
 
     <Region prefHeight="24"/>
 
+    <Button fx:id="adminDashboardButton" text="Admin Dashboard" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleAdminDashboard"/>
     <Button text="Discussion Forum" maxWidth="Infinity" styleClass="app-nav-btn, active" onAction="#handleDiscussionForum"/>
+    <Button fx:id="topicsButton" text="Topics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleTopics"/>
+    <Button fx:id="complaintsButton" text="Complaints" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleComplaints"/>
+    <Button fx:id="membersButton" text="Members" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleMembers"/>
     <Button text="Messages" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleMessages"/>
     <Button fx:id="analyticsButton" text="Analytics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleAnalytics"/>
+    <Button text="Settings" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleSettings"/>
 
     <Region VBox.vgrow="ALWAYS"/>
 
