@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Lecturer\StudentController as LecturerStudentContro
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\AuthController;
@@ -40,6 +41,20 @@ Route::middleware(['auth:sanctum', EnsureApiUserIsNotBlacklisted::class])->group
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'storeMessage']);
     Route::post('/conversations/start', [MessageController::class, 'start']);
     Route::get('/conversation-contacts', [MessageController::class, 'contacts']);
+
+    // Quiz management (policy-authorized inside the controller, mirroring the
+    // web routes' plain 'auth' middleware + QuizPolicy pattern).
+    Route::get('/quizzes', [QuizController::class, 'index']);
+    Route::get('/quizzes/topics', [QuizController::class, 'formTopics']);
+    Route::post('/quizzes', [QuizController::class, 'store']);
+    Route::get('/quizzes/{quiz}/edit', [QuizController::class, 'edit']);
+    Route::patch('/quizzes/{quiz}', [QuizController::class, 'update']);
+    Route::get('/quizzes/{quiz}/questions', [QuizController::class, 'questionsBuilder']);
+    Route::post('/quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion']);
+    Route::delete('/quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion']);
+    Route::post('/quizzes/{quiz}/finalize', [QuizController::class, 'finalizeQuestions']);
+    Route::get('/quizzes/{quiz}/result', [QuizController::class, 'result']);
+    Route::post('/quizzes/{quiz}/confirm-marks', [QuizController::class, 'confirmMarks']);
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/analytics', [AnalyticsController::class, 'index']);
@@ -71,5 +86,8 @@ Route::middleware(['auth:sanctum', EnsureApiUserIsNotBlacklisted::class])->group
 
     Route::middleware('role:student')->group(function () {
         Route::get('/student/dashboard', [StudentDashboardController::class, 'index']);
+        Route::get('/student/live-quiz', [QuizController::class, 'liveForStudent']);
+        Route::get('/quizzes/{quiz}/take', [QuizController::class, 'take']);
+        Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
     });
 });

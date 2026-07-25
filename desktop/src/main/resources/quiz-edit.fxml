@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.QuizEditController">
+    <left>
+        <fx:include source="sidebar.fxml"/>
+    </left>
+    <top>
+        <VBox>
+            <padding>
+                <Insets top="16" right="16" bottom="8" left="16"/>
+            </padding>
+            <Label text="Edit quiz" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Update this quiz's details before its scheduled start." style="-fx-text-fill: #71717a;"/>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox styleClass="app-stat-card" spacing="12" maxWidth="640">
+                <padding>
+                    <Insets top="20" right="16" bottom="16" left="16"/>
+                </padding>
+
+                <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+                <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;" wrapText="true"/>
+
+                <Label text="Title"/>
+                <TextField fx:id="titleField"/>
+
+                <Label text="Subject"/>
+                <TextField fx:id="subjectField"/>
+
+                <GridPane hgap="16" vgap="6">
+                    <columnConstraints>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="50"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <Label text="Total questions" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="Duration (minutes)" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <TextField fx:id="totalQuestionsField" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="durationField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <GridPane hgap="16" vgap="6">
+                    <columnConstraints>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="35"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="25"/>
+                        <javafx.scene.layout.ColumnConstraints percentWidth="40"/>
+                    </columnConstraints>
+                    <Label text="Scheduled date" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="Time (24h)" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="Status" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <DatePicker fx:id="scheduledDatePicker" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="scheduledTimeField" promptText="HH:mm" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <ComboBox fx:id="statusCombo" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                </GridPane>
+
+                <Label text="Course topic"/>
+                <ComboBox fx:id="topicCombo" maxWidth="Infinity"/>
+
+                <CheckBox fx:id="proctoredCheckbox" text="Proctored quiz"/>
+
+                <HBox spacing="10">
+                    <Button fx:id="saveButton" text="Save changes" styleClass="app-btn-primary" onAction="#handleSave"/>
+                    <Button text="Cancel" styleClass="app-btn-light" onAction="#handleCancel"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

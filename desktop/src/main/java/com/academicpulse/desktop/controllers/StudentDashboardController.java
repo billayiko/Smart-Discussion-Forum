@@ -87,7 +87,11 @@ public class StudentDashboardController {
             for (StudentDashboard.UpcomingQuiz quiz : quizzes) {
                 String sub = quiz.subject + " · " + quiz.durationMinutes + " mins";
                 String tag = quiz.hasStarted ? "View report" : "Scheduled";
-                upcomingQuizzesBox.getChildren().add(listRow(quiz.title, sub, tag, quiz.hasStarted ? "app-tag-purple" : "app-tag-gray"));
+                HBox row = listRow(quiz.title, sub, tag, quiz.hasStarted ? "app-tag-purple" : "app-tag-gray");
+                if (quiz.hasStarted) {
+                    row.setOnMouseClicked(e -> openResult(quiz.id, quiz.title));
+                }
+                upcomingQuizzesBox.getChildren().add(row);
             }
         }
 
@@ -119,6 +123,15 @@ public class StudentDashboardController {
                 String sub = a.subject + " · " + a.durationMinutes + " mins";
                 announcementsBox.getChildren().add(listRow("Upcoming quiz: " + a.title, sub, "Soon", "app-tag-orange"));
             }
+        }
+    }
+
+    private void openResult(long quizId, String title) {
+        try {
+            QuizResultController controller = Router.navigate("/quiz-result.fxml", "Academic Pulse - " + title + " Result");
+            controller.setQuizId(quizId);
+        } catch (Exception e) {
+            statusLabel.setText("Failed to open result screen: " + describe(e));
         }
     }
 

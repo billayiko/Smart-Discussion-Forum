@@ -19,6 +19,7 @@ public class SidebarController {
     @FXML private Button lecturerDashboardButton;
     @FXML private Button lecturerStudentsButton;
     @FXML private Button lecturerMarksButton;
+    @FXML private Button quizzesButton;
     @FXML private Button studentDashboardButton;
 
     @FXML
@@ -36,7 +37,7 @@ public class SidebarController {
         }
 
         boolean isLecturer = user != null && "lecturer".equals(user.role);
-        for (Button lecturerOnlyButton : new Button[]{lecturerDashboardButton, lecturerStudentsButton, lecturerMarksButton}) {
+        for (Button lecturerOnlyButton : new Button[]{lecturerDashboardButton, lecturerStudentsButton, lecturerMarksButton, quizzesButton}) {
             lecturerOnlyButton.setVisible(isLecturer);
             lecturerOnlyButton.setManaged(isLecturer);
         }
@@ -110,6 +111,15 @@ public class SidebarController {
     }
 
     @FXML
+    private void handleQuizzes() {
+        try {
+            Router.navigate("/quizzes.fxml", "Academic Pulse - Quiz Management");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
     private void handleLecturerMarks() {
         try {
             Router.navigate("/lecturer-marks.fxml", "Academic Pulse - Student Marks");
@@ -156,6 +166,7 @@ public class SidebarController {
 
     @FXML
     private void handleLogout() {
+        Router.stopLiveQuizWatch();
         new Thread(() -> {
             try {
                 Router.api().logout();

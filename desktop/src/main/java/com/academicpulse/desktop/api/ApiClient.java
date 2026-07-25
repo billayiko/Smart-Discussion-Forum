@@ -11,7 +11,13 @@ import com.academicpulse.desktop.model.Conversation;
 import com.academicpulse.desktop.model.LecturerDashboard;
 import com.academicpulse.desktop.model.LecturerMark;
 import com.academicpulse.desktop.model.LecturerStudentsData;
+import com.academicpulse.desktop.model.LiveQuizStatus;
 import com.academicpulse.desktop.model.Question;
+import com.academicpulse.desktop.model.QuizBuilderData;
+import com.academicpulse.desktop.model.QuizEditData;
+import com.academicpulse.desktop.model.QuizResultData;
+import com.academicpulse.desktop.model.QuizTakeData;
+import com.academicpulse.desktop.model.QuizzesData;
 import com.academicpulse.desktop.model.StudentDashboard;
 import com.academicpulse.desktop.model.Topic;
 import com.academicpulse.desktop.model.TopicAnalytics;
@@ -317,6 +323,134 @@ public class ApiClient {
 
     public StudentDashboard getStudentDashboard() throws ApiException, InterruptedException {
         return fetchCached("student-dashboard", "/student/dashboard", StudentDashboard.class);
+    }
+
+    // ---- Quizzes ----
+
+    public QuizzesData getQuizzes() throws ApiException, InterruptedException {
+        return fetchCached("quizzes", "/quizzes", QuizzesData.class);
+    }
+
+    /** All course topics, for the create/edit quiz form's dropdown. */
+    public List<Topic> getQuizTopics() throws ApiException, InterruptedException {
+        return fetchCached("quiz-topics", "/quizzes/topics", new TypeReference<List<Topic>>() {});
+    }
+
+    /** Returns the new quiz's id, so the caller can jump straight to its question builder. */
+    public long createQuiz(String title, String subject, int totalQuestions, String scheduledAt,
+                            int durationMinutes, String status, Long courseTopicId, boolean proctored)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("title", title);
+        payload.put("subject", subject);
+        payload.put("total_questions", totalQuestions);
+        payload.put("scheduled_at", scheduledAt);
+        payload.put("duration_minutes", durationMinutes);
+        payload.put("status", status);
+        payload.put("course_topic_id", courseTopicId);
+        payload.put("proctored", proctored);
+
+        ApiResponse response = send("POST", "/quizzes", payload, true);
+        requireSuccess(response);
+        JsonNode node = mapper.readTree(response.body());
+        return node.get("id").asLong();
+    }
+
+    public QuizEditData getQuizEdit(long quizId) throws ApiException, InterruptedException {
+        return fetchCached("quiz-edit:" + quizId, "/quizzes/" + quizId + "/edit", QuizEditData.class);
+    }
+
+    public void updateQuiz(long quizId, String title, String subject, int totalQuestions, String scheduledAt,
+                            int durationMinutes, String status, Long courseTopicId, boolean proctored)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("title", title);
+        payload.put("subject", subject);
+        payload.put("total_questions", totalQuestions);
+        payload.put("scheduled_at", scheduledAt);
+        payload.put("duration_minutes", durationMinutes);
+        payload.put("status", status);
+        payload.put("course_topic_id", courseTopicId);
+        payload.put("proctored", proctored);
+        requireSuccess(send("PATCH", "/quizzes/" + quizId, payload, true));
+    }
+
+    public QuizBuilderData getQuizBuilder(long quizId) throws ApiException, InterruptedException {
+        return fetchCached("quiz-builder:" + quizId, "/quizzes/" + quizId + "/questions", QuizBuilderData.class);
+    }
+
+    public void addQuizQuestion(long quizId, String question, String optionA, String optionB, String optionC,
+                                 String optionD, String correctOption) throws ApiException, IOException, InterruptedException {
+        Map<String, String> payload = new java.util.HashMap<>();
+        payload.put("question", question);
+        payload.put("option_a", optionA);
+        payload.put("option_b", optionB);
+        payload.put("option_c", optionC);
+        payload.put("option_d", optionD);
+        payload.put("correct_option", correctOption);
+        requireSuccess(send("POST", "/quizzes/" + quizId + "/questions", payload, true));
+    }
+
+    public void deleteQuizQuestion(long quizId, long questionId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("DELETE", "/quizzes/" + quizId + "/questions/" + questionId, null, true));
+    }
+
+    public void finalizeQuiz(long quizId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/quizzes/" + quizId + "/finalize", null, true));
+    }
+
+    /**
+     * Fails with a 409 ({@link ApiException#statusCode}) if the student has
+     * already submitted this quiz — the caller should send them to the
+     * result screen instead of retrying.
+     */
+    public QuizTakeData getQuizTake(long quizId) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("GET", "/quizzes/" + quizId + "/take", null, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), QuizTakeData.class);
+    }
+
+    public void submitQuiz(long quizId, Map<Long, String> answers, int violations)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        Map<String, String> answerPayload = new java.util.HashMap<>();
+        answers.forEach((questionId, letter) -> answerPayload.put(String.valueOf(questionId), letter));
+        payload.put("answers", answerPayload);
+        payload.put("violations", violations);
+        requireSuccess(send("POST", "/quizzes/" + quizId + "/submit", payload, true));
+    }
+
+    /**
+     * Fails with a 409 ({@link ApiException#statusCode}) if a student who
+     * hasn't attempted yet asks for the result of a quiz that's still live —
+     * the caller should send them to take it instead.
+     */
+    public QuizResultData getQuizResult(long quizId) throws ApiException, IOException, InterruptedException {
+        ApiResponse response = send("GET", "/quizzes/" + quizId + "/result", null, true);
+        requireSuccess(response);
+        return mapper.readValue(response.body(), QuizResultData.class);
+    }
+
+    public void confirmQuizMarks(long quizId) throws ApiException, IOException, InterruptedException {
+        requireSuccess(send("POST", "/quizzes/" + quizId + "/confirm-marks", null, true));
+    }
+
+    /**
+     * Polls whether a quiz is live for the current student right now.
+     * Deliberately uncached and swallows all failures (returning null) —
+     * this backs a frequent background poller that should stay silent
+     * through a transient connectivity blip rather than surface an error
+     * or, worse, act on stale cached data and pop up a quiz that's no
+     * longer actually live.
+     */
+    public LiveQuizStatus getLiveQuizStatusOrNull() {
+        try {
+            ApiResponse response = send("GET", "/student/live-quiz", null, true);
+            requireSuccess(response);
+            return mapper.readValue(response.body(), LiveQuizStatus.class);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // ---- Settings ----

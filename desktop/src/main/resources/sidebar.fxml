@@ -25,6 +25,7 @@
     <Button fx:id="lecturerStudentsButton" text="Students" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleLecturerStudents"/>
     <Button text="Messages" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleMessages"/>
     <Button fx:id="analyticsButton" text="Analytics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleAnalytics"/>
+    <Button fx:id="quizzesButton" text="Quizzes" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleQuizzes"/>
     <Button fx:id="lecturerMarksButton" text="Student Marks" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleLecturerMarks"/>
     <Button text="Settings" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleSettings"/>
 
