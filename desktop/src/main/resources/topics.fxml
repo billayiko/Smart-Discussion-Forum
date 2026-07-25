@@ -2,30 +2,38 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.TopicsController">
     <left>
         <fx:include source="sidebar.fxml"/>
     </left>
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT">
             <padding>
                 <Insets top="16" right="16" bottom="8" left="16"/>
             </padding>
-            <Label text="Discussion Forum" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <VBox>
+                <Label text="Discussion Forum" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Open a topic to browse its discussions and ask a question." style="-fx-text-fill: #71717a;"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
         </HBox>
     </top>
     <center>
-        <VBox spacing="10">
-            <padding>
-                <Insets top="8" right="16" bottom="16" left="16"/>
-            </padding>
-            <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
-            <ListView fx:id="topicsListView" VBox.vgrow="ALWAYS"/>
-            <Button text="Open Forum" onAction="#handleOpenTopic" maxWidth="Infinity"/>
-        </VBox>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="14">
+                <padding>
+                    <Insets top="8" right="16" bottom="16" left="16"/>
+                </padding>
+                <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+                <FlowPane fx:id="topicsBox" hgap="16" vgap="16"/>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

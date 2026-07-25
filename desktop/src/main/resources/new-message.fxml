@@ -2,9 +2,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.NewMessageController">
     <left>
@@ -15,18 +16,21 @@
             <padding>
                 <Insets top="16" right="16" bottom="8" left="16"/>
             </padding>
-            <Button text="&#8592; Back" onAction="#handleBack"/>
+            <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
             <Label text="New Message" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
         </HBox>
     </top>
     <center>
-        <VBox spacing="10">
-            <padding>
-                <Insets top="8" right="16" bottom="16" left="16"/>
-            </padding>
-            <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
-            <ListView fx:id="contactsListView" VBox.vgrow="ALWAYS"/>
-            <Button text="Start Conversation" onAction="#handleStartConversation" maxWidth="Infinity"/>
-        </VBox>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="8" right="16" bottom="16" left="16"/>
+                </padding>
+                <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+                <VBox fx:id="contactsBox" spacing="10"/>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>
