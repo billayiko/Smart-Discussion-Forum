@@ -1,6 +1,7 @@
 package com.academicpulse.desktop;
 
 import com.academicpulse.desktop.api.ApiClient;
+import com.academicpulse.desktop.api.RealtimeClient;
 import com.academicpulse.desktop.controllers.QuizTakeController;
 import com.academicpulse.desktop.model.LiveQuizStatus;
 import com.academicpulse.desktop.model.User;
@@ -19,11 +20,24 @@ import java.util.concurrent.TimeUnit;
 public final class Router {
     private static final long LIVE_QUIZ_POLL_SECONDS = 15;
 
+    /** Must match REVERB_PORT / REVERB_APP_KEY in the server's .env. */
+    private static final int REVERB_PORT = 8080;
+    private static final String REVERB_APP_KEY = "78763db5a08e9d7b6be8";
+
     private static final ApiClient API_CLIENT = new ApiClient();
+    private static final RealtimeClient REALTIME_CLIENT = new RealtimeClient(
+            API_CLIENT.getBaseUrl(), REVERB_PORT, REVERB_APP_KEY,
+            API_CLIENT::getToken,
+            () -> Router.currentUser == null ? null : Router.currentUser.id,
+            Router::handleChatMessage
+    );
     private static Stage stage;
     private static User currentUser;
     private static ScheduledExecutorService liveQuizWatcher;
     private static volatile boolean quizTakeActive = false;
+    private static volatile long activeConversationId = -1;
+    private static volatile Runnable activeConversationRefresh;
+    private static volatile Runnable conversationsListRefresh;
     private static String theme = "light";
 
     private Router() {
@@ -97,6 +111,12 @@ public final class Router {
      * the desktop equivalent of the web's combination of a site-wide
      * {@code RedirectToLiveQuiz} middleware and a client-side countdown
      * timer that together "pop up" a quiz the instant it starts.
+     *
+     * <p>Also starts the realtime chat connection — folded in here rather
+     * than given its own call site, since every place this is called
+     * ("the user just authenticated") is exactly when the realtime
+     * connection should open too, and every place {@link #stopLiveQuizWatch()}
+     * is called ("the user is logging out") is exactly when it should close.
      */
     public static void startLiveQuizWatch() {
         stopLiveQuizWatch();
@@ -106,6 +126,7 @@ public final class Router {
             return t;
         });
         liveQuizWatcher.scheduleWithFixedDelay(Router::pollLiveQuiz, 0, LIVE_QUIZ_POLL_SECONDS, TimeUnit.SECONDS);
+        REALTIME_CLIENT.start();
     }
 
     public static void stopLiveQuizWatch() {
@@ -113,6 +134,40 @@ public final class Router {
             liveQuizWatcher.shutdownNow();
             liveQuizWatcher = null;
         }
+        REALTIME_CLIENT.stop();
+    }
+
+    /**
+     * Registers the currently-open conversation thread (and its refresh
+     * callback) so an incoming realtime chat message can trigger an
+     * immediate reload — mirroring {@link #setQuizTakeActive(boolean)}'s
+     * "which screen is active" gating. Call with (-1, null) when leaving
+     * the thread.
+     */
+    public static void setActiveConversation(long conversationId, Runnable onMessage) {
+        activeConversationId = conversationId;
+        activeConversationRefresh = onMessage;
+    }
+
+    /**
+     * Registers the conversation-list screen's refresh callback so a
+     * realtime message for a conversation that ISN'T the currently-open
+     * thread still updates the list's last-message preview live, instead of
+     * silently waiting for that screen's own poll/manual refresh.
+     */
+    public static void setConversationsListRefresh(Runnable refresh) {
+        conversationsListRefresh = refresh;
+    }
+
+    private static void handleChatMessage(com.fasterxml.jackson.databind.JsonNode data) {
+        long conversationId = data.path("conversation_id").asLong(-1);
+        Platform.runLater(() -> {
+            if (conversationId == activeConversationId && activeConversationRefresh != null) {
+                activeConversationRefresh.run();
+            } else if (conversationsListRefresh != null) {
+                conversationsListRefresh.run();
+            }
+        });
     }
 
     private static void pollLiveQuiz() {

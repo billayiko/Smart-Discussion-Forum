@@ -123,7 +123,20 @@
             }
         }
 
-        // Poll for new messages every 5s so the conversation updates without a manual reload.
+        // Poll for new messages every 5s — kept as a safety net even with realtime
+        // wired up below, so a missed/dropped socket event costs at most 5s, never
+        // a lost update.
         setInterval(syncMessages, 5000);
+
+        // Realtime: nudge an immediate refresh as soon as a message arrives,
+        // instead of waiting for the next poll tick.
+        if (window.Echo) {
+            window.Echo.private('App.Models.User.{{ $user->id }}')
+                .listen('.chat.message', (payload) => {
+                    if (Number(payload.conversation_id) === {{ $conversation->id }}) {
+                        syncMessages();
+                    }
+                });
+        }
     })();
 </script>

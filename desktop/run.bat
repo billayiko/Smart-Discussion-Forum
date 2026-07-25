@@ -33,6 +33,16 @@ if errorlevel 1 (
     echo Laravel dev server already running.
 )
 
+echo Checking Reverb (realtime chat server)...
+netstat -ano | findstr ":8080" | findstr "LISTENING" >nul
+if errorlevel 1 (
+    echo Starting Reverb in a separate window...
+    start "Academic Pulse Reverb Server" /min cmd /c "cd /d "%LARAVEL_DIR%" && php artisan reverb:start"
+    timeout /t 3 /nobreak >nul
+) else (
+    echo Reverb already running.
+)
+
 if not exist target\classes mkdir target\classes
 
 echo Compiling...

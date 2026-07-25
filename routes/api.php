@@ -20,7 +20,15 @@ use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardCont
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\EnsureApiUserIsNotBlacklisted;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+
+// Broadcasting channel authorization for the desktop client, which
+// authenticates with a Sanctum bearer token rather than the session cookie
+// the default (web-guarded) /broadcasting/auth route expects. Same
+// routes/channels.php definitions serve both — authorization only calls
+// $request->user(), which resolves correctly under either guard.
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 // Public Authentication Endpoints
 Route::post('/register', [AuthController::class, 'register']);
