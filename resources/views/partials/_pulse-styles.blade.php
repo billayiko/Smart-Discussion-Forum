@@ -752,6 +752,13 @@
             font-weight: 800;
         }
 
+        .pulse-bar-subrow {
+            margin-top: -4px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--pulse-muted);
+        }
+
         .pulse-meter-label {
             display: flex;
             justify-content: space-between;

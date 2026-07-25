@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
         [$recentQuestions, $unansweredQuestionsCount] = $this->questionsPanelData();
 
-        $quizzesBySubject = $this->quizzesBySubject();
+        $quizzesBySubject = $this->quizzesBySubject($user);
 
         $totalQuestionsCount = Question::count();
         $answeredRate = $totalQuestionsCount > 0
@@ -186,9 +186,11 @@ class DashboardController extends Controller
 
     /**
      * Non-draft quiz counts grouped by subject, with each row's bar width
-     * pre-computed as a percentage of the largest subject's count.
+     * pre-computed as a percentage of the largest subject's count, plus this
+     * student's own average score across the quizzes they've already
+     * attempted in that subject (null when they haven't attempted any yet).
      */
-    protected function quizzesBySubject(): Collection
+    protected function quizzesBySubject(User $user): Collection
     {
         $rows = Quiz::where('status', '!=', 'draft')
             ->selectRaw('subject, count(*) as total')
@@ -199,8 +201,18 @@ class DashboardController extends Controller
 
         $max = (int) $rows->max('total') ?: 1;
 
-        return $rows->map(function ($row) use ($max) {
+        $averagesBySubject = QuizAttempt::where('user_id', $user->id)
+            ->whereHas('quiz', fn ($query) => $query->whereIn('subject', $rows->pluck('subject')))
+            ->with('quiz:id,subject')
+            ->get()
+            ->groupBy(fn (QuizAttempt $attempt) => $attempt->quiz->subject)
+            ->map(fn (Collection $attempts) => (int) round($attempts->avg(
+                fn (QuizAttempt $attempt) => $attempt->total > 0 ? ($attempt->score / $attempt->total) * 100 : 0
+            )));
+
+        return $rows->map(function ($row) use ($max, $averagesBySubject) {
             $row->pct = (int) round(($row->total / $max) * 100);
+            $row->own_average_percent = $averagesBySubject->get($row->subject);
 
             return $row;
         });
