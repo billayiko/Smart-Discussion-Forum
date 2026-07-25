@@ -52,6 +52,14 @@
         })();
 
         (function () {
+            const resetSubmitButtons = () => {
+                document.querySelectorAll('form.pulse-form button[type="submit"][data-original-label]').forEach((button) => {
+                    button.disabled = false;
+                    button.innerHTML = button.dataset.originalLabel;
+                    delete button.dataset.originalLabel;
+                });
+            };
+
             document.querySelectorAll('form.pulse-form').forEach((form) => {
                 form.addEventListener('submit', () => {
                     const button = form.querySelector('button[type="submit"]');
@@ -64,6 +72,19 @@
                     button.dataset.originalLabel = button.innerHTML;
                     button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Please wait…';
                 });
+            });
+
+            // Browsers can restore a full DOM snapshot from back-forward cache
+            // (bfcache) — e.g. after a failed login redirects back and the user
+            // hits Back — which would otherwise leave the submit button stuck
+            // disabled from the previous attempt. A click on a disabled button
+            // does nothing at all, which looks exactly like "the page won't
+            // submit." pageshow with event.persisted fires whenever a page is
+            // restored this way (a plain load doesn't set it).
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    resetSubmitButtons();
+                }
             });
         })();
     </script>
