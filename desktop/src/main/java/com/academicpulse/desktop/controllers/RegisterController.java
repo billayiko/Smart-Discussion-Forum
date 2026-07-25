@@ -117,7 +117,14 @@ public class RegisterController {
 
     private void goToTopics() {
         try {
-            Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            String role = Router.currentUser() != null ? Router.currentUser().role : null;
+            if ("admin".equals(role)) {
+                Router.navigate("/admin-dashboard.fxml", "Academic Pulse - Admin Dashboard");
+            } else if ("lecturer".equals(role)) {
+                Router.navigate("/lecturer-dashboard.fxml", "Academic Pulse - Lecturer Dashboard");
+            } else {
+                Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            }
         } catch (Exception e) {
             showError("Failed to load the next screen: " + describe(e));
         }

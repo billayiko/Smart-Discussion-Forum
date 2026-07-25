@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Api\Admin\TopicController as AdminTopicController;
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\Lecturer\DashboardController as LecturerDashboardController;
+use App\Http\Controllers\Api\Lecturer\MarksController as LecturerMarksController;
+use App\Http\Controllers\Api\Lecturer\StudentController as LecturerStudentController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\QuestionController;
@@ -55,5 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/admin/members/{member}/warn', [AdminMemberController::class, 'warn']);
         Route::post('/admin/members/{member}/blacklist', [AdminMemberController::class, 'blacklist']);
         Route::post('/admin/members/{member}/unblacklist', [AdminMemberController::class, 'unblacklist']);
+    });
+
+    Route::middleware('role:lecturer')->group(function () {
+        Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index']);
+        Route::patch('/lecturer/participation-criteria', [LecturerDashboardController::class, 'updateParticipationCriteria']);
+        Route::get('/lecturer/students', [LecturerStudentController::class, 'index']);
+        Route::get('/lecturer/marks', [LecturerMarksController::class, 'index']);
     });
 });
