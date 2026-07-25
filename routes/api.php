@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\EnsureApiUserIsNotBlacklisted;
 use Illuminate\Support\Facades\Route;
 
 // Public Authentication Endpoints
@@ -21,7 +22,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Authenticated Endpoints (desktop client)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', EnsureApiUserIsNotBlacklisted::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::patch('/me', [ProfileController::class, 'update']);

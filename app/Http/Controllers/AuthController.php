@@ -78,6 +78,15 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+
+        if ($user->isBlacklisted()) {
+            Auth::logout();
+
+            return response()->json([
+                'message' => 'Your account has been suspended due to inactivity. Please contact an administrator.',
+            ], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
