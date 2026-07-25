@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class Message extends Model
 {
@@ -47,6 +49,12 @@ class Message extends Model
      * ChatMessageSent::broadcastOn), so an excluded user's socket never
      * receives the payload at all — the same guarantee
      * MessageController::show already enforces for the non-realtime path.
+     *
+     * ShouldBroadcastNow means this hits Reverb synchronously, in-request —
+     * if Reverb isn't running (or the socket write otherwise fails), that
+     * must never take the whole "message sent" response down with it, since
+     * the message itself is already persisted by the time this runs. The
+     * 5s poll on both clients is the fallback for exactly this case.
      */
     public function notifyParticipants(): void
     {
@@ -55,8 +63,17 @@ class Message extends Model
         $recipients = $this->conversation->participants
             ->reject(fn (User $participant) => $participant->id === $this->user_id || $excludedIds->contains($participant->id));
 
-        if ($recipients->isNotEmpty()) {
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        try {
             event(new ChatMessageSent($this, $recipients));
+        } catch (Throwable $e) {
+            Log::warning('Realtime chat broadcast failed; message was still saved.', [
+                'message_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

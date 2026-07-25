@@ -17,16 +17,22 @@
 
         <div class="pulse-list" id="messages-list">
             @forelse ($conversation->messages as $message)
-                <div class="pulse-row" style="align-items:flex-start;">
-                    <span class="pulse-soft-icon"><i class="fas fa-comment"></i></span>
-                    <span>
-                        <strong>{{ $message->user->id === $user->id ? 'You' : $message->user->name }}</strong>
-                        <p>{{ $message->body }}</p>
-                        <span class="pulse-muted">{{ $message->created_at->diffForHumans() }}</span>
-                        @if ($message->user->id === $user->id && $message->excludedUsers->isNotEmpty())
-                            <span class="pulse-tag orange">Hidden from {{ $message->excludedUsers->pluck('name')->join(', ') }}</span>
+                @php($isOwn = $message->user->id === $user->id)
+                <div style="display:flex; justify-content:{{ $isOwn ? 'flex-end' : 'flex-start' }}; align-items:flex-end; gap:8px;">
+                    @unless ($isOwn)
+                        <span class="pulse-soft-icon" style="flex:0 0 auto;"><i class="fas fa-comment"></i></span>
+                    @endunless
+
+                    <div style="max-width:72%; padding:10px 14px; border-radius:16px; border-bottom-{{ $isOwn ? 'right' : 'left' }}-radius:4px; background:{{ $isOwn ? 'var(--pulse-blue)' : 'var(--pulse-blue-soft)' }}; color:{{ $isOwn ? '#fff' : 'var(--pulse-ink)' }};">
+                        @unless ($isOwn)
+                            <strong style="display:block; font-size:.78rem; margin-bottom:3px; color:var(--pulse-blue);">{{ $message->user->name }}</strong>
+                        @endunless
+                        <p style="margin:0; white-space:pre-wrap; word-break:break-word;">{{ $message->body }}</p>
+                        <span style="display:block; margin-top:5px; font-size:.72rem; {{ $isOwn ? 'color:rgba(255,255,255,.8);' : 'color:var(--pulse-muted);' }}">{{ $message->created_at->diffForHumans() }}</span>
+                        @if ($isOwn && $message->excludedUsers->isNotEmpty())
+                            <span class="pulse-tag orange" style="margin-top:6px;">Hidden from {{ $message->excludedUsers->pluck('name')->join(', ') }}</span>
                         @endif
-                    </span>
+                    </div>
                 </div>
             @empty
                 <div class="pulse-row"><span class="pulse-muted">No messages yet. Say hello!</span></div>
