@@ -49,7 +49,11 @@ public class LoginController {
 
     private void goToTopics() {
         try {
-            Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            if (Router.currentUser() != null && "admin".equals(Router.currentUser().role)) {
+                Router.navigate("/admin-dashboard.fxml", "Academic Pulse - Admin Dashboard");
+            } else {
+                Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
+            }
         } catch (Exception e) {
             showError("Failed to load the next screen: " + describe(e));
         }

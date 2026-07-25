@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ToggleGroup?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.AdminDashboardController">
+    <left>
+        <fx:include source="sidebar.fxml"/>
+    </left>
+    <top>
+        <VBox>
+            <padding>
+                <Insets top="16" right="16" bottom="8" left="16"/>
+            </padding>
+            <Label text="Monitoring &amp; Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Create, manage and analyze performance data for your lecturers and students." style="-fx-text-fill: #71717a;"/>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="14">
+            <padding>
+                <Insets top="8" right="16" bottom="16" left="16"/>
+            </padding>
+
+            <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+
+            <FlowPane fx:id="bubblesBox" hgap="12" vgap="12"/>
+
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <fx:define>
+                    <ToggleGroup fx:id="filterGroup"/>
+                </fx:define>
+                <ToggleButton fx:id="allFilterBtn" text="All Quizzes" selected="true" toggleGroup="$filterGroup" onAction="#handleFilterAll"/>
+                <ToggleButton fx:id="publishedFilterBtn" text="Published" toggleGroup="$filterGroup" onAction="#handleFilterPublished"/>
+                <ToggleButton fx:id="draftFilterBtn" text="Drafts" toggleGroup="$filterGroup" onAction="#handleFilterDraft"/>
+                <ToggleButton fx:id="scheduledFilterBtn" text="Scheduled" toggleGroup="$filterGroup" onAction="#handleFilterScheduled"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Search quizzes..."/>
+                <Button text="Search" onAction="#handleSearch"/>
+            </HBox>
+
+            <TableView fx:id="quizzesTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="titleColumn" text="Quiz Title" prefWidth="180"/>
+                    <TableColumn fx:id="subjectColumn" text="Subject" prefWidth="120"/>
+                    <TableColumn fx:id="questionsColumn" text="Questions" prefWidth="90"/>
+                    <TableColumn fx:id="durationColumn" text="Duration" prefWidth="90"/>
+                    <TableColumn fx:id="attemptsColumn" text="Attempts" prefWidth="90"/>
+                    <TableColumn fx:id="avgScoreColumn" text="Avg. Score" prefWidth="100"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="110"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>
