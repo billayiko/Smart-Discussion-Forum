@@ -1,5 +1,5 @@
 .app-sidebar {
-    -fx-background-color: linear-gradient(to bottom, #0a1628, #0f2b4b);
+    -fx-background-color: linear-gradient(to bottom, #1e1b2e, #2b2650);
     -fx-min-width: 220;
     -fx-pref-width: 220;
 }
@@ -11,14 +11,14 @@
 }
 
 .app-sidebar-brand-accent {
-    -fx-text-fill: #c9a84c;
+    -fx-text-fill: #9b8afb;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
 .app-nav-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #b9c8e0;
+    -fx-text-fill: #c7bce8;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-alignment: CENTER_LEFT;
@@ -33,8 +33,8 @@
 }
 
 .app-nav-btn.active {
-    -fx-background-color: rgba(201, 168, 76, 0.16);
-    -fx-text-fill: #f0d060;
+    -fx-background-color: rgba(124, 110, 244, 0.22);
+    -fx-text-fill: #9b8afb;
 }
 
 .app-sidebar-user-name {
@@ -44,7 +44,7 @@
 }
 
 .app-sidebar-user-role {
-    -fx-text-fill: #8ea5c1;
+    -fx-text-fill: #a79fc9;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
@@ -63,7 +63,7 @@
 }
 
 .app-stat-card {
-    -fx-background-color: #f4f6fb;
+    -fx-background-color: #f5f4fb;
     -fx-background-radius: 10;
     -fx-padding: 12 16 12 16;
     -fx-min-width: 140;
@@ -72,20 +72,93 @@
 .app-stat-value {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f2b4b;
+    -fx-text-fill: #1e1b2e;
 }
 
 .app-stat-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #7182a8;
+    -fx-text-fill: #71717a;
 }
 
 .app-list-row {
     -fx-padding: 6 8 6 8;
-    -fx-background-color: #f4f6fb;
+    -fx-background-color: #f5f4fb;
     -fx-background-radius: 6;
 }
 
 .app-list-row:hover {
-    -fx-background-color: #e6ebf5;
+    -fx-background-color: #ede9fe;
+}
+
+/* Welcome screen */
+.app-welcome-root {
+    -fx-background-color: #f7f7fb;
+}
+
+.app-welcome-brand {
+    -fx-text-fill: #1e1b2e;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.app-welcome-title {
+    -fx-text-fill: #1e1b2e;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.app-welcome-subtitle {
+    -fx-text-fill: #71717a;
+    -fx-font-size: 14px;
+}
+
+.app-btn-primary {
+    -fx-background-color: #7c6ef4;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 999;
+    -fx-cursor: hand;
+}
+
+.app-btn-primary:hover {
+    -fx-background-color: #6a5ce0;
+}
+
+.app-btn-light {
+    -fx-background-color: #ede9fe;
+    -fx-text-fill: #7c6ef4;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 999;
+    -fx-cursor: hand;
+}
+
+.app-btn-light:hover {
+    -fx-background-color: #e0d9fc;
+}
+
+.app-feature-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-padding: 18;
+    -fx-min-width: 150;
+    -fx-max-width: 150;
+    -fx-alignment: CENTER;
+    -fx-effect: dropshadow(gaussian, rgba(30,27,46,0.08), 12, 0, 0, 4);
+}
+
+.app-feature-title {
+    -fx-text-fill: #1e1b2e;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.app-feature-text {
+    -fx-text-fill: #71717a;
+    -fx-font-size: 11px;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
 }

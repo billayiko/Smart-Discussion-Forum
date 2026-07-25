@@ -2,29 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Teams\CreateTeam;
+use App\Concerns\PasswordValidationRules;
+use App\Concerns\ProfileValidationRules;
+use App\Concerns\SecurityQuestionValidationRules;
 use App\Models\User;
+use App\Support\SecurityQuestion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
-    // 1. REGISTRATION ENDPOINT
+    use PasswordValidationRules, ProfileValidationRules, SecurityQuestionValidationRules;
+
+    public function __construct(private readonly CreateTeam $createTeam)
+    {
+    }
+
+    /**
+     * Mirrors App\Actions\Fortify\CreateNewUser exactly (same validation,
+     * same fields, same personal-team creation) so a desktop registrant
+     * ends up in the identical state as a real web signup — a functional
+     * student/lecturer account, not stuck at the default 'member' role.
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'agreed_rules' => 'required|boolean|accepted',
+            ...$this->profileRules(),
+            'role' => ['required', 'string', 'in:student,lecturer'],
+            'password' => $this->passwordRules(),
+            'rules_agreement' => ['required', 'accepted'],
+            'security_question' => $this->securityQuestionRules(),
+            'security_answer' => $this->securityAnswerRules(),
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'member',
-        ]);
+        $user = DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'role' => $validated['role'],
+                'rules_agreed_at' => now(),
+                'security_question' => $validated['security_question'],
+                'security_answer' => SecurityQuestion::normalizeAnswer($validated['security_answer']),
+            ]);
+
+            $this->createTeam->handle($user, $user->name."'s Team", isPersonal: true);
+
+            return $user;
+        });
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -32,7 +59,7 @@ class AuthController extends Controller
             'message' => 'Registration successful!',
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user
+            'user' => $user,
         ], 201);
     }
 
@@ -50,7 +77,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = Auth::user(); 
+        $user = Auth::user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

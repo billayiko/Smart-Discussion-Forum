@@ -81,6 +81,31 @@ public class ApiClient {
         return offline;
     }
 
+    /**
+     * Mirrors the web app's registration form exactly (role, security
+     * question/answer, rules agreement) — see Api\AuthController::register.
+     */
+    public User register(String name, String email, String password, String passwordConfirmation,
+                          String role, String securityQuestion, String securityAnswer)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("name", name);
+        payload.put("email", email);
+        payload.put("password", password);
+        payload.put("password_confirmation", passwordConfirmation);
+        payload.put("role", role);
+        payload.put("rules_agreement", true);
+        payload.put("security_question", securityQuestion);
+        payload.put("security_answer", securityAnswer);
+
+        ApiResponse response = send("POST", "/register", payload, false);
+        requireSuccess(response);
+
+        LoginResponse parsed = mapper.readValue(response.body(), LoginResponse.class);
+        this.token = parsed.accessToken;
+        return parsed.user;
+    }
+
     public User login(String email, String password) throws ApiException, IOException, InterruptedException {
         Map<String, String> payload = Map.of("email", email, "password", password);
         ApiResponse response = send("POST", "/login", payload, false);

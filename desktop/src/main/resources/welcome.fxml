@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.WelcomeController" styleClass="app-welcome-root">
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox alignment="CENTER" spacing="34">
+            <padding>
+                <Insets top="30" right="30" bottom="40" left="30"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10" maxWidth="900">
+                <Label text="Academic Pulse Forum" styleClass="app-welcome-brand"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button text="Log In" styleClass="app-btn-light" onAction="#handleLogin"/>
+                <Button text="Get Started" styleClass="app-btn-primary" onAction="#handleGetStarted"/>
+            </HBox>
+
+            <VBox alignment="CENTER" spacing="14" maxWidth="560">
+                <Label text="Welcome to Academic Pulse Forum" styleClass="app-welcome-title" wrapText="true" textAlignment="CENTER"/>
+                <Label text="Your central hub for lectures, discussions, quizzes, and academic collaboration."
+                       styleClass="app-welcome-subtitle" wrapText="true" textAlignment="CENTER"/>
+                <HBox spacing="12" alignment="CENTER">
+                    <Button text="Get Started" styleClass="app-btn-primary" onAction="#handleGetStarted"/>
+                    <Button text="Log In" styleClass="app-btn-light" onAction="#handleLogin"/>
+                </HBox>
+            </VBox>
+
+            <GridPane hgap="16" vgap="16" alignment="CENTER">
+                <VBox styleClass="app-feature-card" spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="💡" style="-fx-font-size: 22px;"/>
+                    <Label text="Smart Learning" styleClass="app-feature-title"/>
+                    <Label text="Access lectures and resources anytime, anywhere." styleClass="app-feature-text"/>
+                </VBox>
+                <VBox styleClass="app-feature-card" spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="💬" style="-fx-font-size: 22px;"/>
+                    <Label text="Engage &amp; Discuss" styleClass="app-feature-title"/>
+                    <Label text="Join meaningful discussions and share ideas." styleClass="app-feature-text"/>
+                </VBox>
+                <VBox styleClass="app-feature-card" spacing="8" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <Label text="🛡️" style="-fx-font-size: 22px;"/>
+                    <Label text="Take Quizzes" styleClass="app-feature-title"/>
+                    <Label text="Assess your knowledge with interactive quizzes." styleClass="app-feature-text"/>
+                </VBox>
+                <VBox styleClass="app-feature-card" spacing="8" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                    <Label text="⭐" style="-fx-font-size: 22px;"/>
+                    <Label text="Track Progress" styleClass="app-feature-title"/>
+                    <Label text="Monitor learning and achievement effortlessly." styleClass="app-feature-text"/>
+                </VBox>
+            </GridPane>
+
+            <VBox alignment="CENTER" spacing="14">
+                <Label text="Trusted by students and educators" style="-fx-text-fill: #1e1b2e; -fx-font-weight: bold;"/>
+                <HBox spacing="18" alignment="CENTER">
+                    <VBox styleClass="app-stat-card" alignment="CENTER">
+                        <Label text="1,200+" styleClass="app-stat-value"/>
+                        <Label text="Students" styleClass="app-stat-label"/>
+                    </VBox>
+                    <VBox styleClass="app-stat-card" alignment="CENTER">
+                        <Label text="150+" styleClass="app-stat-value"/>
+                        <Label text="Lectures" styleClass="app-stat-label"/>
+                    </VBox>
+                    <VBox styleClass="app-stat-card" alignment="CENTER">
+                        <Label text="320+" styleClass="app-stat-value"/>
+                        <Label text="Discussions" styleClass="app-stat-label"/>
+                    </VBox>
+                    <VBox styleClass="app-stat-card" alignment="CENTER">
+                        <Label text="98%" styleClass="app-stat-value"/>
+                        <Label text="Satisfaction" styleClass="app-stat-label"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

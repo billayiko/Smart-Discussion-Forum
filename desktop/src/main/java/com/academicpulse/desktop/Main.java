@@ -7,7 +7,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Router.init(primaryStage);
-        Router.navigate("/login.fxml", "Academic Pulse - Login");
+        Router.navigate("/welcome.fxml", "Academic Pulse Forum");
         primaryStage.show();
     }
 
