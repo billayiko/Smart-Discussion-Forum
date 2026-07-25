@@ -4,53 +4,44 @@ import com.academicpulse.desktop.Router;
 import com.academicpulse.desktop.model.Answer;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.Topic;
+import com.academicpulse.desktop.util.ForumUi;
+import com.academicpulse.desktop.util.RelativeTime;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/** A single thread's question + replies — mirrors pages/dashboards/questions/_forum-thread.blade.php's message list. */
 public class ThreadDetailController {
     private static final long POLL_INTERVAL_SECONDS = 5;
 
     @FXML private Label titleLabel;
-    @FXML private Label bodyLabel;
     @FXML private Label statusLabel;
-    @FXML private ListView<Answer> answersListView;
+    @FXML private VBox messagesBox;
     @FXML private TextArea replyField;
 
     private Topic topic;
     private long questionId;
     private ScheduledExecutorService poller;
 
-    @FXML
-    public void initialize() {
-        answersListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Answer answer, boolean empty) {
-                super.updateItem(answer, empty);
-                if (empty || answer == null) {
-                    setText(null);
-                    return;
-                }
-                String author = answer.user == null ? "unknown" : answer.user.name;
-                setText(author + ": " + answer.body);
-                setWrapText(true);
-            }
-        });
-    }
-
     public void setTopicAndQuestionId(Topic topic, long questionId) {
         this.topic = topic;
         this.questionId = questionId;
         loadQuestion();
         startPolling();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        loadQuestion();
     }
 
     /**
@@ -104,12 +95,48 @@ public class ThreadDetailController {
 
     private void applyQuestion(Question question) {
         titleLabel.setText(question.title);
-        String author = question.user == null ? "unknown" : question.user.name;
-        bodyLabel.setText("Asked by " + author + ": " + question.body);
-        answersListView.setItems(FXCollections.observableArrayList(question.answers));
+
         int count = question.answers.size();
         String base = count == 0 ? "No replies yet." : count + " repl" + (count == 1 ? "y" : "ies") + ".";
         statusLabel.setText(Router.api().isOffline() ? "Offline — showing saved data. " + base : base);
+
+        messagesBox.getChildren().clear();
+        messagesBox.getChildren().add(messageCard(question.user, question.body, question.createdAt, question.views));
+        for (Answer answer : question.answers) {
+            messagesBox.getChildren().add(messageCard(answer.user, answer.body, answer.createdAt, -1));
+        }
+    }
+
+    private VBox messageCard(com.academicpulse.desktop.model.User author, String body, String createdAt, long views) {
+        String name = author == null ? "unknown" : author.name;
+        String initials = author == null ? "?" : author.initials();
+
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-weight: bold;");
+        Label roleBadge = ForumUi.roleBadge(author);
+        Label timeLabel = new Label(RelativeTime.ago(createdAt));
+        timeLabel.setStyle("-fx-text-fill: #71717a; -fx-font-size: 11px; -fx-font-weight: bold;");
+        HBox head = new HBox(8, nameLabel, roleBadge, timeLabel);
+        head.setAlignment(Pos.CENTER_LEFT);
+
+        Label bodyLabel = new Label(body == null ? "" : body);
+        bodyLabel.setWrapText(true);
+        bodyLabel.setStyle("-fx-text-fill: #2d2a3d;");
+
+        VBox textBox = new VBox(6, head, bodyLabel);
+        if (views >= 0) {
+            Label viewsLabel = new Label(views + " views");
+            viewsLabel.setStyle("-fx-text-fill: #71717a; -fx-font-size: 11px; -fx-font-weight: bold;");
+            textBox.getChildren().add(viewsLabel);
+        }
+        HBox.setHgrow(textBox, Priority.ALWAYS);
+
+        HBox row = new HBox(12, ForumUi.avatar(initials), textBox);
+        row.setAlignment(Pos.TOP_LEFT);
+
+        VBox card = new VBox(row);
+        card.getStyleClass().add("app-topic-card");
+        return card;
     }
 
     @FXML

@@ -2,7 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -12,23 +12,28 @@
         <fx:include source="sidebar.fxml"/>
     </left>
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT">
             <padding>
                 <Insets top="16" right="16" bottom="8" left="16"/>
             </padding>
-            <Label text="Messages" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <VBox>
+                <Label text="Messages" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Message classmates, lecturers, or start a group." style="-fx-text-fill: #71717a;"/>
+            </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="New Message" onAction="#handleNewMessage"/>
+            <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
+            <Button text="New Message" styleClass="app-btn-primary" onAction="#handleNewMessage"/>
         </HBox>
     </top>
     <center>
-        <VBox spacing="10">
-            <padding>
-                <Insets top="8" right="16" bottom="16" left="16"/>
-            </padding>
-            <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
-            <ListView fx:id="conversationsListView" VBox.vgrow="ALWAYS"/>
-            <Button text="Open Conversation" onAction="#handleOpenConversation" maxWidth="Infinity"/>
-        </VBox>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="8" right="16" bottom="16" left="16"/>
+                </padding>
+                <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+                <VBox fx:id="conversationsBox" spacing="10"/>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>
