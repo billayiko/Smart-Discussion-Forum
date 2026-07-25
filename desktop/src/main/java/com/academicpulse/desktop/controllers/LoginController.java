@@ -49,8 +49,11 @@ public class LoginController {
 
     private void goToTopics() {
         try {
-            if (Router.currentUser() != null && "admin".equals(Router.currentUser().role)) {
+            String role = Router.currentUser() != null ? Router.currentUser().role : null;
+            if ("admin".equals(role)) {
                 Router.navigate("/admin-dashboard.fxml", "Academic Pulse - Admin Dashboard");
+            } else if ("lecturer".equals(role)) {
+                Router.navigate("/lecturer-dashboard.fxml", "Academic Pulse - Lecturer Dashboard");
             } else {
                 Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
             }

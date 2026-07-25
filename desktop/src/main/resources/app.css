@@ -178,6 +178,25 @@
 .app-tag-gray { -fx-background-color: #f1f1f5; -fx-text-fill: #6b7280; }
 .app-tag-purple { -fx-background-color: #f1eaff; -fx-text-fill: #7c6ef4; }
 
+/* Horizontal bar chart rows, matching the web app's pulse-bar-track/pulse-bar-fill */
+.app-bar-track {
+    -fx-background-color: #f1f1f5;
+    -fx-background-radius: 999;
+    -fx-min-height: 8;
+    -fx-pref-height: 8;
+}
+
+.app-bar-fill {
+    -fx-background-color: #d9d5f7;
+    -fx-background-radius: 999;
+    -fx-min-height: 8;
+    -fx-pref-height: 8;
+}
+
+.app-bar-fill.has-value {
+    -fx-background-color: #7c6ef4;
+}
+
 /* Small icon-style round action buttons */
 .app-icon-btn {
     -fx-background-color: #f5f4fb;

@@ -16,6 +16,9 @@ public class SidebarController {
     @FXML private Button topicsButton;
     @FXML private Button complaintsButton;
     @FXML private Button membersButton;
+    @FXML private Button lecturerDashboardButton;
+    @FXML private Button lecturerStudentsButton;
+    @FXML private Button lecturerMarksButton;
 
     @FXML
     public void initialize() {
@@ -29,6 +32,12 @@ public class SidebarController {
         for (Button adminOnlyButton : new Button[]{analyticsButton, adminDashboardButton, topicsButton, complaintsButton, membersButton}) {
             adminOnlyButton.setVisible(isAdmin);
             adminOnlyButton.setManaged(isAdmin);
+        }
+
+        boolean isLecturer = user != null && "lecturer".equals(user.role);
+        for (Button lecturerOnlyButton : new Button[]{lecturerDashboardButton, lecturerStudentsButton, lecturerMarksButton}) {
+            lecturerOnlyButton.setVisible(isLecturer);
+            lecturerOnlyButton.setManaged(isLecturer);
         }
     }
 
@@ -72,6 +81,33 @@ public class SidebarController {
     private void handleSettings() {
         try {
             Router.navigate("/settings.fxml", "Academic Pulse - Settings");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleLecturerDashboard() {
+        try {
+            Router.navigate("/lecturer-dashboard.fxml", "Academic Pulse - Lecturer Dashboard");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleLecturerStudents() {
+        try {
+            Router.navigate("/lecturer-students.fxml", "Academic Pulse - Students");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleLecturerMarks() {
+        try {
+            Router.navigate("/lecturer-marks.fxml", "Academic Pulse - Student Marks");
         } catch (Exception ignored) {
             // nothing sensible to show here; the target screen will report its own load errors
         }

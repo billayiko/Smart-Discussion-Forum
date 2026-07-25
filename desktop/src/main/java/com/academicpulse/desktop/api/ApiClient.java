@@ -8,6 +8,9 @@ import com.academicpulse.desktop.model.AdminTopicsData;
 import com.academicpulse.desktop.model.AnalyticsSummary;
 import com.academicpulse.desktop.model.Answer;
 import com.academicpulse.desktop.model.Conversation;
+import com.academicpulse.desktop.model.LecturerDashboard;
+import com.academicpulse.desktop.model.LecturerMark;
+import com.academicpulse.desktop.model.LecturerStudentsData;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.Topic;
 import com.academicpulse.desktop.model.TopicAnalytics;
@@ -283,6 +286,30 @@ public class ApiClient {
 
     public void unblacklistMember(long memberId) throws ApiException, IOException, InterruptedException {
         requireSuccess(send("POST", "/admin/members/" + memberId + "/unblacklist", null, true));
+    }
+
+    // ---- Lecturer ----
+
+    public LecturerDashboard getLecturerDashboard() throws ApiException, InterruptedException {
+        return fetchCached("lecturer-dashboard", "/lecturer/dashboard", LecturerDashboard.class);
+    }
+
+    public void updateParticipationCriteria(int pointsPerQuestion, int pointsPerAnswer, int pointsPerLikeReceived, int targetPoints)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> payload = Map.of(
+                "points_per_question", pointsPerQuestion,
+                "points_per_answer", pointsPerAnswer,
+                "points_per_like_received", pointsPerLikeReceived,
+                "target_points", targetPoints);
+        requireSuccess(send("PATCH", "/lecturer/participation-criteria", payload, true));
+    }
+
+    public LecturerStudentsData getLecturerStudents() throws ApiException, InterruptedException {
+        return fetchCached("lecturer-students", "/lecturer/students", LecturerStudentsData.class);
+    }
+
+    public List<LecturerMark> getLecturerMarks() throws ApiException, InterruptedException {
+        return fetchCached("lecturer-marks", "/lecturer/marks", new TypeReference<List<LecturerMark>>() {});
     }
 
     // ---- Settings ----
