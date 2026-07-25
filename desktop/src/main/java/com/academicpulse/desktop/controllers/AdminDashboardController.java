@@ -93,6 +93,25 @@ public class AdminDashboardController {
         load();
     }
 
+    @FXML
+    private void handleLogout() {
+        Router.stopLiveQuizWatch();
+        new Thread(() -> {
+            try {
+                Router.api().logout();
+            } catch (Exception ignored) {
+                // token may already be invalid server-side; proceed to login regardless
+            }
+            Router.setCurrentUser(null);
+            Platform.runLater(() -> {
+                try {
+                    Router.navigate("/login.fxml", "Academic Pulse - Login");
+                } catch (Exception ignored) {
+                }
+            });
+        }).start();
+    }
+
     private void load() {
         statusLabel.setText("Loading...");
         String search = searchField.getText();
