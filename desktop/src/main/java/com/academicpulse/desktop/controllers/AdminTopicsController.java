@@ -93,6 +93,7 @@ public class AdminTopicsController {
             private final Button deleteButton = new Button("Delete");
 
             {
+                deleteButton.getStyleClass().add("app-btn-light");
                 deleteButton.setOnAction(e -> {
                     AdminTopic topic = getTableRow() == null ? null : getTableRow().getItem();
                     if (topic != null) {

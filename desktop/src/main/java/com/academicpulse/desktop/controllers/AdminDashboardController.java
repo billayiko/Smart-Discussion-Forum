@@ -3,9 +3,11 @@ package com.academicpulse.desktop.controllers;
 import com.academicpulse.desktop.Router;
 import com.academicpulse.desktop.model.AdminDashboard;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -26,7 +28,7 @@ public class AdminDashboardController {
     @FXML private TableColumn<AdminDashboard.QuizRow, String> durationColumn;
     @FXML private TableColumn<AdminDashboard.QuizRow, String> attemptsColumn;
     @FXML private TableColumn<AdminDashboard.QuizRow, String> avgScoreColumn;
-    @FXML private TableColumn<AdminDashboard.QuizRow, String> statusColumn;
+    @FXML private TableColumn<AdminDashboard.QuizRow, AdminDashboard.QuizRow> statusColumn;
 
     private String currentStatusFilter;
 
@@ -39,7 +41,25 @@ public class AdminDashboardController {
         attemptsColumn.setCellValueFactory(row -> new SimpleStringProperty(String.valueOf(row.getValue().attemptsCount)));
         avgScoreColumn.setCellValueFactory(row -> new SimpleStringProperty(
                 row.getValue().averageScorePercent != null ? row.getValue().averageScorePercent + "%" : "—"));
-        statusColumn.setCellValueFactory(row -> new SimpleStringProperty(capitalize(row.getValue().stage)));
+        statusColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
+        statusColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(AdminDashboard.QuizRow row, boolean empty) {
+                super.updateItem(row, empty);
+                if (empty || row == null) {
+                    setGraphic(null);
+                    return;
+                }
+                Label tag = new Label(capitalize(row.stage));
+                tag.getStyleClass().add("app-tag");
+                tag.getStyleClass().add(switch (row.stage == null ? "" : row.stage) {
+                    case "active" -> "app-tag-green";
+                    case "due_soon" -> "app-tag-orange";
+                    default -> "app-tag-gray";
+                });
+                setGraphic(tag);
+            }
+        });
 
         load();
     }
