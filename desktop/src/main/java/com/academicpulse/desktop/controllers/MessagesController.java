@@ -22,6 +22,7 @@ public class MessagesController {
     @FXML
     public void initialize() {
         loadConversations();
+        Router.setConversationsListRefresh(this::loadConversations);
     }
 
     @FXML

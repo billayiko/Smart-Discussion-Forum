@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ChatMessageSent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,5 +38,25 @@ class Message extends Model
     public function isExcludedFor(User $user): bool
     {
         return $this->excludedUsers->contains('id', $user->id);
+    }
+
+    /**
+     * Realtime delivery for this message: every conversation participant
+     * except the sender and anyone this specific message excludes. Each
+     * recipient is addressed on their own private channel (see
+     * ChatMessageSent::broadcastOn), so an excluded user's socket never
+     * receives the payload at all — the same guarantee
+     * MessageController::show already enforces for the non-realtime path.
+     */
+    public function notifyParticipants(): void
+    {
+        $excludedIds = $this->excludedUsers->pluck('id');
+
+        $recipients = $this->conversation->participants
+            ->reject(fn (User $participant) => $participant->id === $this->user_id || $excludedIds->contains($participant->id));
+
+        if ($recipients->isNotEmpty()) {
+            event(new ChatMessageSent($this, $recipients));
+        }
     }
 }

@@ -97,6 +97,7 @@ class MessageController extends Controller
 
         $conversation->touch();
         $user->recordCommunication();
+        $message->notifyParticipants();
 
         return response()->json(['message' => 'Message sent.'], 201);
     }

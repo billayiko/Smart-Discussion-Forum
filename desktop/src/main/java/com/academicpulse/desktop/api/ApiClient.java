@@ -100,6 +100,16 @@ public class ApiClient {
         return token != null;
     }
 
+    /** The API base URL (e.g. "http://127.0.0.1:8000/api") — RealtimeClient derives its WebSocket host from this. */
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    /** The current Sanctum bearer token, or null if not logged in — used to authorize the realtime channel subscription. */
+    public String getToken() {
+        return token;
+    }
+
     /** Whether the most recent GET fell back to cached data due to a connectivity failure. */
     public boolean isOffline() {
         return offline;
