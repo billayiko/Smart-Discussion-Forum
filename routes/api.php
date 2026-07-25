@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Lecturer\StudentController as LecturerStudentContro
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -65,5 +66,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/lecturer/participation-criteria', [LecturerDashboardController::class, 'updateParticipationCriteria']);
         Route::get('/lecturer/students', [LecturerStudentController::class, 'index']);
         Route::get('/lecturer/marks', [LecturerMarksController::class, 'index']);
+    });
+
+    Route::middleware('role:student')->group(function () {
+        Route::get('/student/dashboard', [StudentDashboardController::class, 'index']);
     });
 });

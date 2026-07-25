@@ -12,6 +12,7 @@ import com.academicpulse.desktop.model.LecturerDashboard;
 import com.academicpulse.desktop.model.LecturerMark;
 import com.academicpulse.desktop.model.LecturerStudentsData;
 import com.academicpulse.desktop.model.Question;
+import com.academicpulse.desktop.model.StudentDashboard;
 import com.academicpulse.desktop.model.Topic;
 import com.academicpulse.desktop.model.TopicAnalytics;
 import com.academicpulse.desktop.model.User;
@@ -310,6 +311,12 @@ public class ApiClient {
 
     public List<LecturerMark> getLecturerMarks() throws ApiException, InterruptedException {
         return fetchCached("lecturer-marks", "/lecturer/marks", new TypeReference<List<LecturerMark>>() {});
+    }
+
+    // ---- Student ----
+
+    public StudentDashboard getStudentDashboard() throws ApiException, InterruptedException {
+        return fetchCached("student-dashboard", "/student/dashboard", StudentDashboard.class);
     }
 
     // ---- Settings ----
