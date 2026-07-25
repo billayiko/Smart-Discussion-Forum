@@ -9,8 +9,13 @@ import java.util.List;
 public class Conversation {
     public long id;
     public String displayName;
+    public boolean isGroup;
+    public Long createdBy;
+    public boolean canManageMembers;
     public String updatedAt;
     public LastMessage lastMessage;
+    public List<Participant> participants = Collections.emptyList();
+    public List<Participant> addableUsers = Collections.emptyList();
     public List<ChatMessage> messages = Collections.emptyList();
 
     @Override
@@ -23,5 +28,13 @@ public class Conversation {
         public String body;
         public String userName;
         public String createdAt;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Participant {
+        public long id;
+        public String name;
+        public String role;
+        public boolean isCreator;
     }
 }

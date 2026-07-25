@@ -8,27 +8,40 @@ import com.academicpulse.desktop.util.RelativeTime;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/** A single conversation's messages — mirrors pages/dashboards/messages/_thread.blade.php's message list. */
+/** A single conversation's messages — mirrors pages/dashboards/messages/_thread.blade.php's message list + members panel. */
 public class ConversationDetailController {
     private static final long POLL_INTERVAL_SECONDS = 5;
 
     @FXML private Label titleLabel;
+    @FXML private Label groupTagLabel;
     @FXML private Label statusLabel;
     @FXML private VBox messagesBox;
     @FXML private TextArea replyField;
+    @FXML private VBox exclusionsBox;
+    @FXML private VBox membersPanel;
+    @FXML private VBox membersBox;
+    @FXML private HBox addMemberBox;
+    @FXML private ComboBox<Conversation.Participant> addMemberCombo;
 
     private long conversationId;
     private ScheduledExecutorService poller;
+    private final List<CheckBox> exclusionCheckboxes = new ArrayList<>();
 
     public void setConversationId(long conversationId) {
         this.conversationId = conversationId;
@@ -41,13 +54,6 @@ public class ConversationDetailController {
         loadConversation();
     }
 
-    /**
-     * Polls for new messages every few seconds so the conversation updates
-     * without the user having to leave and reopen it — this is also what
-     * makes reconnect-after-offline work automatically: each tick simply
-     * retries the same API call, and {@link com.academicpulse.desktop.api.ApiClient}
-     * transparently falls back to (and later recovers from) its local cache.
-     */
     private void startPolling() {
         stopPolling();
         poller = Executors.newSingleThreadScheduledExecutor(runnable -> {
@@ -58,12 +64,6 @@ public class ConversationDetailController {
         poller.scheduleWithFixedDelay(this::pollConversation, POLL_INTERVAL_SECONDS, POLL_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
-    /**
-     * {@code Router.navigate()} swaps the FXML root with no lifecycle
-     * callback, so a controller that started a background poller must stop
-     * it itself before navigating away — otherwise it keeps polling forever
-     * from an orphaned instance.
-     */
     private void stopPolling() {
         if (poller != null) {
             poller.shutdownNow();
@@ -94,6 +94,9 @@ public class ConversationDetailController {
 
     private void applyConversation(Conversation conversation) {
         titleLabel.setText(conversation.displayName);
+        groupTagLabel.setText("Group · " + conversation.participants.size() + " members");
+        groupTagLabel.setVisible(conversation.isGroup);
+        groupTagLabel.setManaged(conversation.isGroup);
 
         int count = conversation.messages.size();
         String base = count == 0 ? "No messages yet." : count + " message" + (count == 1 ? "" : "s") + ".";
@@ -104,6 +107,73 @@ public class ConversationDetailController {
         messagesBox.getChildren().clear();
         for (ChatMessage message : conversation.messages) {
             messagesBox.getChildren().add(messageCard(message, currentUserId));
+        }
+
+        renderMembersPanel(conversation);
+        renderExclusions(conversation);
+    }
+
+    private void renderMembersPanel(Conversation conversation) {
+        membersPanel.setVisible(conversation.isGroup);
+        membersPanel.setManaged(conversation.isGroup);
+        if (!conversation.isGroup) {
+            return;
+        }
+
+        membersBox.getChildren().clear();
+        for (Conversation.Participant participant : conversation.participants) {
+            Label nameLabel = new Label(participant.name + (participant.isCreator ? " · Creator" : ""));
+            nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+            HBox row = new HBox(8, nameLabel);
+            row.setAlignment(Pos.CENTER_LEFT);
+
+            if (conversation.canManageMembers && !participant.isCreator) {
+                javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+                Button removeButton = new Button("✕");
+                removeButton.getStyleClass().add("app-icon-btn");
+                removeButton.setOnAction(e -> removeMember(participant.id));
+                row.getChildren().addAll(spacer, removeButton);
+            }
+            membersBox.getChildren().add(row);
+        }
+
+        addMemberBox.setVisible(conversation.canManageMembers);
+        addMemberBox.setManaged(conversation.canManageMembers);
+        if (conversation.canManageMembers) {
+            addMemberCombo.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Conversation.Participant p) {
+                    return p == null ? "" : p.name + " (" + p.role + ")";
+                }
+
+                @Override
+                public Conversation.Participant fromString(String string) {
+                    return null;
+                }
+            });
+            addMemberCombo.getItems().setAll(conversation.addableUsers);
+        }
+    }
+
+    private void renderExclusions(Conversation conversation) {
+        exclusionCheckboxes.clear();
+        exclusionsBox.getChildren().setAll(exclusionsBox.getChildren().get(0));
+        exclusionsBox.setVisible(conversation.isGroup);
+        exclusionsBox.setManaged(conversation.isGroup);
+
+        if (!conversation.isGroup) {
+            return;
+        }
+        long currentUserId = Router.currentUser() == null ? -1 : Router.currentUser().id;
+        for (Conversation.Participant participant : conversation.participants) {
+            if (participant.id == currentUserId) {
+                continue;
+            }
+            CheckBox checkbox = new CheckBox(participant.name);
+            checkbox.setUserData(participant.id);
+            exclusionCheckboxes.add(checkbox);
+            exclusionsBox.getChildren().add(checkbox);
         }
     }
 
@@ -124,6 +194,11 @@ public class ConversationDetailController {
         bodyLabel.setStyle("-fx-text-fill: #2d2a3d;");
 
         VBox textBox = new VBox(4, head, bodyLabel);
+        if (isOwn && message.excludedNames != null && !message.excludedNames.isEmpty()) {
+            Label hiddenTag = new Label("Hidden from " + String.join(", ", message.excludedNames));
+            hiddenTag.getStyleClass().addAll("app-tag", "app-tag-orange");
+            textBox.getChildren().add(hiddenTag);
+        }
         HBox.setHgrow(textBox, Priority.ALWAYS);
 
         HBox row = new HBox(12, ForumUi.avatar(initials), textBox);
@@ -142,16 +217,52 @@ public class ConversationDetailController {
             return;
         }
 
+        List<Long> excludedIds = exclusionCheckboxes.stream()
+                .filter(CheckBox::isSelected)
+                .map(cb -> (Long) cb.getUserData())
+                .toList();
+
         statusLabel.setText("Sending...");
         new Thread(() -> {
             try {
-                Router.api().sendMessage(conversationId, body);
+                if (excludedIds.isEmpty()) {
+                    Router.api().sendMessage(conversationId, body);
+                } else {
+                    Router.api().sendMessage(conversationId, body, excludedIds);
+                }
                 Platform.runLater(() -> {
                     replyField.clear();
                     loadConversation();
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> statusLabel.setText("Failed to send message: " + describe(e)));
+            }
+        }).start();
+    }
+
+    @FXML
+    private void handleAddMember() {
+        Conversation.Participant selected = addMemberCombo.getValue();
+        if (selected == null) {
+            return;
+        }
+        new Thread(() -> {
+            try {
+                Router.api().addConversationMember(conversationId, selected.id);
+                Platform.runLater(this::loadConversation);
+            } catch (Exception e) {
+                Platform.runLater(() -> statusLabel.setText("Failed to add member: " + describe(e)));
+            }
+        }).start();
+    }
+
+    private void removeMember(long userId) {
+        new Thread(() -> {
+            try {
+                Router.api().removeConversationMember(conversationId, userId);
+                Platform.runLater(this::loadConversation);
+            } catch (Exception e) {
+                Platform.runLater(() -> statusLabel.setText("Failed to remove member: " + describe(e)));
             }
         }).start();
     }

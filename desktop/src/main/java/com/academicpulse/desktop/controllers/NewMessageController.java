@@ -10,21 +10,26 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-/** Contact picker for starting a new conversation — mirrors the "New Message" panel in
- *  pages/dashboards/messages/_conversations.blade.php (contacts list only; the desktop API
- *  has no group-creation or user-search endpoint, so those web-only pieces are omitted). */
+/** Contact picker for starting a new conversation or group — mirrors the "New Message" panel in
+ *  pages/dashboards/messages/_conversations.blade.php (search filters client-side; the desktop
+ *  contacts endpoint returns the full list rather than a server-side search). */
 public class NewMessageController {
     @FXML private Label statusLabel;
+    @FXML private TextField searchField;
     @FXML private VBox contactsBox;
+
+    private List<User> allContacts = List.of();
 
     @FXML
     public void initialize() {
+        searchField.textProperty().addListener((obs, old, value) -> render(filtered(value)));
         loadContacts();
     }
 
@@ -38,15 +43,29 @@ public class NewMessageController {
         new Thread(() -> {
             try {
                 var contacts = Router.api().getContacts();
-                Platform.runLater(() -> render(contacts));
+                Platform.runLater(() -> {
+                    allContacts = contacts;
+                    render(filtered(searchField.getText()));
+                });
             } catch (Exception e) {
                 Platform.runLater(() -> statusLabel.setText("Failed to load contacts: " + describe(e)));
             }
         }).start();
     }
 
+    private List<User> filtered(String search) {
+        String term = search == null ? "" : search.trim().toLowerCase();
+        if (term.isEmpty()) {
+            return allContacts;
+        }
+        return allContacts.stream()
+                .filter(u -> (u.name != null && u.name.toLowerCase().contains(term))
+                        || (u.email != null && u.email.toLowerCase().contains(term)))
+                .toList();
+    }
+
     private void render(List<User> contacts) {
-        statusLabel.setText(contacts.isEmpty() ? "No other users found." : "Select a contact to message.");
+        statusLabel.setText(contacts.isEmpty() ? "No users found." : "Select a contact to message.");
 
         contactsBox.getChildren().clear();
         for (User contact : contacts) {
@@ -92,6 +111,15 @@ public class NewMessageController {
                 Platform.runLater(() -> statusLabel.setText("Failed to start conversation: " + describe(e)));
             }
         }).start();
+    }
+
+    @FXML
+    private void handleCreateGroup() {
+        try {
+            Router.navigate("/group-create.fxml", "Academic Pulse - Create Group");
+        } catch (Exception e) {
+            statusLabel.setText("Failed to open group creation: " + describe(e));
+        }
     }
 
     @FXML

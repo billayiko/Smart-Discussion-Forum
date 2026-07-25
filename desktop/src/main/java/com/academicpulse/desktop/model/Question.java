@@ -14,6 +14,8 @@ public class Question {
     public String createdAt;
     public String updatedAt;
     public long answersCount;
+    public long likesCount;
+    public boolean likedByMe;
     public User user;
     public Topic topic;
     public List<Answer> answers = Collections.emptyList();

@@ -4,15 +4,20 @@ import com.academicpulse.desktop.Router;
 import com.academicpulse.desktop.model.Answer;
 import com.academicpulse.desktop.model.Question;
 import com.academicpulse.desktop.model.Topic;
+import com.academicpulse.desktop.model.User;
 import com.academicpulse.desktop.util.ForumUi;
 import com.academicpulse.desktop.util.RelativeTime;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.concurrent.Executors;
@@ -24,7 +29,10 @@ public class ThreadDetailController {
     private static final long POLL_INTERVAL_SECONDS = 5;
 
     @FXML private Label titleLabel;
+    @FXML private Button reportButton;
     @FXML private Label statusLabel;
+    @FXML private VBox reportBox;
+    @FXML private TextField reportReasonField;
     @FXML private VBox messagesBox;
     @FXML private TextArea replyField;
 
@@ -39,17 +47,19 @@ public class ThreadDetailController {
         startPolling();
     }
 
+    /** Reached from the admin's flat moderation list, which has no single owning topic to return to. */
+    public void setQuestionIdForAdmin(long questionId) {
+        this.topic = null;
+        this.questionId = questionId;
+        loadQuestion();
+        startPolling();
+    }
+
     @FXML
     private void handleRefresh() {
         loadQuestion();
     }
 
-    /**
-     * Polls for new replies every few seconds — the same mechanism also
-     * covers reconnect-after-offline, since each tick just retries the API
-     * call and {@link com.academicpulse.desktop.api.ApiClient} transparently
-     * falls back to (and later recovers from) its local cache.
-     */
     private void startPolling() {
         stopPolling();
         poller = Executors.newSingleThreadScheduledExecutor(runnable -> {
@@ -60,11 +70,6 @@ public class ThreadDetailController {
         poller.scheduleWithFixedDelay(this::pollQuestion, POLL_INTERVAL_SECONDS, POLL_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
-    /**
-     * {@code Router.navigate()} swaps the FXML root with no lifecycle
-     * callback, so this must be stopped explicitly before navigating away —
-     * otherwise it keeps polling forever from an orphaned instance.
-     */
     private void stopPolling() {
         if (poller != null) {
             poller.shutdownNow();
@@ -101,13 +106,29 @@ public class ThreadDetailController {
         statusLabel.setText(Router.api().isOffline() ? "Offline — showing saved data. " + base : base);
 
         messagesBox.getChildren().clear();
-        messagesBox.getChildren().add(messageCard(question.user, question.body, question.createdAt, question.views));
+        messagesBox.getChildren().add(questionCard(question));
         for (Answer answer : question.answers) {
-            messagesBox.getChildren().add(messageCard(answer.user, answer.body, answer.createdAt, -1));
+            messagesBox.getChildren().add(answerCard(answer));
         }
     }
 
-    private VBox messageCard(com.academicpulse.desktop.model.User author, String body, String createdAt, long views) {
+    private VBox questionCard(Question question) {
+        VBox card = messageShell(question.user, question.body, question.createdAt, question.views,
+                question.likesCount, question.likedByMe, () -> Router.api().toggleQuestionLike(question.id));
+        return card;
+    }
+
+    private VBox answerCard(Answer answer) {
+        return messageShell(answer.user, answer.body, answer.createdAt, -1,
+                answer.likesCount, answer.likedByMe, () -> Router.api().toggleAnswerLike(answer.id));
+    }
+
+    private interface LikeToggle {
+        boolean toggle() throws Exception;
+    }
+
+    private VBox messageShell(User author, String body, String createdAt, long views,
+                               long likesCount, boolean likedByMe, LikeToggle toggle) {
         String name = author == null ? "unknown" : author.name;
         String initials = author == null ? "?" : author.initials();
 
@@ -123,12 +144,33 @@ public class ThreadDetailController {
         bodyLabel.setWrapText(true);
         bodyLabel.setStyle("-fx-text-fill: #2d2a3d;");
 
+        Button likeButton = new Button((likedByMe ? "♥ " : "♡ ") + likesCount);
+        likeButton.getStyleClass().add(likedByMe ? "app-btn-primary" : "app-btn-light");
+        likeButton.setOnAction(e -> {
+            likeButton.setDisable(true);
+            new Thread(() -> {
+                try {
+                    toggle.toggle();
+                    Platform.runLater(this::loadQuestion);
+                } catch (Exception ex) {
+                    Platform.runLater(() -> {
+                        statusLabel.setText("Failed to like: " + describe(ex));
+                        likeButton.setDisable(false);
+                    });
+                }
+            }).start();
+        });
+
+        HBox footer = new HBox(10, likeButton);
+        footer.setAlignment(Pos.CENTER_LEFT);
+
         VBox textBox = new VBox(6, head, bodyLabel);
         if (views >= 0) {
             Label viewsLabel = new Label(views + " views");
             viewsLabel.setStyle("-fx-text-fill: #71717a; -fx-font-size: 11px; -fx-font-weight: bold;");
             textBox.getChildren().add(viewsLabel);
         }
+        textBox.getChildren().add(footer);
         HBox.setHgrow(textBox, Priority.ALWAYS);
 
         HBox row = new HBox(12, ForumUi.avatar(initials), textBox);
@@ -162,11 +204,46 @@ public class ThreadDetailController {
     }
 
     @FXML
+    private void handleToggleReport() {
+        boolean show = !reportBox.isVisible();
+        reportBox.setVisible(show);
+        reportBox.setManaged(show);
+    }
+
+    @FXML
+    private void handleSubmitReport() {
+        String reason = reportReasonField.getText() == null ? "" : reportReasonField.getText().trim();
+        if (reason.isEmpty()) {
+            statusLabel.setText("Describe why you're reporting this question first.");
+            return;
+        }
+
+        statusLabel.setText("Submitting report...");
+        new Thread(() -> {
+            try {
+                Router.api().reportQuestion(questionId, reason);
+                Platform.runLater(() -> {
+                    reportReasonField.clear();
+                    reportBox.setVisible(false);
+                    reportBox.setManaged(false);
+                    statusLabel.setText("Your complaint has been submitted to the admin for review.");
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> statusLabel.setText("Failed to submit report: " + describe(e)));
+            }
+        }).start();
+    }
+
+    @FXML
     private void handleBack() {
         stopPolling();
         try {
-            TopicThreadsController controller = Router.navigate("/topic-threads.fxml", "Academic Pulse - " + topic.title);
-            controller.setTopic(topic);
+            if (topic != null) {
+                TopicThreadsController controller = Router.navigate("/topic-threads.fxml", "Academic Pulse - " + topic.title);
+                controller.setTopic(topic);
+            } else {
+                Router.navigate("/admin-questions.fxml", "Academic Pulse - Questions");
+            }
         } catch (Exception e) {
             statusLabel.setText("Failed to go back: " + describe(e));
         }

@@ -8,4 +8,6 @@ public class Answer {
     public String body;
     public String createdAt;
     public User user;
+    public long likesCount;
+    public boolean likedByMe;
 }

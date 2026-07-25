@@ -16,6 +16,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+
+import java.nio.file.Path;
 
 /** Question builder — mirrors quizzes/questions.blade.php. */
 public class QuizBuilderController {
@@ -188,6 +191,30 @@ public class QuizBuilderController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> errorLabel.setText("Failed to add question: " + describe(e)));
+            }
+        }).start();
+    }
+
+    @FXML
+    private void handleImportCsv() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose a question CSV file");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files", "*.csv", "*.txt"));
+        java.io.File file = chooser.showOpenDialog(questionField.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        Path csvPath = file.toPath();
+        statusLabel.setText("Importing...");
+        new Thread(() -> {
+            try {
+                String message = Router.api().importQuizQuestionsCsv(quizId, csvPath);
+                Platform.runLater(() -> {
+                    statusLabel.setText(message);
+                    load();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> errorLabel.setText("Failed to import: " + describe(e)));
             }
         }).start();
     }

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -20,6 +21,7 @@
             <Button text="&#8592; Back" styleClass="app-btn-light" onAction="#handleBack"/>
             <Label fx:id="titleLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" wrapText="true"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="reportButton" text="&#9873; Report" styleClass="app-btn-light" onAction="#handleToggleReport"/>
             <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
         </HBox>
     </top>
@@ -30,6 +32,14 @@
                     <Insets top="8" right="16" bottom="16" left="16"/>
                 </padding>
                 <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
+
+                <VBox fx:id="reportBox" styleClass="app-composer" spacing="8" visible="false" managed="false">
+                    <Label text="Report this question" style="-fx-font-weight: bold;"/>
+                    <HBox spacing="10">
+                        <TextField fx:id="reportReasonField" promptText="Why are you reporting this question?" styleClass="app-composer-input" HBox.hgrow="ALWAYS"/>
+                        <Button text="Submit report" styleClass="app-btn-danger" onAction="#handleSubmitReport"/>
+                    </HBox>
+                </VBox>
 
                 <VBox fx:id="messagesBox" spacing="14"/>
 

@@ -2,6 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.academicpulse.desktop.controllers.SidebarController"
@@ -27,12 +28,18 @@
     <Button fx:id="analyticsButton" text="Analytics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleAnalytics"/>
     <Button fx:id="quizzesButton" text="Quizzes" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleQuizzes"/>
     <Button fx:id="lecturerMarksButton" text="Student Marks" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleLecturerMarks"/>
+    <Button fx:id="studentTopicsButton" text="Topics" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleStudentTopics"/>
+    <Button fx:id="notificationsButton" text="Notifications" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleNotifications"/>
     <Button text="Settings" maxWidth="Infinity" styleClass="app-nav-btn" onAction="#handleSettings"/>
 
     <Region VBox.vgrow="ALWAYS"/>
 
     <Label fx:id="userNameLabel" styleClass="app-sidebar-user-name"/>
     <Label fx:id="userRoleLabel" styleClass="app-sidebar-user-role"/>
+    <HBox spacing="6">
+        <Button fx:id="lightThemeButton" text="&#9728; Light" styleClass="app-btn-light" onAction="#handleLightTheme" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="darkThemeButton" text="&#9789; Dark" styleClass="app-btn-light" onAction="#handleDarkTheme" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    </HBox>
     <Button text="Logout" maxWidth="Infinity" styleClass="app-logout-btn" onAction="#handleLogout">
         <VBox.margin>
             <Insets top="10"/>

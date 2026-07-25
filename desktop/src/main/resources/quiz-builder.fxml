@@ -76,6 +76,10 @@
                         <Label text="Correct answer (a, b, c or d)"/>
                         <TextField fx:id="correctOptionField" maxWidth="80"/>
                         <Button text="+ Add question" styleClass="app-btn-primary" onAction="#handleAddQuestion"/>
+
+                        <Label text="Or import from CSV" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                        <Label text="Columns: question, option_a, option_b, option_c, option_d, correct_option" style="-fx-text-fill: #71717a; -fx-font-size: 11px;" wrapText="true"/>
+                        <Button text="Choose file &amp; import" styleClass="app-btn-light" onAction="#handleImportCsv"/>
                     </VBox>
                 </GridPane>
             </VBox>

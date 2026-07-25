@@ -24,6 +24,7 @@ public final class Router {
     private static User currentUser;
     private static ScheduledExecutorService liveQuizWatcher;
     private static volatile boolean quizTakeActive = false;
+    private static String theme = "light";
 
     private Router() {
     }
@@ -53,10 +54,29 @@ public final class Router {
         FXMLLoader loader = new FXMLLoader(Router.class.getResource(fxmlPath));
         Parent root = loader.load();
         Scene scene = new Scene(root, 1080, 640);
-        scene.getStylesheets().add(Router.class.getResource("/app.css").toExternalForm());
+        applyTheme(scene);
         stage.setScene(scene);
         stage.setTitle(title);
         return loader.getController();
+    }
+
+    public static String currentTheme() {
+        return theme;
+    }
+
+    /** Switches the theme and immediately restyles the current scene (no re-navigation needed). */
+    public static void setTheme(String newTheme) {
+        theme = newTheme;
+        if (stage != null && stage.getScene() != null) {
+            applyTheme(stage.getScene());
+        }
+    }
+
+    private static void applyTheme(Scene scene) {
+        scene.getStylesheets().setAll(Router.class.getResource("/app.css").toExternalForm());
+        if ("dark".equals(theme)) {
+            scene.getStylesheets().add(Router.class.getResource("/app-dark.css").toExternalForm());
+        }
     }
 
     /**
