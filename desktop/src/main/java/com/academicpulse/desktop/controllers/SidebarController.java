@@ -19,6 +19,7 @@ public class SidebarController {
     @FXML private Button lecturerDashboardButton;
     @FXML private Button lecturerStudentsButton;
     @FXML private Button lecturerMarksButton;
+    @FXML private Button studentDashboardButton;
 
     @FXML
     public void initialize() {
@@ -39,6 +40,10 @@ public class SidebarController {
             lecturerOnlyButton.setVisible(isLecturer);
             lecturerOnlyButton.setManaged(isLecturer);
         }
+
+        boolean isStudent = user != null && "student".equals(user.role);
+        studentDashboardButton.setVisible(isStudent);
+        studentDashboardButton.setManaged(isStudent);
     }
 
     @FXML
@@ -108,6 +113,15 @@ public class SidebarController {
     private void handleLecturerMarks() {
         try {
             Router.navigate("/lecturer-marks.fxml", "Academic Pulse - Student Marks");
+        } catch (Exception ignored) {
+            // nothing sensible to show here; the target screen will report its own load errors
+        }
+    }
+
+    @FXML
+    private void handleStudentDashboard() {
+        try {
+            Router.navigate("/student-dashboard.fxml", "Academic Pulse - Student Dashboard");
         } catch (Exception ignored) {
             // nothing sensible to show here; the target screen will report its own load errors
         }

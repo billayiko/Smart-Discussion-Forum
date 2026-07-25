@@ -122,6 +122,8 @@ public class RegisterController {
                 Router.navigate("/admin-dashboard.fxml", "Academic Pulse - Admin Dashboard");
             } else if ("lecturer".equals(role)) {
                 Router.navigate("/lecturer-dashboard.fxml", "Academic Pulse - Lecturer Dashboard");
+            } else if ("student".equals(role)) {
+                Router.navigate("/student-dashboard.fxml", "Academic Pulse - Student Dashboard");
             } else {
                 Router.navigate("/topics.fxml", "Academic Pulse - Discussion Forum");
             }
