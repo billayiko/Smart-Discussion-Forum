@@ -59,7 +59,7 @@ public class AdminComplaintsController {
 
             {
                 dismissButton.getStyleClass().add("app-btn-light");
-                deleteButton.getStyleClass().add("app-btn-light");
+                deleteButton.getStyleClass().add("app-btn-danger");
                 dismissButton.setOnAction(e -> resolve(rowItem(), "dismiss"));
                 deleteButton.setOnAction(e -> resolve(rowItem(), "delete_question"));
             }
