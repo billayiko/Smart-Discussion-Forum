@@ -162,3 +162,34 @@
     -fx-wrap-text: true;
     -fx-text-alignment: center;
 }
+
+/* Pill status/role tags, matching the web app's pulse-tag badges */
+.app-tag {
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+}
+
+.app-tag-green { -fx-background-color: #dcf7f1; -fx-text-fill: #0f9488; }
+.app-tag-orange { -fx-background-color: #fdecd6; -fx-text-fill: #c46d00; }
+.app-tag-red { -fx-background-color: #fde3e3; -fx-text-fill: #b91c1c; }
+.app-tag-gray { -fx-background-color: #f1f1f5; -fx-text-fill: #6b7280; }
+.app-tag-purple { -fx-background-color: #f1eaff; -fx-text-fill: #7c6ef4; }
+
+/* Small icon-style round action buttons */
+.app-icon-btn {
+    -fx-background-color: #f5f4fb;
+    -fx-text-fill: #7c6ef4;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 999;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+    -fx-cursor: hand;
+}
+
+.app-icon-btn:hover {
+    -fx-background-color: #ede9fe;
+}

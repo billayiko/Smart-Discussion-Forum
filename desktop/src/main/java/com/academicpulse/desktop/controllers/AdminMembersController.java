@@ -28,8 +28,8 @@ public class AdminMembersController {
     @FXML private TableColumn<AdminMember, String> nameColumn;
     @FXML private TableColumn<AdminMember, String> emailColumn;
     @FXML private TableColumn<AdminMember, String> roleColumn;
-    @FXML private TableColumn<AdminMember, String> warningsColumn;
-    @FXML private TableColumn<AdminMember, String> statusColumn;
+    @FXML private TableColumn<AdminMember, AdminMember> warningsColumn;
+    @FXML private TableColumn<AdminMember, AdminMember> statusColumn;
     @FXML private TableColumn<AdminMember, AdminMember> actionsColumn;
 
     @FXML
@@ -37,8 +37,39 @@ public class AdminMembersController {
         nameColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().name));
         emailColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().email));
         roleColumn.setCellValueFactory(row -> new SimpleStringProperty(capitalize(row.getValue().role)));
-        warningsColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().warningCount + " / 2"));
-        statusColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().blacklisted ? "Blacklisted" : "Active"));
+
+        warningsColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
+        warningsColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(AdminMember member, boolean empty) {
+                super.updateItem(member, empty);
+                if (empty || member == null) {
+                    setGraphic(null);
+                    return;
+                }
+                Label tag = new Label(member.warningCount + " / 2");
+                tag.getStyleClass().add("app-tag");
+                tag.getStyleClass().add(member.warningCount == 0 ? "app-tag-gray"
+                        : member.warningCount == 1 ? "app-tag-orange" : "app-tag-red");
+                setGraphic(tag);
+            }
+        });
+
+        statusColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
+        statusColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(AdminMember member, boolean empty) {
+                super.updateItem(member, empty);
+                if (empty || member == null) {
+                    setGraphic(null);
+                    return;
+                }
+                Label tag = new Label(member.blacklisted ? "Blacklisted" : "Active");
+                tag.getStyleClass().add("app-tag");
+                tag.getStyleClass().add(member.blacklisted ? "app-tag-red" : "app-tag-green");
+                setGraphic(tag);
+            }
+        });
 
         actionsColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
         actionsColumn.setCellFactory(col -> new TableCell<>() {
@@ -49,6 +80,8 @@ public class AdminMembersController {
             private final HBox box = new HBox(6, warnButton, blacklistButton, roleCombo);
 
             {
+                warnButton.getStyleClass().add("app-btn-light");
+                blacklistButton.getStyleClass().add("app-btn-light");
                 warnButton.setOnAction(e -> warn(rowItem()));
                 blacklistButton.setOnAction(e -> toggleBlacklist(rowItem()));
                 roleCombo.setOnAction(e -> {

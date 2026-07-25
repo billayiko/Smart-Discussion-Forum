@@ -23,7 +23,7 @@
             <padding>
                 <Insets top="8" right="16" bottom="16" left="16"/>
             </padding>
-            <Label fx:id="statusLabel" style="-fx-text-fill: #7182a8;"/>
+            <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
             <ListView fx:id="topicsListView" VBox.vgrow="ALWAYS"/>
             <Button text="Open Forum" onAction="#handleOpenTopic" maxWidth="Infinity"/>
         </VBox>

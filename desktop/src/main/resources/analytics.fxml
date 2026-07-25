@@ -24,19 +24,19 @@
                 <padding>
                     <Insets top="8" right="16" bottom="16" left="16"/>
                 </padding>
-                <Label fx:id="statusLabel" style="-fx-text-fill: #7182a8;"/>
+                <Label fx:id="statusLabel" style="-fx-text-fill: #71717a;"/>
 
                 <FlowPane fx:id="statsBox" hgap="10" vgap="10"/>
 
                 <HBox spacing="16">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Most Active Students" style="-fx-font-weight: bold;"/>
-                        <Label text="by questions asked" style="-fx-text-fill: #7182a8; -fx-font-size: 11px;"/>
+                        <Label text="by questions asked" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
                         <VBox fx:id="topAskersBox" spacing="4"/>
                     </VBox>
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Most Helpful Repliers" style="-fx-font-weight: bold;"/>
-                        <Label text="by answers given" style="-fx-text-fill: #7182a8; -fx-font-size: 11px;"/>
+                        <Label text="by answers given" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
                         <VBox fx:id="topAnswerersBox" spacing="4"/>
                     </VBox>
                 </HBox>
@@ -44,12 +44,12 @@
                 <HBox spacing="16">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Most Subscribed Topics" style="-fx-font-weight: bold;"/>
-                        <Label text="click a topic for its own statistics" style="-fx-text-fill: #7182a8; -fx-font-size: 11px;"/>
+                        <Label text="click a topic for its own statistics" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
                         <VBox fx:id="topTopicsBox" spacing="4"/>
                     </VBox>
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Lecturers by Workload" style="-fx-font-weight: bold;"/>
-                        <Label text="by topics assigned" style="-fx-text-fill: #7182a8; -fx-font-size: 11px;"/>
+                        <Label text="by topics assigned" style="-fx-text-fill: #71717a; -fx-font-size: 11px;"/>
                         <VBox fx:id="topLecturersBox" spacing="4"/>
                     </VBox>
                 </HBox>

@@ -23,7 +23,7 @@ public class AdminComplaintsController {
     @FXML private TableColumn<AdminComplaint, String> authorColumn;
     @FXML private TableColumn<AdminComplaint, String> reasonColumn;
     @FXML private TableColumn<AdminComplaint, String> reporterColumn;
-    @FXML private TableColumn<AdminComplaint, String> statusColumn;
+    @FXML private TableColumn<AdminComplaint, AdminComplaint> statusColumn;
     @FXML private TableColumn<AdminComplaint, AdminComplaint> actionsColumn;
 
     @FXML
@@ -34,7 +34,22 @@ public class AdminComplaintsController {
                 row.getValue().questionAuthor == null ? "" : row.getValue().questionAuthor));
         reasonColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().reason));
         reporterColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().reporterName));
-        statusColumn.setCellValueFactory(row -> new SimpleStringProperty(capitalize(row.getValue().status)));
+
+        statusColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
+        statusColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(AdminComplaint complaint, boolean empty) {
+                super.updateItem(complaint, empty);
+                if (empty || complaint == null) {
+                    setGraphic(null);
+                    return;
+                }
+                Label tag = new Label(capitalize(complaint.status));
+                tag.getStyleClass().add("app-tag");
+                tag.getStyleClass().add("pending".equals(complaint.status) ? "app-tag-orange" : "app-tag-gray");
+                setGraphic(tag);
+            }
+        });
 
         actionsColumn.setCellValueFactory(row -> new SimpleObjectProperty<>(row.getValue()));
         actionsColumn.setCellFactory(col -> new TableCell<>() {
@@ -43,6 +58,8 @@ public class AdminComplaintsController {
             private final HBox box = new HBox(6, dismissButton, deleteButton);
 
             {
+                dismissButton.getStyleClass().add("app-btn-light");
+                deleteButton.getStyleClass().add("app-btn-light");
                 dismissButton.setOnAction(e -> resolve(rowItem(), "dismiss"));
                 deleteButton.setOnAction(e -> resolve(rowItem(), "delete_question"));
             }

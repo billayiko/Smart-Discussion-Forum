@@ -13,10 +13,10 @@
         </padding>
         <Button text="&#8592; Back" onAction="#handleBack"/>
         <Label text="Academic Pulse Forum" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-        <Label text="Sign in to continue" style="-fx-text-fill: #7182a8;"/>
+        <Label text="Sign in to continue" style="-fx-text-fill: #71717a;"/>
         <TextField fx:id="emailField" promptText="Email"/>
         <PasswordField fx:id="passwordField" promptText="Password"/>
         <Button fx:id="loginButton" text="Log In" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity"/>
-        <Label fx:id="errorLabel" style="-fx-text-fill: #d33333;" wrapText="true"/>
+        <Label fx:id="errorLabel" style="-fx-text-fill: #b91c1c; -fx-font-weight: bold;" wrapText="true"/>
     </VBox>
 </StackPane>
