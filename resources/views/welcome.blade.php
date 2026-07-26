@@ -10,8 +10,8 @@
                 <a href="#features">Features</a>
                 <a href="#why-us">Why Us</a>
                 <a href="#about">About</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#contact">Contact</a>
+                {{-- <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a> --}}
             </nav>
 
             <div class="pulse-tools">
