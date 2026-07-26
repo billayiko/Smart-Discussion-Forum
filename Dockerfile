@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # ---- Frontend assets (Vite/Tailwind) ----
-FROM node:20-alpine AS frontend
+# Debian-based (glibc), not alpine: Tailwind v4/Rollup's native binaries in
+# package.json (@rollup/rollup-linux-x64-gnu, lightningcss, tailwind oxide)
+# are glibc builds and fail to load under alpine's musl libc.
+FROM node:20-bookworm-slim AS frontend
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
