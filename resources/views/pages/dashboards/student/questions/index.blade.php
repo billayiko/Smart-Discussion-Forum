@@ -33,6 +33,7 @@
 
             <main class="pulse-main">
                 @include('pages.dashboards.questions._header', ['title' => 'Discussion Forum', 'subtitle' => 'Open a topic to browse its discussions and ask a question.'])
+                @include('partials._quiz-countdown')
                 @include('pages.dashboards.questions._topic-bubbles')
             </main>
         </div>

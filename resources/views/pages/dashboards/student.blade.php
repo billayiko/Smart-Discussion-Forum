@@ -52,6 +52,8 @@
                     </div>
                 </header>
 
+                @include('partials._quiz-countdown')
+
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>

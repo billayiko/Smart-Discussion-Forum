@@ -14,9 +14,15 @@
             <p style="color:var(--muted); font-weight:650; margin-top:4px;">{{ $quiz->subject }}</p>
 
             @if ($attempt)
-                <div class="notice" style="margin-top:18px; font-size:1rem;">
-                    Score: {{ $attempt->score }} / {{ $attempt->total }} ({{ $pct }}%)
+                <div class="notice" style="margin-top:18px; font-size:1rem; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <span>Score: {{ $attempt->score }} / {{ $attempt->total }} ({{ $pct }}%)</span>
+                    @if ($quiz->canStillSubmit())
+                        <a href="{{ route('quizzes.take', $quiz) }}" class="ap-btn primary"><i class="fas fa-pen"></i> Edit answers</a>
+                    @endif
                 </div>
+                @if ($quiz->canStillSubmit())
+                    <p style="margin-top:8px; color:var(--muted); font-weight:650;"><i class="fas fa-circle-info"></i> You can still change your answers and resubmit until the timer runs out.</p>
+                @endif
                 @if ($attempt->proctoring_violations > 0)
                     <div class="error-list" style="margin-top:12px;">
                         <i class="fas fa-triangle-exclamation"></i> {{ $attempt->proctoring_violations }} proctoring warning(s) were recorded during this attempt.
