@@ -61,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
                 ? Quiz::upcomingFor($user)->map(fn (Quiz $quiz) => [
                     'url' => route('quizzes.take', $quiz),
                     'startsAt' => $quiz->scheduled_at->toIso8601String(),
+                    'title' => $quiz->title,
+                    'subject' => $quiz->subject,
                 ])->values()
                 : collect();
 

@@ -47,6 +47,7 @@ public class ConversationDetailController {
         this.conversationId = conversationId;
         loadConversation();
         startPolling();
+        Router.setActiveConversation(conversationId, this::loadConversation);
     }
 
     @FXML
@@ -270,6 +271,7 @@ public class ConversationDetailController {
     @FXML
     private void handleBack() {
         stopPolling();
+        Router.setActiveConversation(-1, null);
         try {
             Router.navigate("/messages.fxml", "Academic Pulse - Messages");
         } catch (Exception e) {

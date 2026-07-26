@@ -33,7 +33,11 @@ proctored.
 
 ### Messaging
 Direct messages and group conversations between students, lecturers, and
-admins, with membership management on group threads.
+admins, with membership management on group threads and per-message
+exclusion (hide a specific message from specific group members). Delivered
+in realtime via Laravel Reverb (WebSocket) on both the web and desktop
+clients, each falling back to its existing 5s poll (and, on desktop, an
+offline SQLite cache) if the realtime connection is ever unavailable.
 
 ### Moderation
 Automatic inactivity warnings and blacklisting (`members:check-inactivity`,
@@ -103,9 +107,10 @@ php artisan migrate
 npm install
 npm run build      # or `npm run dev` while developing
 php artisan serve
+php artisan reverb:start   # realtime chat — required alongside `serve`, separate process
 ```
 
-Or, in one shot: `composer run setup`.
+Or, in one shot: `composer run setup` (still start `reverb:start` separately).
 
 Visit `http://127.0.0.1:8000`. The registration form asks you to pick a role
 (`student`, `lecturer`, or `admin`) to sign up with directly, or seed sample
@@ -163,6 +168,11 @@ default address) — see `ApiClient`'s constructor in
 `src/main/java/com/academicpulse/desktop/api/ApiClient.java` to change it.
 Log in with any existing web-app user's credentials (student or lecturer —
 admins have no discussion-forum bubbles to browse).
+
+For realtime chat, `php artisan reverb:start` must also be running (see
+above); `RealtimeClient` connects on login and falls back to the existing
+5s poll if it can't reach Reverb, so a missing/stopped Reverb server never
+breaks messaging, it just loses the instant-delivery part.
 
 **Note:** on a fresh machine, the JavaFX runtime must be resolvable via
 Maven the first time (`javafx-maven-plugin` downloads the platform-specific

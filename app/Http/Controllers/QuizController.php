@@ -297,7 +297,10 @@ class QuizController extends Controller
 
         $existingAttempt = QuizAttempt::where('quiz_id', $quiz->id)->where('user_id', $user->id)->first();
 
-        if ($existingAttempt) {
+        // Once a student has submitted, they can still revise their answers
+        // for as long as the quiz's window remains open; only once it's
+        // over does their submission become final.
+        if ($existingAttempt && ! $quiz->canStillSubmit()) {
             return redirect()->route('quizzes.result', $quiz)->with('success', 'You have already submitted this quiz.');
         }
 
@@ -309,14 +312,18 @@ class QuizController extends Controller
 
         $quiz->load('questions');
 
-        return view('quizzes.take', compact('quiz'));
+        $previousAnswers = $existingAttempt->answers ?? [];
+
+        return view('quizzes.take', compact('quiz', 'existingAttempt', 'previousAnswers'));
     }
 
     public function submit(Request $request, Quiz $quiz)
     {
         $user = $request->user();
 
-        if (QuizAttempt::where('quiz_id', $quiz->id)->where('user_id', $user->id)->exists()) {
+        $existingAttempt = QuizAttempt::where('quiz_id', $quiz->id)->where('user_id', $user->id)->first();
+
+        if ($existingAttempt && ! $quiz->canStillSubmit()) {
             return redirect()->route('quizzes.result', $quiz);
         }
 
@@ -326,7 +333,6 @@ class QuizController extends Controller
         $validated = $request->validate([
             'answers' => ['nullable', 'array'],
             'answers.*' => ['nullable', 'in:a,b,c,d'],
-            'violations' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $answers = $validated['answers'] ?? [];
@@ -339,15 +345,15 @@ class QuizController extends Controller
             }
         }
 
-        QuizAttempt::create([
-            'quiz_id' => $quiz->id,
-            'user_id' => $user->id,
-            'score' => $score,
-            'total' => $questions->count(),
-            'answers' => $answers,
-            'proctoring_violations' => $validated['violations'] ?? 0,
-            'submitted_at' => now(),
-        ]);
+        QuizAttempt::updateOrCreate(
+            ['quiz_id' => $quiz->id, 'user_id' => $user->id],
+            [
+                'score' => $score,
+                'total' => $questions->count(),
+                'answers' => $answers,
+                'submitted_at' => now(),
+            ]
+        );
 
         return redirect()->route('quizzes.result', $quiz)->with('success', 'Quiz submitted.');
     }

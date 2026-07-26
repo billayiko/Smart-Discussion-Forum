@@ -52,6 +52,8 @@
                     </div>
                 </header>
 
+                @include('partials._quiz-countdown')
+
                 <section class="pulse-grid pulse-stats">
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
@@ -84,6 +86,9 @@
                                     <span class="pulse-bar-track"><span class="pulse-bar-fill {{ $row->total > 0 ? 'has-value' : '' }}" style="width: {{ $row->pct }}%;"></span></span>
                                     <span class="pulse-bar-value">{{ $row->total }}</span>
                                 </div>
+                                @if ($row->own_average_percent !== null)
+                                    <div class="pulse-bar-subrow">Your average in {{ $row->subject }}: {{ $row->own_average_percent }}%</div>
+                                @endif
                             @empty
                                 <p class="pulse-muted">No quizzes published yet.</p>
                             @endforelse
