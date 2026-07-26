@@ -50,25 +50,6 @@ public class LecturerDashboardController {
     }
 
     @FXML
-    private void handleLogout() {
-        Router.stopLiveQuizWatch();
-        new Thread(() -> {
-            try {
-                Router.api().logout();
-            } catch (Exception ignored) {
-                // token may already be invalid server-side; proceed to login regardless
-            }
-            Router.setCurrentUser(null);
-            Platform.runLater(() -> {
-                try {
-                    Router.navigate("/login.fxml", "Academic Pulse - Login");
-                } catch (Exception ignored) {
-                }
-            });
-        }).start();
-    }
-
-    @FXML
     private void handleSaveCriteria() {
         Integer perQuestion = parseIntOrNull(pointsPerQuestionField.getText());
         Integer perAnswer = parseIntOrNull(pointsPerAnswerField.getText());
