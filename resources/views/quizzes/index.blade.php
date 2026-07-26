@@ -133,7 +133,7 @@
                 </div>
 
                 <div style="margin-top:18px;">
-                    {{ $quizzes->links() }}
+                    @include('partials._pagination', ['paginator' => $quizzes])
                 </div>
             </main>
         </div>
