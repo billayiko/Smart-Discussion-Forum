@@ -67,7 +67,7 @@
                     </article>
                     <article class="pulse-card pulse-stat">
                         <span class="pulse-stat-icon orange"><i class="fas fa-calendar"></i></span>
-                        <span><small>Upcoming Classes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">{{ $stats['next_class'] ? 'Next '.$stats['next_class']->scheduled_at->diffForHumans() : 'None scheduled' }}</span></span>
+                        <span><small>Upcoming Quizes</small><b>{{ $stats['upcoming_classes'] }}</b><span class="pulse-trend">{{ $stats['next_class'] ? 'Next '.$stats['next_class']->scheduled_at->diffForHumans() : 'None scheduled' }}</span></span>
                     </article>
                 </section>
 
