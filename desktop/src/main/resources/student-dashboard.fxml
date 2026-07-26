@@ -24,7 +24,6 @@
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="&#8635; Refresh" styleClass="app-btn-light" onAction="#handleRefresh"/>
-            <Button text="Logout" styleClass="app-logout-btn" onAction="#handleLogout"/>
         </HBox>
     </top>
     <center>
