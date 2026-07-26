@@ -1,5 +1,12 @@
 # syntax=docker/dockerfile:1
 
+# ---- Composer deps (needed by the frontend stage too: resources/css/app.css
+# imports vendor/livewire/flux/dist/flux.css, so Vite can't build without it) ----
+FROM composer:2 AS composer-deps
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --ignore-platform-reqs
+
 # ---- Frontend assets (Vite/Tailwind) ----
 # Debian-based (glibc), not alpine: Tailwind v4/Rollup's native binaries in
 # package.json (@rollup/rollup-linux-x64-gnu, lightningcss, tailwind oxide)
@@ -11,6 +18,7 @@ RUN npm ci
 COPY vite.config.js ./
 COPY resources ./resources
 COPY public ./public
+COPY --from=composer-deps /app/vendor ./vendor
 RUN npm run build
 
 # ---- PHP application ----
