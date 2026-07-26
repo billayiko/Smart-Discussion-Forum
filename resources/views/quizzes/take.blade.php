@@ -30,8 +30,8 @@
                         <label style="font-size:.92rem; color:var(--text); margin-bottom:10px;">{{ $index + 1 }}. {{ $question->question }}</label>
                         <div style="display:grid; gap:8px; margin-top:8px;">
                             @foreach ($question->options() as $letter => $text)
-                                <label style="display:block; padding:12px 14px; border:2px solid var(--line); border-radius:12px; cursor:pointer; font-weight:600; text-align:left;">
-                                    <input type="radio" name="answers[{{ $question->id }}]" value="{{ $letter }}" style="margin-right:10px; vertical-align:middle;" @checked(($previousAnswers[$question->id] ?? null) === $letter) required>
+                                <label style="display:block; padding:12px 14px; border:2px solid var(--line); border-radius:12px; cursor:pointer; font-weight:600; font-size:1rem; text-align:left;">
+                                    <input type="radio" name="answers[{{ $question->id }}]" value="{{ $letter }}" style="width:1em; height:1em; margin-right:10px; vertical-align:middle; accent-color:var(--pulse-blue, #7c6ef4);" @checked(($previousAnswers[$question->id] ?? null) === $letter) required>
                                     {{ strtoupper($letter) }}. {{ $text }}
                                 </label>
                             @endforeach
