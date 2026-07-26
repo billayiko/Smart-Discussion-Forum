@@ -239,23 +239,58 @@
         }
 
         .pulse-page[data-theme="dark"] {
-            --pulse-blue: #9b8afb;
-            --pulse-blue-soft: #2b2650;
-            --pulse-purple: #b79cf7;
-            --pulse-green: #2dd4bf;
-            --pulse-orange: #f5c283;
-            --pulse-cyan: #f472b6;
-            --pulse-ink: #f2f0fa;
-            --pulse-muted: #9691ad;
-            --pulse-line: rgba(255, 255, 255, .12);
-            --pulse-card: rgba(30, 27, 46, .82);
-            --pulse-shadow: 0 24px 70px rgba(0, 0, 0, .4);
+            --pulse-blue: #4f7df3;
+            --pulse-blue-soft: #1c2b5e;
+            --pulse-purple: #9b8afb;
+            --pulse-purple-soft: #241f4d;
+            --pulse-green: #34d399;
+            --pulse-green-soft: #123526;
+            --pulse-orange: #f5b25e;
+            --pulse-orange-soft: #46310f;
+            --pulse-cyan: #38bdf8;
+            --pulse-cyan-soft: #103349;
+            --pulse-ink: #eef1fb;
+            --pulse-muted: #8b93bb;
+            --pulse-line: rgba(255, 255, 255, .08);
+            --pulse-card: #161f45;
+            --pulse-panel: rgba(255, 255, 255, .05);
+            --pulse-panel-line: rgba(255, 255, 255, .08);
+            --pulse-track: rgba(255, 255, 255, .1);
+            --pulse-nav-ink: #9aa4c9;
+            --pulse-shadow: 0 24px 60px rgba(0, 0, 0, .45);
             background:
-                radial-gradient(circle at 12% 18%, rgba(155,138,251,.18) 0%, transparent 26%),
-                radial-gradient(circle at 88% 12%, rgba(45,212,191,.16) 0%, transparent 28%),
-                radial-gradient(circle at 28% 82%, rgba(244,114,182,.16) 0%, transparent 30%),
-                #13111f;
+                radial-gradient(circle at 15% 15%, rgba(79,125,243,.14) 0%, transparent 30%),
+                #0b1330;
         }
+
+        .pulse-page[data-theme="dark"] .pulse-sidebar { background: #0d1638; border-right-color: rgba(255, 255, 255, .06); }
+        .pulse-page[data-theme="dark"] .pulse-menu { background: var(--pulse-panel); border-color: var(--pulse-panel-line); }
+        .pulse-page[data-theme="dark"] .pulse-user,
+        .pulse-page[data-theme="dark"] .pulse-theme-panel,
+        .pulse-page[data-theme="dark"] .pulse-search,
+        .pulse-page[data-theme="dark"] .pulse-select,
+        .pulse-page[data-theme="dark"] .pulse-icon-btn,
+        .pulse-page[data-theme="dark"] .pulse-row,
+        .pulse-page[data-theme="dark"] .pulse-mini,
+        .pulse-page[data-theme="dark"] .pulse-resource,
+        .pulse-page[data-theme="dark"] .pulse-input {
+            background: var(--pulse-panel);
+            border-color: var(--pulse-panel-line);
+        }
+        .pulse-page[data-theme="dark"] .pulse-card { border-color: var(--pulse-panel-line); }
+        .pulse-page[data-theme="dark"] .pulse-stat-icon.purple { background: var(--pulse-purple-soft); }
+        .pulse-page[data-theme="dark"] .pulse-stat-icon.green { background: var(--pulse-green-soft); }
+        .pulse-page[data-theme="dark"] .pulse-stat-icon.orange { background: var(--pulse-orange-soft); }
+        .pulse-page[data-theme="dark"] .pulse-stat-icon.cyan { background: var(--pulse-cyan-soft); }
+        .pulse-page[data-theme="dark"] .pulse-tag.green { color: #4ade80; background: var(--pulse-green-soft); }
+        .pulse-page[data-theme="dark"] .pulse-tag.orange { color: #fbbf24; background: var(--pulse-orange-soft); }
+        .pulse-page[data-theme="dark"] .pulse-tag.gray { color: #9aa4c9; background: var(--pulse-panel); }
+        .pulse-page[data-theme="dark"] .pulse-progress,
+        .pulse-page[data-theme="dark"] .pulse-bar-track { background: var(--pulse-track); }
+        .pulse-page[data-theme="dark"] .pulse-table td { color: #c7cde8; }
+        .pulse-page[data-theme="dark"] .pulse-avatar { background: linear-gradient(135deg, var(--pulse-blue), #3457c7); }
+        .pulse-page[data-theme="dark"] .pulse-logo i { box-shadow: 0 12px 28px rgba(79, 125, 243, .35); }
+        .pulse-page[data-theme="dark"] .pulse-btn { box-shadow: 0 14px 30px rgba(79, 125, 243, .28); }
 
         .pulse-page > * {
             position: relative;
@@ -312,7 +347,7 @@
             gap: 11px;
             padding: 0 12px;
             border-radius: 10px;
-            color: #52525b;
+            color: var(--pulse-nav-ink, #52525b);
             font-size: .84rem;
             font-weight: 750;
             transition: background .2s ease, color .2s ease, transform .2s ease;
@@ -961,6 +996,10 @@
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
             padding: 28px;
+        }
+
+        .pulse-proof-card .pulse-stat-icon {
+            margin: 0 auto;
         }
 
         .pulse-proof-card strong {
