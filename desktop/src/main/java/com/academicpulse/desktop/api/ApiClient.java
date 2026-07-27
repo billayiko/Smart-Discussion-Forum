@@ -61,7 +61,7 @@ import java.util.UUID;
  * new content still requires connectivity.</p>
  */
 public class ApiClient {
-    private static final String DEFAULT_BASE_URL = "http://127.0.0.1:8000/api";
+    private static final String DEFAULT_BASE_URL = "https://academic-pulse-forum.onrender.com/api";
 
     private final String baseUrl;
     private final HttpClient httpClient;
