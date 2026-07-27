@@ -56,7 +56,7 @@
                 <p>Join meaningful discussions and share ideas.</p>
             </article>
             <article class="pulse-card pulse-feature">
-                <span class="pulse-stat-icon"><i class="fas fa-shield-halved"></i></span>
+                <span class="pulse-stat-icon"><i class="fas fa-clipboard-question"></i></span>
                 <h2>Take Quizzes</h2>
                 <p>Assess your knowledge with interactive quizzes.</p>
             </article>
