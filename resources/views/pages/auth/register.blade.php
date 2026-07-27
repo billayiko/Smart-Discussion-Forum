@@ -51,6 +51,7 @@
                             <option value="">Select your role</option>
                             <option value="student" @selected(old('role') === 'student')>Student</option>
                             <option value="lecturer" @selected(old('role') === 'lecturer')>Lecturer</option>
+                            <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                         </select>
                     </span>
                 </label>
