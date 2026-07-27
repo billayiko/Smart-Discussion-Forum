@@ -13,7 +13,7 @@ class QuestionController extends Controller
     {
         $questions = Question::with(['user', 'topic'])
             ->withCount('answers')
-            ->orderByRaw('answers_count = 0 desc')
+            ->orderByRaw('(select count(*) from answers where answers.question_id = questions.id) = 0 desc')
             ->latest()
             ->get();
 

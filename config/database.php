@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -34,8 +34,12 @@ return [
 
         'sqlite' => [
             'driver' => 'sqlite',
-            'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            // No env('DB_URL')/env('DB_DATABASE') here on purpose: those are set
+            // for the primary pgsql connection, and since every connection array
+            // reads the same env vars, reusing them here would make this
+            // connection silently point at Postgres too. This connection is only
+            // used for the old local sqlite file now, so its path is fixed.
+            'database' => database_path('database.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,
