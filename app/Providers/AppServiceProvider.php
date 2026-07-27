@@ -8,6 +8,7 @@ use App\Notifications\MembershipWarning;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -101,6 +102,13 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureDefaults(): void
     {
+        // Belt-and-suspenders alongside trustProxies() in bootstrap/app.php:
+        // guarantees url()/asset()/route() never emit http:// on Render, even
+        // if a request somehow arrives without the expected forwarded-proto header.
+        if ($this->app->isProduction()) {
+            URL::forceScheme('https');
+        }
+
         Date::use(CarbonImmutable::class);
 
         DB::prohibitDestructiveCommands(
