@@ -27,7 +27,7 @@ RUN npm run build
 FROM php:8.4-apache AS app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libzip-dev libpng-dev libonig-dev libxml2-dev libpq-dev unzip git \
+        libzip-dev libpng-dev libonig-dev libxml2-dev libpq-dev libsqlite3-dev unzip git \
     && docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite mbstring bcmath zip exif pcntl \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
