@@ -22,7 +22,9 @@ COPY --from=composer-deps /app/vendor ./vendor
 RUN npm run build
 
 # ---- PHP application ----
-FROM php:8.3-apache AS app
+# symfony/* (pulled in transitively by laravel/framework) is locked to the
+# 8.1.x line, which requires PHP >=8.4.1 — php:8.3-apache is too old for it.
+FROM php:8.4-apache AS app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libzip-dev libpng-dev libonig-dev libxml2-dev libpq-dev unzip git \
