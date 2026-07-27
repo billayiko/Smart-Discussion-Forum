@@ -10,8 +10,13 @@ if [ -z "$APP_KEY" ]; then
     echo "WARNING: APP_KEY is not set. Generate one locally with 'php artisan key:generate --show' and set it in your host's environment variables."
 fi
 
-mkdir -p database
-touch database/database.sqlite
+# Only bootstrap a SQLite file when actually using the sqlite driver — on
+# Postgres (DB_CONNECTION=pgsql + DB_URL set), this would just leave behind
+# an unused, empty database.sqlite that nothing reads from.
+if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
+    mkdir -p database
+    touch database/database.sqlite
+fi
 
 php artisan migrate --force --no-interaction || echo "WARNING: migrations failed to run."
 

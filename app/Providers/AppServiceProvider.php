@@ -115,14 +115,12 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
+        // At least 8 characters, 1 uppercase, 1 lowercase, and 1 digit or
+        // symbol. Applied in every environment (previously this policy only
+        // ran in production, so local/dev accepted any password at all).
+        Password::defaults(fn (): Password => Password::min(8)
+            ->mixedCase()
+            ->rules(['regex:/[^A-Za-z]/']),
         );
     }
 }
