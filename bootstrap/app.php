@@ -19,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Render (and Cloudflare in front of it) terminates TLS and forwards
+        // requests to the container over plain HTTP, so without trusting the
+        // proxy, Request::isSecure() is always false and url()/asset()/route()
+        // emit http:// links on an https:// page (mixed content).
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             SetTeamUrlDefaults::class,
             EnsureUserIsNotBlacklisted::class,
