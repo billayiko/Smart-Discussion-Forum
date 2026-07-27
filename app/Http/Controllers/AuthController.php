@@ -30,7 +30,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             ...$this->profileRules(),
-            'role' => ['required', 'string', 'in:student,lecturer'],
+            'role' => ['required', 'string', 'in:student,lecturer,admin'],
             'password' => $this->passwordRules(),
             'rules_agreement' => ['required', 'accepted'],
             'security_question' => $this->securityQuestionRules(),
