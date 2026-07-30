@@ -8,6 +8,7 @@ use App\Notifications\MembershipWarning;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -101,20 +102,25 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureDefaults(): void
     {
+        // Belt-and-suspenders alongside trustProxies() in bootstrap/app.php:
+        // guarantees url()/asset()/route() never emit http:// on Render, even
+        // if a request somehow arrives without the expected forwarded-proto header.
+        if ($this->app->isProduction()) {
+            URL::forceScheme('https');
+        }
+
         Date::use(CarbonImmutable::class);
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
+        // At least 8 characters, 1 uppercase, 1 lowercase, and 1 digit or
+        // symbol. Applied in every environment (previously this policy only
+        // ran in production, so local/dev accepted any password at all).
+        Password::defaults(fn (): Password => Password::min(8)
+            ->mixedCase()
+            ->rules(['regex:/[^A-Za-z]/']),
         );
     }
 }

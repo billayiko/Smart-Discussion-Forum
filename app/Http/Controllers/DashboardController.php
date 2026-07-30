@@ -174,7 +174,7 @@ class DashboardController extends Controller
     {
         $recentQuestions = Question::with(['user', 'topic'])
             ->withCount('answers')
-            ->orderByRaw('answers_count = 0 desc')
+            ->orderByRaw('(select count(*) from answers where answers.question_id = questions.id) = 0 desc')
             ->latest()
             ->take(4)
             ->get();

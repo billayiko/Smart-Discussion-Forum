@@ -30,7 +30,7 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
-            'role' => ['required', 'string', 'in:student,lecturer'],
+            'role' => ['required', 'string', 'in:student,lecturer,admin'],
             'password' => $this->passwordRules(),
             'rules_agreement' => ['required', 'accepted'],
             'security_question' => $this->securityQuestionRules(),

@@ -42,7 +42,7 @@ public class RegisterController {
 
     @FXML
     public void initialize() {
-        roleCombo.getItems().addAll("Student", "Lecturer");
+        roleCombo.getItems().addAll("Student", "Lecturer", "Admin");
 
         for (Map.Entry<String, String> entry : SECURITY_QUESTIONS.entrySet()) {
             RadioButton radio = new RadioButton(entry.getValue());
