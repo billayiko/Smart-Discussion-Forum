@@ -32,7 +32,9 @@
 
             <div>
                 <h1>Welcome to<span>Academic Pulse Forum</span></h1>
-                <p>Your central hub for lectures, discussions, quizzes, and academic collaboration.</p>
+                <p>Academic Pulse Forum brings your course discussions, quizzes, and messaging into
+                    one place — organized by topic, and tailored to your role as a student, lecturer,
+                    or admin.</p>
                 <div class="pulse-hero-actions">
                     @if (Route::has('register'))
                         <a class="pulse-btn" href="{{ url('/register') }}">Get Started</a>
@@ -46,49 +48,53 @@
 
         <section class="pulse-feature-grid" id="features" aria-label="Platform features">
             <article class="pulse-card pulse-feature">
-                <span class="pulse-stat-icon"><i class="fas fa-lightbulb"></i></span>
-                <h2>Smart Learning</h2>
-                <p>Access lectures and resources anytime, anywhere.</p>
+                <span class="pulse-stat-icon"><i class="fas fa-layer-group"></i></span>
+                <h2>Topic-Scoped Discussions</h2>
+                <p>Ask and answer questions inside the exact course topic they belong to — no
+                    digging through unrelated threads.</p>
             </article>
             <article class="pulse-card pulse-feature">
-                <span class="pulse-stat-icon purple"><i class="fas fa-calendar-check"></i></span>
-                <h2>Engage & Discuss</h2>
-                <p>Join meaningful discussions and share ideas.</p>
+                <span class="pulse-stat-icon purple"><i class="fas fa-gauge-high"></i></span>
+                <h2>Role-Based Dashboards</h2>
+                <p>Students, lecturers, and admins each get a dashboard built around what they
+                    actually need to do.</p>
             </article>
             <article class="pulse-card pulse-feature">
-                <span class="pulse-stat-icon"><i class="fas fa-clipboard-question"></i></span>
-                <h2>Take Quizzes</h2>
-                <p>Assess your knowledge with interactive quizzes.</p>
+                <span class="pulse-stat-icon green"><i class="fas fa-clipboard-question"></i></span>
+                <h2>Quizzes & Assessments</h2>
+                <p>Create, schedule, and take quizzes tied directly to a course topic, with instant
+                    results and tracking.</p>
             </article>
             <article class="pulse-card pulse-feature">
-                <span class="pulse-stat-icon purple"><i class="fas fa-star"></i></span>
-                <h2>Track Progress</h2>
-                <p>Monitor learning and achievement effortlessly.</p>
+                <span class="pulse-stat-icon cyan"><i class="fas fa-bolt"></i></span>
+                <h2>Realtime Messaging</h2>
+                <p>Direct and group chat delivered instantly, with automatic fallback so you're
+                    never left waiting.</p>
             </article>
         </section>
 
         <section class="pulse-proof" id="why-us">
-            <p>Trusted by students and educators worldwide</p>
+            <p>Why students and lecturers choose Academic Pulse Forum</p>
             <div class="pulse-card pulse-proof-card">
                 <div>
-                    <span class="pulse-stat-icon"><i class="fas fa-users"></i></span>
-                    <strong>1,200+</strong>
-                    <span>Students</span>
+                    <span class="pulse-stat-icon"><i class="fas fa-compass"></i></span>
+                    <strong>One Place</strong>
+                    <span>Lectures, discussions, quizzes, and messaging under a single login</span>
                 </div>
                 <div>
-                    <span class="pulse-stat-icon"><i class="fas fa-book-open"></i></span>
-                    <strong>150+</strong>
-                    <span>Lectures</span>
+                    <span class="pulse-stat-icon purple"><i class="fas fa-bolt"></i></span>
+                    <strong>Always in Sync</strong>
+                    <span>WebSocket-powered updates, with automatic offline fallback</span>
                 </div>
                 <div>
-                    <span class="pulse-stat-icon"><i class="fas fa-comments"></i></span>
-                    <strong>320+</strong>
-                    <span>Discussions</span>
+                    <span class="pulse-stat-icon green"><i class="fas fa-shield-halved"></i></span>
+                    <strong>Actively Moderated</strong>
+                    <span>Automatic inactivity checks and admin-reviewed reports keep things civil</span>
                 </div>
                 <div>
-                    <span class="pulse-stat-icon"><i class="fas fa-star"></i></span>
-                    <strong>98%</strong>
-                    <span>Satisfaction</span>
+                    <span class="pulse-stat-icon cyan"><i class="fas fa-desktop"></i></span>
+                    <strong>Web & Desktop</strong>
+                    <span>Use it in the browser or the native desktop client — same account, same data</span>
                 </div>
             </div>
         </section>

@@ -135,6 +135,25 @@ composer types:check  # Larastan/PHPStan
 - `members:check-inactivity` — warns, then blacklists, inactive members
   per the thresholds in `ModerationSetting`.
 
+## Docker
+
+A production-style image is defined in the `Dockerfile` (multi-stage:
+Composer deps → Vite/Tailwind asset build on `node:20-bookworm-slim` →
+`php:8.4-apache` runtime). It bakes in a SQLite database by default.
+
+```bash
+docker build -t academic-pulse-forum .
+docker run -p 8080:80 -e APP_KEY="base64:...(from `php artisan key:generate --show`)" academic-pulse-forum
+```
+
+`docker-entrypoint.sh` runs on container start: it binds Apache to `$PORT`
+(defaults to `80`, matching what most container hosts like Render inject at
+runtime), warns if `APP_KEY` isn't set, ensures `database/database.sqlite`
+exists, and runs `php artisan migrate --force` before handing off to
+`apache2-foreground`. Realtime chat (`reverb:start`) isn't part of this
+image — run it as a separate process/container if you need it in a
+containerized deployment.
+
 ## REST API (for the desktop client)
 
 Base path: `/api`. Authentication is via Laravel Sanctum bearer tokens —
