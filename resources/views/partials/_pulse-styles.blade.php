@@ -1099,6 +1099,19 @@
             background: #ffb86b;
         }
 
+        .pulse-illustration--login {
+            background: none;
+            background-image: url('{{ asset('images/auth/login-illustration.svg') }}');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        .pulse-illustration--login::before,
+        .pulse-illustration--login::after {
+            content: none;
+        }
+
         .pulse-auth-card {
             width: min(640px, 100%);
             justify-self: center;

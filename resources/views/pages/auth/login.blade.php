@@ -11,7 +11,7 @@
                 <p>Sign in to continue your learning journey.</p>
             </div>
 
-            <div class="pulse-illustration" aria-hidden="true"></div>
+            <div class="pulse-illustration pulse-illustration--login" aria-hidden="true"></div>
         </section>
 
         <section class="pulse-card pulse-auth-card">
